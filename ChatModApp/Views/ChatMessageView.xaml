@@ -1,0 +1,26 @@
+﻿<local:ChatMessageViewBase
+    x:Class="ChatModApp.Views.ChatMessageView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:ChatModApp.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:ChatModApp.ViewModels"
+    d:DataContext="{d:DesignInstance Type=viewmodels:ChatMessageViewModel}"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Name="Username" FontWeight="Bold" />
+        <TextBlock Name="Message" Grid.Column="1" />
+    </Grid>
+</local:ChatMessageViewBase>
