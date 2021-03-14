@@ -8,16 +8,13 @@ namespace ChatModApp.ViewModels
     {
         public RoutingState Router { get; }
 
-        public readonly ChatViewModel ChatViewModel;
-
-        public MainViewModel(ChatViewModel chatViewModel, AuthenticationViewModel authenticationViewModel)
+        public MainViewModel(ChatTabViewModel chatTabViewModel, AuthenticationViewModel authenticationViewModel)
         {
-            ChatViewModel = chatViewModel;
-
             Router = new RoutingState();
             authenticationViewModel.HostScreen = this;
 
-            Router.NavigateAndReset.Execute(authenticationViewModel).Subscribe();
+            Router.NavigateAndReset.Execute(chatTabViewModel).Subscribe();
+            //Router.NavigateAndReset.Execute(authenticationViewModel).Subscribe();
         }
     }
 }

@@ -153,9 +153,6 @@
     <Compile Include="Views\ChatTabView.xaml.cs">
       <DependentUpon>ChatTabView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ChatTabItemView.xaml.cs">
-      <DependentUpon>ChatTabItemView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\ChatView.xaml.cs">
       <DependentUpon>ChatView.xaml</DependentUpon>
     </Compile>
@@ -195,10 +192,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ChatTabItemView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\ChatView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -220,10 +213,10 @@
       <Version>7.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting">
-      <Version>6.0.0-preview.1.21102.12</Version>
+      <Version>6.0.0-preview.2.21154.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging">
-      <Version>6.0.0-preview.1.21102.12</Version>
+      <Version>6.0.0-preview.2.21154.6</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.12</Version>
@@ -256,7 +249,7 @@
       <Version>10.0.1</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">
-      <Version>3.2.2-preview-f48b03412b56f4311091238735df64033d8a7514</Version>
+      <Version>3.2.2</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Client">
       <Version>3.2.2-preview-fad69ab15afcde6e74c178736b666a6cad9381d3</Version>

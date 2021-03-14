@@ -30,6 +30,7 @@ namespace ChatModApp.ViewModels
                 _chatTabs.Add(newTab);
             });
 
+
             _chatTabs = new ObservableCollectionExtended<ChatTabItemViewModel>();
             _chatTabs
                 .ToObservableChangeSet()

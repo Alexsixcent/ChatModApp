@@ -6,10 +6,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:viewModels="using:ChatModApp.ViewModels"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <muxc:TabView Name="TabView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <muxc:TabView Name="TabView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <muxc:TabView.TabItemTemplate>
+                <DataTemplate x:DataType="viewModels:ChatTabItemViewModel">
+                    <muxc:TabViewItem Header="{x:Bind Title}">
+                        <local:ChatView ViewModel="{x:Bind Chat}"/>
+                    </muxc:TabViewItem>
+                </DataTemplate>
+            </muxc:TabView.TabItemTemplate>
+        </muxc:TabView>
     </Grid>
 </local:ChatTabViewBase>

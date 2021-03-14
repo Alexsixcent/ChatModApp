@@ -1,4 +1,8 @@
-﻿using System.Reactive.Disposables;
+﻿using System;
+using System.Reactive;
+using System.Reactive.Disposables;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using ChatModApp.ViewModels;
 using ReactiveUI;
 
@@ -23,7 +27,7 @@ namespace ChatModApp.Views
                 this.OneWayBind(ViewModel, vm => vm.ChatTabs, v => v.TabView.TabItemsSource)
                     .DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.AddTabCommand, v => v.TabView.AddTabButtonCommand)
+                this.OneWayBind(ViewModel, vm => vm.AddTabCommand, v => v.TabView.AddTabButtonCommand)
                     .DisposeWith(disposables);
             });
         }
