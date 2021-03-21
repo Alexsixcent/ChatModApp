@@ -13,8 +13,8 @@ namespace ChatModApp.ViewModels
             Router = new RoutingState();
             authenticationViewModel.HostScreen = this;
 
-            Router.NavigateAndReset.Execute(chatTabViewModel).Subscribe();
-            //Router.NavigateAndReset.Execute(authenticationViewModel).Subscribe();
+            //Router.NavigateAndReset.Execute(chatTabViewModel).Subscribe();
+            Router.NavigateAndReset.Execute(authenticationViewModel).Subscribe();
         }
     }
 }

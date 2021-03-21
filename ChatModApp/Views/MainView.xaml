@@ -11,8 +11,6 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-
         <reactiveUi:RoutedViewHost Name="RoutedViewHost"/>
-
     </Grid>
 </views:MainViewBase>

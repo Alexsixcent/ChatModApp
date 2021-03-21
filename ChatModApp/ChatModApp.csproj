@@ -133,6 +133,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Converters\GenericConverter.cs" />
+    <Compile Include="Models\TwitchAuthResponseType.cs" />
+    <Compile Include="Models\TwitchAuthScope.cs" />
+    <Compile Include="Models\TwitchAuthQueryParams.cs" />
+    <Compile Include="Services\AuthenticationService.cs" />
+    <Compile Include="Services\IAuthApi.cs" />
     <Compile Include="Tools\AkavacheSuspensionDriver.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -222,7 +227,7 @@
       <Version>6.2.12</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.6.0-prerelease.210227001</Version>
+      <Version>2.6.0-prerelease.210315002</Version>
     </PackageReference>
     <PackageReference Include="NLog">
       <Version>4.7.8</Version>
@@ -235,6 +240,12 @@
     </PackageReference>
     <PackageReference Include="ReactiveUI.Fody">
       <Version>13.2.2</Version>
+    </PackageReference>
+    <PackageReference Include="Refit">
+      <Version>6.0.38</Version>
+    </PackageReference>
+    <PackageReference Include="Refit.HttpClientFactory">
+      <Version>6.0.38</Version>
     </PackageReference>
     <PackageReference Include="Splat">
       <Version>10.0.1</Version>
@@ -249,15 +260,13 @@
       <Version>10.0.1</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">
-      <Version>3.2.2</Version>
+      <Version>3.2.3-preview-763492b669e9a024be47d6c0a0feaac62db1042a</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Client">
       <Version>3.2.2-preview-fad69ab15afcde6e74c178736b666a6cad9381d3</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="..\Tools\Tools.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
