@@ -1,56 +1,44 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive;
 using Windows.UI.Xaml.Controls;
+using ChatModApp.Models;
+using ChatModApp.Services;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using Tools.Extensions;
 
 namespace ChatModApp.ViewModels
 {
     public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel
     {
-        public IScreen HostScreen { get; set; }
+        public IScreen? HostScreen { get; set; }
         public string UrlPathSegment { get; } = Guid.NewGuid().ToString().Substring(0, 5);
 
-        [Reactive] public Uri AuthUri { get; private set; }
-        public readonly ReactiveCommand<WebViewNavigationCompletedEventArgs, Unit> AuthCompleteCommand;
+        public Uri AuthUri { get; }
+        public readonly ReactiveCommand<WebViewNavigationStartingEventArgs, Unit> AuthCompleteCommand;
 
 
-        private const string ClientId = "110gs3dzgr2bj3ask88vqi7mnczk02";
-        private const string RedirectUri = "http://localhost";
+        private readonly AuthenticationService _authService;
+        private readonly ChatTabViewModel _chatTabs;
+        private readonly TwitchAuthQueryParams _queryParams;
 
-        private ChatTabViewModel _chatTab;
 
-        public AuthenticationViewModel(ChatTabViewModel chatTab)
+        public AuthenticationViewModel(AuthenticationService authService, ChatTabViewModel chatTabs)
         {
-            _chatTab = chatTab;
-            AuthCompleteCommand = ReactiveCommand.Create<WebViewNavigationCompletedEventArgs>(AuthComplete);
-            AuthUri = GenerateAuthUri();
+            _authService = authService;
+            _chatTabs = chatTabs;
+            AuthCompleteCommand = ReactiveCommand.Create<WebViewNavigationStartingEventArgs>(AuthComplete);
+
+            (AuthUri, _queryParams) = authService.GenerateAuthUri();
         }
 
-        private Uri GenerateAuthUri()
-        {
-            return new Uri("https://id.twitch.tv/oauth2/authorize")
-                .AddQuery("client_id", ClientId)
-                .AddQuery("redirect_uri", RedirectUri)
-                .AddQuery("response_type", "token")
-                .AddQuery("scope", "viewing_activity_read")
-                .AddQuery("state", Guid.NewGuid().ToString());
-        }
 
-        private void AuthComplete(WebViewNavigationCompletedEventArgs args)
+        private void AuthComplete(WebViewNavigationStartingEventArgs args)
         {
-            if (!args.IsSuccess || args.Uri.Host != "localhost") 
+            if (!_authService.AuthFromCallbackUri(args.Uri))
                 return;
-            
-            var segments = args.Uri.ToString().Split('/');
-            var accessToken = segments.Last().Split('&').First().TrimStart("#access_token=");
 
-            RxApp.SuspensionHost.GetAppState<AppState>().TwitchAccessToken = accessToken;
-
-            _chatTab.HostScreen = HostScreen;
-            HostScreen.Router.NavigateAndReset.Execute(_chatTab).Subscribe();
+            args.Cancel = true;
+            _chatTabs.HostScreen = HostScreen;
+            HostScreen.Router.NavigateAndReset.Execute(_chatTabs).Subscribe();
         }
     }
 }

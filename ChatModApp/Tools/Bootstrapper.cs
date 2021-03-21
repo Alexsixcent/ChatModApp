@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging.EventLog;
 using ReactiveUI;
+using Refit;
 using Splat;
 using Splat.Microsoft.Extensions.DependencyInjection;
 using Splat.Microsoft.Extensions.Logging;
@@ -73,9 +74,11 @@ namespace ChatModApp.Tools
             resolver.InitializeReactiveUI();
             resolver.UseNLogWithWrappingFullLogger();
             
-
             resolver.RegisterViewsForViewModels(Assembly.GetExecutingAssembly(), "ChatModApp.Views");
-            
+
+            services.AddRefitClient<IAuthApi>()
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://id.twitch.tv"));
+
             services
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<AuthenticationViewModel>()
@@ -83,6 +86,7 @@ namespace ChatModApp.Tools
                 .AddTransient<ChatViewModel>()
                 .AddTransient<ChatTabItemViewModel>()
 
+                .AddSingleton<AuthenticationService>()
                 .AddSingleton<TwitchChatService>();
         }
     }

@@ -25,7 +25,7 @@ namespace ChatModApp.Views
                     .DisposeWith(disposable);
 
                 AuthWebView.Events()
-                    .NavigationCompleted
+                    .NavigationStarting
                     .Select(args => args.args)
                     .InvokeCommand(ViewModel.AuthCompleteCommand)
                     .DisposeWith(disposable);
