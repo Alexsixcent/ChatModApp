@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using ChatModApp.Models;
 using ChatModApp.Services;

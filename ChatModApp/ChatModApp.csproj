@@ -217,6 +217,9 @@
     <PackageReference Include="DynamicData">
       <Version>7.1.1</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection">
+      <Version>6.0.0-preview.2.21154.6</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting">
       <Version>6.0.0-preview.2.21154.6</Version>
     </PackageReference>

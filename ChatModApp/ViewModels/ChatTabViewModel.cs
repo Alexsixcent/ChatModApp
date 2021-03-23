@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using ChatModApp.Services;
 using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -18,8 +19,11 @@ namespace ChatModApp.ViewModels
         public ReactiveCommand<ChatTabItemViewModel, Unit> CloseTabCommand { get; }
         public ObservableCollectionExtended<ChatTabItemViewModel> ChatTabs { get; }
 
-        public ChatTabViewModel()
+        private TwitchChatService _chatService;
+
+        public ChatTabViewModel(TwitchChatService chatService)
         {
+            _chatService = chatService;
             ChannelNameSubmit = "";
             ChatTabs = new ObservableCollectionExtended<ChatTabItemViewModel>();
 
@@ -32,7 +36,10 @@ namespace ChatModApp.ViewModels
             var newTab = Locator.Current.GetService<ChatTabItemViewModel>();
 
             newTab.Title = title ?? $"New tab {ChatTabs.Count + 1}";
+            newTab.Chat.Channel = title;
 
+            _chatService.JoinChannel(title);
+            
             return newTab;
         }
     }

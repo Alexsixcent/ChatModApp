@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Tools.Services;
 
 namespace Tools.Extensions
 {
@@ -11,7 +10,7 @@ namespace Tools.Extensions
         {
             return services
                 .AddSingleton<THostedService>()
-                .AddHostedService<BackgroundServiceStarter<THostedService>>();
+                .AddHostedService(provider => provider.GetRequiredService<THostedService>());
         }
     }
 }

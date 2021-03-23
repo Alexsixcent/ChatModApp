@@ -17,10 +17,12 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="3*" />
         </Grid.ColumnDefinitions>
 
         <TextBlock Name="Username" FontWeight="Bold" />
-        <TextBlock Name="Message" Grid.Column="1" />
+        <TextBlock Grid.Column="1" Text=":" Margin="0,0,5,0"/>
+        <TextBlock Name="Message" Grid.Column="2" />
     </Grid>
 </local:ChatMessageViewBase>

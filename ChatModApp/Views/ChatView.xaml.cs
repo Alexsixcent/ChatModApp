@@ -19,9 +19,6 @@ namespace ChatModApp.Views
             {
                 this.OneWayBind(ViewModel, vm => vm.ChatMessages, v => v.ChatList.ItemsSource)
                     .DisposeWith(disposables);
-
-                this.BindCommand(ViewModel, vm => vm.SubmitCommand, v => v.SubmitButton)
-                    .DisposeWith(disposables);
             });
         }
     }

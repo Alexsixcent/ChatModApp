@@ -1,36 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Web;
 using ChatModApp.Models;
+using Microsoft.Extensions.Hosting;
 using ReactiveUI;
 using Tools.Extensions;
 
 namespace ChatModApp.Services
 {
-    public class AuthenticationService
+    public class AuthenticationService : BackgroundService
     {
         public const string ClientId = "110gs3dzgr2bj3ask88vqi7mnczk02";
-        private const string RedirectUri = "http://localhost:3000/callback";
-
 
         public string TwitchAccessToken
         {
             get => RxApp.SuspensionHost.GetAppState<AppState>().TwitchAccessToken;
             private set => RxApp.SuspensionHost.GetAppState<AppState>().TwitchAccessToken = value;
         }
+
         public bool IsAuthenticated => !string.IsNullOrWhiteSpace(TwitchAccessToken);
+        public IObservable<string> AccessTokenChanged { get; }
         public IEnumerable<TwitchAuthScope> Scopes { get; }
 
 
-
-
+        private const string RedirectUri = "http://localhost:3000/callback";
+        private event EventHandler<string>? AccessTokenChangedEvent;
 
         public AuthenticationService()
         {
+            AccessTokenChanged = Observable.FromEventPattern<string>(
+                    h => AccessTokenChangedEvent += h,
+                    h => AccessTokenChangedEvent -= h)
+                .Select(pattern => pattern.EventArgs);
+
             Scopes = new List<TwitchAuthScope>
             {
-                TwitchAuthScope.ChatRead, 
+                TwitchAuthScope.ChatRead,
                 TwitchAuthScope.ChatEdit
             };
         }
@@ -61,8 +69,14 @@ namespace ChatModApp.Services
                 return false;
 
             TwitchAccessToken = accessToken;
+            AccessTokenChangedEvent?.Invoke(this, accessToken);
 
             return true;
+        }
+
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            return Task.CompletedTask;
         }
     }
 }

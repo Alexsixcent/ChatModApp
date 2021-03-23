@@ -1,4 +1,5 @@
-﻿using ReactiveUI;
+﻿using System.Drawing;
+using ReactiveUI;
 
 namespace ChatModApp.ViewModels
 {
@@ -6,5 +7,6 @@ namespace ChatModApp.ViewModels
     {
         public string Username { get; set; }
         public string Message { get; set; }
+        public Color UsernameColor { get; set; }
     }
 }

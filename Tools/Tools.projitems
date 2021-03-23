@@ -15,6 +15,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\WeatherForecast.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PeriodicTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReactiveTabViewItem.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Services\BackgroundServiceStarter.cs" />
   </ItemGroup>
 </Project>

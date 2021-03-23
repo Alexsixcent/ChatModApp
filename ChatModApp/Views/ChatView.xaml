@@ -10,17 +10,30 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <StackPanel Orientation="Vertical">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*" />
+            <RowDefinition Height="2*" />
+        </Grid.RowDefinitions>
 
-        <ListView Name="ChatList"/>
+        <ListView Name="ChatList">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsStackPanel Orientation="Vertical" ItemsUpdatingScrollMode="KeepLastItemInView" />
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+        </ListView>
 
-        <StackPanel Orientation="Horizontal" Margin="0,20,0,20" Height="60">
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,20,0,20">
             <TextBox Name="ChatBox"
-                     Header="Enter the channel's username:" PlaceholderText="Channel"
-                     Width="300" HorizontalAlignment="Left" />
+                     PlaceholderText="Send a message"
+                     HorizontalAlignment="Stretch"
+                     TextWrapping="Wrap"
+                     AcceptsReturn="True"/>
+
             <Button Name="SubmitButton"
-                    Content="Open"
-                    VerticalAlignment="Stretch" HorizontalAlignment="Left" Margin="20,0" />
+                    Content="Chat"
+                    VerticalAlignment="Stretch" HorizontalAlignment="Right" Margin="5,5" />
         </StackPanel>
-    </StackPanel>
+    </Grid>
 </views:ChatViewBase>

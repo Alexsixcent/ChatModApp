@@ -12,6 +12,7 @@ using Splat;
 using Splat.Microsoft.Extensions.DependencyInjection;
 using Splat.Microsoft.Extensions.Logging;
 using Splat.NLog;
+using Tools.Extensions;
 using LogLevel = NLog.LogLevel;
 using Registrations = Akavache.Registrations;
 
@@ -24,7 +25,7 @@ namespace ChatModApp.Tools
         public static void Init()
         {
             Registrations.Start("ChatModApp");
-
+            
             var host = Host
                 .CreateDefaultBuilder()
                 .ConfigureLogging(loggingBuilder =>
@@ -53,6 +54,8 @@ namespace ChatModApp.Tools
             
             Container = host.Services;
             Container.UseMicrosoftDependencyResolver();
+
+            Container.GetRequiredService<TwitchChatService>();
         }
 
 
@@ -86,8 +89,8 @@ namespace ChatModApp.Tools
                 .AddTransient<ChatViewModel>()
                 .AddTransient<ChatTabItemViewModel>()
 
-                .AddSingleton<AuthenticationService>()
-                .AddSingleton<TwitchChatService>();
+                .AddHostedSingletonService<AuthenticationService>()
+                .AddHostedSingletonService<TwitchChatService>();
         }
     }
 }

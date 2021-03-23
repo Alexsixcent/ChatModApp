@@ -1,4 +1,7 @@
-﻿using System.Reactive.Disposables;
+﻿using System;
+using System.Reactive.Disposables;
+using Windows.UI;
+using Windows.UI.Xaml.Media;
 using ChatModApp.ViewModels;
 using ReactiveUI;
 
@@ -22,6 +25,9 @@ namespace ChatModApp.Views
                     .DisposeWith(disposable);
 
                 this.OneWayBind(ViewModel, vm => vm.Message, v => v.Message.Text)
+                    .DisposeWith(disposable);
+
+                this.OneWayBind(ViewModel, vm => vm.UsernameColor, v => v.Username.Foreground, color => new SolidColorBrush(Color.FromArgb(byte.MaxValue, color.R, color.G, color.B)))
                     .DisposeWith(disposable);
             });
         }
