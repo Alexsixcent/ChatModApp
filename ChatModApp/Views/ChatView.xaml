@@ -13,7 +13,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="8*" />
-            <RowDefinition Height="2*" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <ListView Name="ChatList">
@@ -24,16 +24,17 @@
             </ListView.ItemsPanel>
         </ListView>
 
-        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,20,0,20">
+        <StackPanel Grid.Row="1" Orientation="Vertical">
             <TextBox Name="ChatBox"
                      PlaceholderText="Send a message"
                      HorizontalAlignment="Stretch"
                      TextWrapping="Wrap"
-                     AcceptsReturn="True"/>
+                     AcceptsReturn="True"
+                     Margin="5,5" />
 
             <Button Name="SubmitButton"
                     Content="Chat"
-                    VerticalAlignment="Stretch" HorizontalAlignment="Right" Margin="5,5" />
+                    VerticalAlignment="Stretch" HorizontalAlignment="Right" Margin="0,0,5,5" />
         </StackPanel>
     </Grid>
 </views:ChatViewBase>

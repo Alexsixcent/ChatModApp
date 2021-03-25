@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Reactive;
 using ReactiveUI;
 
 namespace ChatModApp.ViewModels
@@ -8,12 +7,11 @@ namespace ChatModApp.ViewModels
     {
         public RoutingState Router { get; }
 
-        public MainViewModel(ChatTabViewModel chatTabViewModel, AuthenticationViewModel authenticationViewModel)
+        public MainViewModel(AuthenticationViewModel authenticationViewModel)
         {
             Router = new RoutingState();
             authenticationViewModel.HostScreen = this;
 
-            //Router.NavigateAndReset.Execute(chatTabViewModel).Subscribe();
             Router.NavigateAndReset.Execute(authenticationViewModel).Subscribe();
         }
     }

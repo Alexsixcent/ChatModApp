@@ -138,6 +138,7 @@
     <Compile Include="Models\TwitchAuthQueryParams.cs" />
     <Compile Include="Services\AuthenticationService.cs" />
     <Compile Include="Services\IAuthApi.cs" />
+    <Compile Include="Services\TwitchApiService.cs" />
     <Compile Include="Tools\AkavacheSuspensionDriver.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -149,11 +150,15 @@
     <Compile Include="ViewModels\ChatMessageViewModel.cs" />
     <Compile Include="Services\TwitchChatService.cs" />
     <Compile Include="ViewModels\ChatTabItemViewModel.cs" />
+    <Compile Include="ViewModels\ChatTabPromptViewModel.cs" />
     <Compile Include="ViewModels\ChatTabViewModel.cs" />
     <Compile Include="ViewModels\ChatViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\AuthenticationView.xaml.cs">
       <DependentUpon>AuthenticationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ChatTabPromptView.xaml.cs">
+      <DependentUpon>ChatTabPromptView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ChatTabView.xaml.cs">
       <DependentUpon>ChatTabView.xaml</DependentUpon>
@@ -190,6 +195,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="Views\AuthenticationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ChatTabPromptView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

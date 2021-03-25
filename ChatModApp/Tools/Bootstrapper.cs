@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using ChatModApp.Services;
 using ChatModApp.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +14,7 @@ using Splat;
 using Splat.Microsoft.Extensions.DependencyInjection;
 using Splat.Microsoft.Extensions.Logging;
 using Splat.NLog;
+using Tools;
 using Tools.Extensions;
 using LogLevel = NLog.LogLevel;
 using Registrations = Akavache.Registrations;
@@ -25,7 +28,7 @@ namespace ChatModApp.Tools
         public static void Init()
         {
             Registrations.Start("ChatModApp");
-            
+
             var host = Host
                 .CreateDefaultBuilder()
                 .ConfigureLogging(loggingBuilder =>
@@ -51,11 +54,17 @@ namespace ChatModApp.Tools
                 })
                 .UseEnvironment(Environments.Development)
                 .Build();
-            
+
             Container = host.Services;
             Container.UseMicrosoftDependencyResolver();
+        }
 
-            Container.GetRequiredService<TwitchChatService>();
+        public static Task InitServices()
+        {
+            var tasks = Container.GetServices<IService>()
+                .Select(s => s.Initialize());
+
+            return Task.WhenAll(tasks);
         }
 
 
@@ -76,7 +85,7 @@ namespace ChatModApp.Tools
             resolver.InitializeSplat();
             resolver.InitializeReactiveUI();
             resolver.UseNLogWithWrappingFullLogger();
-            
+
             resolver.RegisterViewsForViewModels(Assembly.GetExecutingAssembly(), "ChatModApp.Views");
 
             services.AddRefitClient<IAuthApi>()
@@ -86,11 +95,15 @@ namespace ChatModApp.Tools
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<AuthenticationViewModel>()
                 .AddSingleton<ChatTabViewModel>()
+
                 .AddTransient<ChatViewModel>()
                 .AddTransient<ChatTabItemViewModel>()
+                .AddTransient<ChatTabPromptViewModel>()
 
-                .AddHostedSingletonService<AuthenticationService>()
-                .AddHostedSingletonService<TwitchChatService>();
+
+                .AddService<AuthenticationService>()
+                .AddService<TwitchApiService>()
+                .AddService<TwitchChatService>();
         }
     }
 }

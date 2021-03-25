@@ -7,25 +7,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     xmlns:viewModels="using:ChatModApp.ViewModels"
+    xmlns:reactiveUi="using:ReactiveUI"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <muxc:TabView Name="TabView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <FlyoutBase.AttachedFlyout>
-                <Flyout>
-                    <StackPanel Orientation="Vertical">
-                        <TextBox Name="FlyoutTextBox"
-                                 Header="Please enter the channel name:"
-                                 PlaceholderText="Channel"/>
-                        <Button Name="FlyoutSubmitButton" Content="Open"/>
-                    </StackPanel>
-                </Flyout>
-            </FlyoutBase.AttachedFlyout>
+        <muxc:TabView Name="TabViewControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <muxc:TabView.TabItemTemplate>
                 <DataTemplate x:DataType="viewModels:ChatTabItemViewModel">
                     <muxc:TabViewItem Header="{x:Bind Title}">
-                        <local:ChatView ViewModel="{x:Bind Chat}"/>
+                        <reactiveUi:RoutedViewHost Router="{x:Bind Router, Mode=OneTime}"/>
                     </muxc:TabViewItem>
                 </DataTemplate>
             </muxc:TabView.TabItemTemplate>

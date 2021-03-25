@@ -9,9 +9,12 @@ using ReactiveUI;
 
 namespace ChatModApp.ViewModels
 {
-    public class ChatViewModel : ReactiveObject, IDisposable
+    public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     {
-        public string Channel { get; set; }
+        public string UrlPathSegment => Guid.NewGuid().ToString().Substring(0, 5);
+        public IScreen? HostScreen { get; set; }
+
+        public string? Channel { get; set; }
         public readonly ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages;
 
 
@@ -45,6 +48,14 @@ namespace ChatModApp.ViewModels
                 .DisposeWith(_disposables);
         }
 
-        public void Dispose() => _disposables.Dispose();
+        public void Initialize() => _chatService.JoinChannel(Channel);
+
+        public void Dispose()
+        {
+            _disposables.Dispose();
+
+            if (Channel is not null) 
+                _chatService.LeaveChannel(Channel);
+        }
     }
 }

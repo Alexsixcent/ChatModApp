@@ -1,6 +1,5 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Windows.UI.Xaml.Controls.Primitives;
 using ChatModApp.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 using ReactiveUI;
@@ -23,23 +22,20 @@ namespace ChatModApp.Views
             InitializeComponent();
             this.WhenActivated(disposables =>
             {
-                this.Bind(ViewModel, vm => vm.ChatTabs, v => v.TabView.TabItemsSource)
+                this.Bind(ViewModel, vm => vm.ChatTabs, v => v.TabViewControl.TabItemsSource)
                     .DisposeWith(disposables);
 
-                this.Bind(ViewModel, vm => vm.ChannelNameSubmit, v => v.FlyoutTextBox.Text)
-                    .DisposeWith(disposables);
-
-                this.BindCommand(ViewModel, vm => vm.AddTabCommand, v => v.FlyoutSubmitButton,
-                        vm => vm.ChannelNameSubmit)
-                    .DisposeWith(disposables);
-
-                Observable.FromEventPattern<TabViewTabCloseRequestedEventArgs>(TabView,
-                        nameof(TabView.TabCloseRequested))
+                Observable.FromEventPattern<TabViewTabCloseRequestedEventArgs>(TabViewControl,
+                        nameof(TabViewControl.TabCloseRequested))
                     .Select(pattern => pattern.EventArgs.Item)
                     .InvokeCommand(ViewModel, vm => vm.CloseTabCommand)
                     .DisposeWith(disposables);
 
-                TabView.AddTabButtonClick += (sender, args) => FlyoutBase.ShowAttachedFlyout(sender);
+                this.BindCommand(ViewModel, vm => vm.AddTabCommand, v => v.TabViewControl, nameof(TabViewControl.AddTabButtonClick))
+                    .DisposeWith(disposables);
+
+                this.Bind(ViewModel, vm => vm.OpenedTabIndex, v => v.TabViewControl.SelectedIndex)
+                    .DisposeWith(disposables);
             });
         }
     }

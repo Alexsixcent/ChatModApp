@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using System.Threading.Tasks;
 using Windows.UI.Xaml.Controls;
 using ChatModApp.Models;
 using ChatModApp.Services;
@@ -11,7 +10,7 @@ namespace ChatModApp.ViewModels
     public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel
     {
         public IScreen? HostScreen { get; set; }
-        public string UrlPathSegment { get; } = Guid.NewGuid().ToString().Substring(0, 5);
+        public string UrlPathSegment { get; } = "auth";
 
         public Uri AuthUri { get; }
         public readonly ReactiveCommand<WebViewNavigationStartingEventArgs, Unit> AuthCompleteCommand;

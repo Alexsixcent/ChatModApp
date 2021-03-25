@@ -1,8 +1,4 @@
 ﻿using System.Reactive.Disposables;
-using System.Windows.Input;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Navigation;
 using ChatModApp.ViewModels;
 using ReactiveUI;
 using Splat;

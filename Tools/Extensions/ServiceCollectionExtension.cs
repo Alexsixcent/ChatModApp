@@ -12,5 +12,13 @@ namespace Tools.Extensions
                 .AddSingleton<THostedService>()
                 .AddHostedService(provider => provider.GetRequiredService<THostedService>());
         }
+
+        public static IServiceCollection AddService<TService>(this IServiceCollection services)
+            where TService : class, IService
+        {
+            return services
+                    .AddSingleton<TService>()
+                    .AddSingleton<IService, TService>(provider => provider.GetRequiredService<TService>());
+        }
     }
 }
