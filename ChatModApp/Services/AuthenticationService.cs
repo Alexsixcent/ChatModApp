@@ -38,7 +38,9 @@ namespace ChatModApp.Services
             Scopes = new List<TwitchAuthScope>
             {
                 TwitchAuthScope.ChatRead,
-                TwitchAuthScope.ChatEdit
+                TwitchAuthScope.ChatEdit,
+
+                TwitchAuthScope.UserSubscriptions
             };
         }
 

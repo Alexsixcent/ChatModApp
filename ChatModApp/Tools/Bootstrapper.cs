@@ -103,7 +103,8 @@ namespace ChatModApp.Tools
 
                 .AddService<AuthenticationService>()
                 .AddService<TwitchApiService>()
-                .AddService<TwitchChatService>();
+                .AddService<TwitchChatService>()
+                .AddService<EmotesService>();
         }
     }
 }

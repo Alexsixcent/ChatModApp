@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="using:ChatModApp.Views" xmlns:viewmodels="using:ChatModApp.ViewModels"
+    xmlns:winui="using:Microsoft.UI.Xaml.Controls"
     d:DataContext="{d:DesignInstance Type=viewmodels:ChatViewModel}"
     mc:Ignorable="d"
     d:DesignHeight="300"
@@ -19,7 +20,7 @@
         <ListView Name="ChatList">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <ItemsStackPanel Orientation="Vertical" ItemsUpdatingScrollMode="KeepLastItemInView" />
+                    <ItemsStackPanel CacheLength="2" Orientation="Vertical" ItemsUpdatingScrollMode="KeepLastItemInView" />
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>

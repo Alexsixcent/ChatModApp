@@ -24,7 +24,7 @@ namespace ChatModApp.Views
                 this.OneWayBind(ViewModel, vm => vm.Username, v => v.Username.Text)
                     .DisposeWith(disposable);
 
-                this.OneWayBind(ViewModel, vm => vm.Message, v => v.Message.Text)
+                this.OneWayBind(ViewModel, vm => vm.Message, v => v.Message.ItemsSource)
                     .DisposeWith(disposable);
 
                 this.OneWayBind(ViewModel, vm => vm.UsernameColor, v => v.Username.Foreground, color => new SolidColorBrush(Color.FromArgb(byte.MaxValue, color.R, color.G, color.B)))

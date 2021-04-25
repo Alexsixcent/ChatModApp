@@ -97,7 +97,10 @@ namespace ChatModApp.Models
         #region V5 API
 
         [EnumMember(Value = "viewing_activity_read")]
-        ViewingActivityRead
+        ViewingActivityRead,
+
+        [EnumMember(Value = "user_subscriptions")]
+        UserSubscriptions
 
         #endregion
     }
