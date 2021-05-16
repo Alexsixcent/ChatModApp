@@ -22,7 +22,7 @@ namespace ChatModApp.ViewModels
             _disposables = new CompositeDisposable();
             Channel = "";
 
-            OpenCommand = ReactiveCommand.CreateFromTask<string>(async s =>
+            OpenCommand = ReactiveCommand.Create<string>(s =>
             {
                 chatViewModel.Channel = s;
                 chatViewModel.HostScreen = HostScreen;

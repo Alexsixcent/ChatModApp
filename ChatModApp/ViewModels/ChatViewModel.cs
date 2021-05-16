@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using ChatModApp.Services;
 using DynamicData;
 using ReactiveUI;
@@ -33,20 +32,20 @@ namespace ChatModApp.ViewModels
             _chatMessages.DisposeWith(_disposables);
 
             _chatMessages.Connect()
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Bind(out ChatMessages)
-                .Subscribe()
-                .DisposeWith(_disposables);
+                         .ObserveOn(RxApp.MainThreadScheduler)
+                         .Bind(out ChatMessages)
+                         .Subscribe()
+                         .DisposeWith(_disposables);
 
             _chatService.ChatMessageReceived
-                .Where(message => message.Channel == Channel)
-                .Subscribe(message => _chatMessages.Add(new ChatMessageViewModel
-                {
-                    Username = message.Username, 
-                    Message = emotesService.GetMessageFragments(message),
-                    UsernameColor = message.Color
-                }))
-                .DisposeWith(_disposables);
+                        .Where(message => message.Channel == Channel)
+                        .Subscribe(message => _chatMessages.Add(new ChatMessageViewModel
+                        {
+                            Username = message.Username,
+                            Message = emotesService.GetMessageFragments(message),
+                            UsernameColor = message.Color
+                        }))
+                        .DisposeWith(_disposables);
         }
 
         public void Initialize()
@@ -61,7 +60,7 @@ namespace ChatModApp.ViewModels
         {
             _disposables.Dispose();
 
-            if (Channel is not null) 
+            if (Channel is not null)
                 _chatService.LeaveChannel(Channel);
         }
     }
