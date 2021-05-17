@@ -15,42 +15,6 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <UserControl.Resources>
-        <DataTemplate x:Key="TextTemplate" x:DataType="models:TextFragment">
-            <TextBlock Text="{x:Bind Text}" />
-        </DataTemplate>
+    <RichTextBlock Name="MessageTextBlock" TextWrapping="WrapWholeWords" TextAlignment="Left" VerticalAlignment="Center"/>
 
-        <DataTemplate x:Key="EmoteTemplate" x:DataType="models:EmoteFragment">
-            <toolkit:ImageEx IsCacheEnabled="True"
-                             CacheMode="BitmapCache"
-                             Width="{x:Bind Emote.Width}"
-                             Height="{x:Bind Emote.Height}"
-                             Source="{x:Bind Emote.Uri}" />
-        </DataTemplate>
-
-        <converters:ChatMessageTemplateSelector x:Key="ChatMessageTemplateSelector"
-                                                Text="{StaticResource TextTemplate}"
-                                                Emote="{StaticResource EmoteTemplate}" />
-    </UserControl.Resources>
-
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="3*" />
-        </Grid.ColumnDefinitions>
-
-        <TextBlock Name="Username" FontWeight="Bold" />
-        <TextBlock Grid.Column="1" Text=":" Margin="0,0,5,0" />
-
-
-        <winui:ItemsRepeater Grid.Column="2" Name="Message" ItemTemplate="{StaticResource ChatMessageTemplateSelector}">
-            <winui:ItemsRepeater.Layout>
-                <toolkit:WrapLayout Orientation="Horizontal" HorizontalSpacing="5" VerticalSpacing="5"/>
-            </winui:ItemsRepeater.Layout>
-        </winui:ItemsRepeater>
-    </Grid>
 </local:ChatMessageViewBase>
