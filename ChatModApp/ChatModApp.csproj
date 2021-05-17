@@ -198,6 +198,9 @@
     <PackageReference Include="NLog">
       <Version>4.7.9</Version>
     </PackageReference>
+    <PackageReference Include="NLog.Extensions.Logging">
+      <Version>1.7.2</Version>
+    </PackageReference>
     <PackageReference Include="ReactiveUI">
       <Version>13.2.18</Version>
     </PackageReference>
@@ -217,12 +220,6 @@
       <Version>11.0.1</Version>
     </PackageReference>
     <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection">
-      <Version>11.0.1</Version>
-    </PackageReference>
-    <PackageReference Include="Splat.Microsoft.Extensions.Logging">
-      <Version>11.0.1</Version>
-    </PackageReference>
-    <PackageReference Include="Splat.NLog">
       <Version>11.0.1</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">
