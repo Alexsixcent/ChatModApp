@@ -39,6 +39,7 @@ namespace ChatModApp.Tools
                     .Where(ti =>
                         ti.Namespace is not null 
                         && ti.Namespace.StartsWith(parentNamespace) 
+                        && !ti.Name.EndsWith("Base")
                         && ti.GetTypeInfo().ImplementedInterfaces.Contains(typeof(IViewFor)) 
                         && !ti.IsAbstract);
 

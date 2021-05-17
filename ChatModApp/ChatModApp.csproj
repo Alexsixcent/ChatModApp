@@ -97,6 +97,7 @@
     <Compile Include="Tools\Bootstrapper.cs" />
     <Compile Include="Tools\AppState.cs" />
     <Compile Include="Tools\DependencyResolverExtensions.cs" />
+    <Compile Include="Tools\ViewLocator.cs" />
     <Compile Include="ViewModels\AuthenticationViewModel.cs" />
     <Compile Include="ViewModels\ChatMessageViewModel.cs" />
     <Compile Include="Services\TwitchChatService.cs" />
@@ -175,7 +176,7 @@
       <Version>7.2.1</Version>
     </PackageReference>
     <PackageReference Include="DynamicData">
-      <Version>7.1.1</Version>
+      <Version>7.1.16</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection">
       <Version>6.0.0-preview.3.21201.4</Version>
@@ -190,25 +191,25 @@
       <Version>6.2.12</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
-      <Version>7.0.1</Version>
+      <Version>7.0.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.6.0-prerelease.210405001</Version>
+      <Version>2.6.0-prerelease.210430001</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.7.9</Version>
+      <Version>4.7.10</Version>
     </PackageReference>
     <PackageReference Include="NLog.Extensions.Logging">
       <Version>1.7.2</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI">
-      <Version>13.2.18</Version>
+      <Version>13.3.2</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Events">
-      <Version>13.2.18</Version>
+      <Version>13.3.2</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Fody">
-      <Version>13.2.18</Version>
+      <Version>13.3.2</Version>
     </PackageReference>
     <PackageReference Include="Refit">
       <Version>6.0.38</Version>
@@ -217,16 +218,16 @@
       <Version>6.0.38</Version>
     </PackageReference>
     <PackageReference Include="Splat">
-      <Version>11.0.1</Version>
+      <Version>11.1.1</Version>
     </PackageReference>
     <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection">
-      <Version>11.0.1</Version>
+      <Version>11.1.1</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">
-      <Version>3.2.3-preview-763492b669e9a024be47d6c0a0feaac62db1042a</Version>
+      <Version>3.2.4-preview-d093e175264edce7ccb64c37f7a334f375be79f3</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Client">
-      <Version>3.2.2-preview-fad69ab15afcde6e74c178736b666a6cad9381d3</Version>
+      <Version>3.2.3-preview-94b33cd801bf51e1d81b179ce10c7d896072b4c3</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />

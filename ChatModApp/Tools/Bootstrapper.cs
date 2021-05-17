@@ -70,7 +70,6 @@ namespace ChatModApp.Tools
                 .Build();
 
             Container = host.Services;
-            Container.UseMicrosoftDependencyResolver();
         }
 
         public static Task InitServices()
@@ -87,12 +86,13 @@ namespace ChatModApp.Tools
             resolver.InitializeSplat();
             resolver.InitializeReactiveUI();
 
+            resolver.RegisterLazySingleton(() => new ViewLocator(), typeof(IViewLocator));
             resolver.RegisterViewsForViewModels(Assembly.GetExecutingAssembly(), "ChatModApp.Views");
 
             services
                 .AddRefitClient<IAuthApi>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://id.twitch.tv"));
-
+            
             services
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<AuthenticationViewModel>()
