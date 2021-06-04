@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Windows.Storage;
 using ChatModApp.Services;
+using ChatModApp.Services.ApiClients;
 using ChatModApp.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -90,8 +91,8 @@ namespace ChatModApp.Tools
             resolver.RegisterViewsForViewModels(Assembly.GetExecutingAssembly(), "ChatModApp.Views");
 
             services
-                .AddRefitClient<IAuthApi>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://id.twitch.tv"));
+                .AddRefitClient<IBttvApi>()
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.betterttv.net/3/cached"));
             
             services
                 .AddSingleton<MainViewModel>()
@@ -101,10 +102,10 @@ namespace ChatModApp.Tools
                 .AddTransient<ChatTabItemViewModel>()
                 .AddTransient<ChatTabPromptViewModel>()
 
-                .AddService<AuthenticationService>()
-                .AddService<TwitchApiService>()
-                .AddService<TwitchChatService>()
-                .AddService<EmotesService>();
+                .AddSingleton<AuthenticationService>()
+                .AddSingleton<TwitchApiService>()
+                .AddSingleton<TwitchChatService>()
+                .AddSingleton<EmotesService>();
         }
     }
 }

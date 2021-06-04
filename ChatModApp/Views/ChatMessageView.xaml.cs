@@ -61,10 +61,9 @@ namespace ChatModApp.Views
                 {
                     Child = new ImageEx
                     {
-                        IsCacheEnabled = true,
-                        Source = emote.Emote.Uri,
-                        Width = emote.Emote.Width,
-                        Height = emote.Emote.Height
+                        IsCacheEnabled = true, 
+                        Source = emote.Emote.Uri, 
+                        Stretch = Stretch.None
                     }
                 },
                 _ => throw new ArgumentException("Fragment not of valid type.")

@@ -18,7 +18,6 @@
             return result;
         }
 
-
         public static string TrimEnd(this string target, string trimString)
         {
             if (string.IsNullOrEmpty(trimString))
@@ -34,5 +33,8 @@
 
             return result;
         }
+
+        public static string SubstringAbs(this string target, int start, int end) =>
+            target.Substring(start, end - start + 1);
     }
 }
