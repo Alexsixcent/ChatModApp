@@ -22,15 +22,15 @@ namespace ChatModApp.ViewModels
             _disposables = new CompositeDisposable();
             Channel = "";
 
-            OpenCommand = ReactiveCommand.Create<string>(s =>
+            OpenCommand = ReactiveCommand.CreateFromTask<string>(async s =>
             {
                 chatViewModel.Channel = s;
                 chatViewModel.HostScreen = HostScreen;
                 HostScreen.Router.Navigate.Execute(chatViewModel).Subscribe();
 
-                chatViewModel.Initialize();
+                await chatViewModel.Initialize();
             });
-
+            
             OpenCommand.DisposeWith(_disposables);
             chatViewModel.DisposeWith(_disposables);
         }

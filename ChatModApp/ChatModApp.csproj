@@ -78,17 +78,22 @@
   <ItemGroup>
     <Compile Include="Converters\ChatMessageTemplateSelector.cs" />
     <Compile Include="Converters\GenericConverter.cs" />
+    <Compile Include="Models\BttvUserEmoteResponse.cs" />
+    <Compile Include="Models\Emotes\BttvEmote.cs" />
     <Compile Include="Models\EmoteFragment.cs" />
-    <Compile Include="Models\IEmote.cs" />
+    <Compile Include="Models\Emotes\IEmote.cs" />
     <Compile Include="Models\IMessageFragment.cs" />
     <Compile Include="Models\TextFragment.cs" />
     <Compile Include="Models\TwitchAuthResponseType.cs" />
     <Compile Include="Models\TwitchAuthScope.cs" />
     <Compile Include="Models\TwitchAuthQueryParams.cs" />
-    <Compile Include="Models\TwitchEmote.cs" />
+    <Compile Include="Models\Emotes\TwitchEmote.cs" />
+    <Compile Include="Services\ApiClients\IBttvApi.cs" />
     <Compile Include="Services\AuthenticationService.cs" />
+    <Compile Include="Models\Emotes\EmoteKey.cs" />
     <Compile Include="Services\EmotesService.cs" />
-    <Compile Include="Services\IAuthApi.cs" />
+    <Compile Include="Services\ApiClients\IAuthApi.cs" />
+    <Compile Include="Tools\Grouping.cs" />
     <Compile Include="Services\TwitchApiService.cs" />
     <Compile Include="Tools\AkavacheSuspensionDriver.cs" />
     <Compile Include="App.xaml.cs">
@@ -97,6 +102,7 @@
     <Compile Include="Tools\Bootstrapper.cs" />
     <Compile Include="Tools\AppState.cs" />
     <Compile Include="Tools\DependencyResolverExtensions.cs" />
+    <Compile Include="Tools\Extensions\ColorExtensions.cs" />
     <Compile Include="Tools\ViewLocator.cs" />
     <Compile Include="ViewModels\AuthenticationViewModel.cs" />
     <Compile Include="ViewModels\ChatMessageViewModel.cs" />

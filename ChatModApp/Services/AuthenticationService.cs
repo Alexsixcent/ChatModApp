@@ -30,11 +30,6 @@ namespace ChatModApp.Services
 
         public AuthenticationService()
         {
-            AccessTokenChanged = Observable.FromEventPattern<string>(
-                    h => AccessTokenChangedEvent += h,
-                    h => AccessTokenChangedEvent -= h)
-                .Select(pattern => pattern.EventArgs);
-
             Scopes = new List<TwitchAuthScope>
             {
                 TwitchAuthScope.ChatRead,
@@ -42,6 +37,15 @@ namespace ChatModApp.Services
 
                 TwitchAuthScope.UserSubscriptions
             };
+
+            var connectable = Observable.FromEventPattern<string>(
+                                            h => AccessTokenChangedEvent += h,
+                                            h => AccessTokenChangedEvent -= h)
+                                        .Select(pattern => pattern.EventArgs)
+                                        .Replay(1);
+
+            connectable.Connect();
+            AccessTokenChanged = connectable;
         }
 
         public Task Initialize() => Task.CompletedTask;
@@ -58,7 +62,7 @@ namespace ChatModApp.Services
                 State = Guid.NewGuid().ToString("N")
             };
             return (new Uri("https://id.twitch.tv/oauth2/authorize").AddQueries(queryParams),
-                queryParams);
+                    queryParams);
         }
 
         public bool AuthFromCallbackUri(Uri callbackUri)

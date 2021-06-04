@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using Tools;
 using TwitchLib.Api;
@@ -14,7 +14,7 @@ namespace ChatModApp.Services
 {
     public class TwitchApiService : IService
     {
-        public IObservable<User> Connected { get; }
+        public IObservable<User> UserConnected { get; }
 
         public Helix Helix => _api.Helix;
         public V5 V5 => _api.V5;
@@ -25,13 +25,9 @@ namespace ChatModApp.Services
         {
             _api = new TwitchAPI();
 
-            var o = authService.AccessTokenChanged
-                .Select(Connect);
-
-            Connected = o.Select(_ => GetCurrentUser().ToObservable())
-                .Concat();
-
-            o.Subscribe();
+            UserConnected = authService.AccessTokenChanged
+                                       .Select(Connect)
+                                       .SelectMany(GetCurrentUser);
         }
 
         public Task Initialize() => Task.CompletedTask;
@@ -44,7 +40,7 @@ namespace ChatModApp.Services
             return Unit.Default;
         }
 
-        public async Task<User> GetCurrentUser()
+        private async Task<User> GetCurrentUser(Unit _, CancellationToken cancellation)
         {
             var res = await _api.Helix.Users.GetUsersAsync();
             return res.Users.Single();

@@ -1,62 +1,206 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 using ChatModApp.Models;
+using ChatModApp.Models.Emotes;
+using ChatModApp.Services.ApiClients;
+using ChatModApp.Tools;
 using DynamicData;
-using DynamicData.Kernel;
 using Tools;
+using Tools.Extensions;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client.Models;
+using EmoteKeyValue = System.Collections.Generic.KeyValuePair<ChatModApp.Models.Emotes.EmoteKey, ChatModApp.Models.IEmote>;
 
 namespace ChatModApp.Services
 {
     public class EmotesService : IService
     {
+        public IObservableCache<IGroup<IEmote, string, EmoteKey.EmoteType>, EmoteKey.EmoteType> GlobalEmoteGroups { get; }
+
+        public IObservableCache<Grouping<Grouping<IEmote, string, EmoteKey.EmoteType>, EmoteKey.EmoteType, string>,
+            string> UserEmoteGroups { get; }
+
         private readonly TwitchApiService _apiService;
         private readonly AuthenticationService _authService;
+        private readonly IBttvApi _bttvApi;
 
-        private readonly SourceCache<IEmote, string> _globalEmotes;
+        private readonly SourceCache<EmoteKeyValue, EmoteKey> _emotes;
+        private readonly IObservableCache<IEmote, string> _globalEmotes;
+        private readonly IObservableCache<Grouping<IEmote, string, string>, string> _userEmotes;
 
-        public EmotesService(TwitchApiService apiService, AuthenticationService authService)
+        public EmotesService(TwitchApiService apiService, AuthenticationService authService, IBttvApi bttvApi)
         {
-            _globalEmotes = new SourceCache<IEmote, string>(emote => emote.Code);
-
+            _emotes = new SourceCache<EmoteKeyValue, EmoteKey>(kv => kv.Key);
             _apiService = apiService;
             _authService = authService;
+            _bttvApi = bttvApi;
 
-            _apiService.Connected
-                .Select(user => Connect(user).ToObservable())
-                .Concat()
-                .Subscribe();
+            _apiService.UserConnected
+                       .SelectMany(Connect)
+                       .Subscribe();
+
+            GlobalEmoteGroups = _emotes.Connect()
+                             .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Global))
+                             .Group(kv => kv.Key.Type)
+                             .Transform(group =>
+                                            (IGroup<IEmote, string, EmoteKey.EmoteType>) new
+                                                Grouping<IEmote, string, EmoteKey.EmoteType>(
+                                                    group.Key,
+                                                    group.Cache.Connect()
+                                                         .ChangeKey(kv => kv.Value.Code)
+                                                         .Transform(pair => pair.Value)
+                                                         .AsObservableCache()))
+                             .DisposeMany()
+                             .AsObservableCache();
+
+            UserEmoteGroups = _emotes.Connect()
+                                     .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Member))
+                                     .Group(kv => kv.Key.Channel)
+                                     .Transform(group =>
+                                                    new Grouping<Grouping<IEmote, string, EmoteKey.EmoteType>,
+                                                        EmoteKey.EmoteType,
+                                                        string>(group.Key, group.Cache.Connect()
+                                                                    .Group(kv => kv.Key.Type)
+                                                                    .Transform(innerGroup =>
+                                                                                   new Grouping<IEmote, string,
+                                                                                       EmoteKey.EmoteType>(
+                                                                                       innerGroup.Key,
+                                                                                       innerGroup.Cache.Connect()
+                                                                                           .ChangeKey(
+                                                                                               kv => kv.Value.Code)
+                                                                                           .Transform(kv => kv.Value)
+                                                                                           .AsObservableCache()))
+                                                                    .DisposeMany()
+                                                                    .AsObservableCache()))
+                                     .DisposeMany()
+                                     .AsObservableCache();
+
+            _globalEmotes = _emotes.Connect()
+                                  .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Global))
+                                  .ChangeKey(kv => kv.Key.Code)
+                                  .Transform(kv => kv.Value)
+                                  .AsObservableCache();
+
+            _userEmotes = _emotes.Connect()
+                                 .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Member))
+                                 .Group(kv => kv.Key.Channel)
+                                 .Transform(group => new Grouping<IEmote, string, string>(
+                                                group.Key,
+                                                group.Cache.Connect().ChangeKey(kv => kv.Value.Code)
+                                                     .Transform(pair => pair.Value).AsObservableCache()))
+                                 .DisposeMany().AsObservableCache();
         }
 
         public Task Initialize() => Task.CompletedTask;
 
-        public IEnumerable<IMessageFragment> GetMessageFragments(ChatMessage message)
+        public IEnumerable<IMessageFragment> GetMessageFragments(ChatMessage chatMessage)
+        {
+            var msg = chatMessage.Message;
+            var fragments = new List<IMessageFragment>();
+
+
+            if (chatMessage.EmoteSet.Emotes.Count == 0)
+            {
+                fragments.AddRange(ParseTextFragment(msg, chatMessage.Channel));
+            }
+            else
+            {
+                chatMessage.EmoteSet.Emotes.Sort((left, right) => left.StartIndex.CompareTo(right.StartIndex));
+
+                var lastEndIndex = 0;
+                foreach (var emote in chatMessage.EmoteSet.Emotes)
+                {
+                    if (emote.StartIndex - lastEndIndex > 1)
+                    {
+                        fragments.AddRange(
+                            ParseTextFragment(msg.SubstringAbs(lastEndIndex, emote.StartIndex - 1), chatMessage.Channel));
+                    }
+
+                    fragments.Add(new EmoteFragment(new TwitchEmote(int.Parse(emote.Id), emote.Name)));
+                    lastEndIndex = emote.EndIndex + 1;
+                }
+
+                if (lastEndIndex < msg.Length - 1)
+                {
+                    fragments.AddRange(ParseTextFragment(msg.Substring(lastEndIndex), chatMessage.Channel));
+                }
+            }
+
+            return fragments;
+        }
+
+        public async Task LoadChannelEmotes(string channel)
+        {
+            var res = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> {channel});
+
+            var id = res.Users.Single().Id;
+
+            var emotes = await _bttvApi.GetUserEmotes(int.Parse(id));
+
+            _emotes.Edit(updater =>
+            {
+                updater.AddOrUpdate(emotes.ChannelEmotes.Select(
+                                        emote => new EmoteKeyValue(
+                                            new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
+                                                         channel), emote)));
+                updater.AddOrUpdate(emotes.SharedEmotes.Select(
+                                        emote => new EmoteKeyValue(
+                                            new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
+                                                         channel), emote)));
+            });
+        }
+
+        public void UnloadChannelEmotes(string channel)
+        {
+            var group = UserEmoteGroups.Lookup(channel);
+            if (!@group.HasValue)
+                return;
+
+            var emotes =
+                @group.Value.Cache.Items.SelectMany(
+                    grouping => grouping.Cache.Items.Select(emote => new EmoteKey(grouping.Key, emote, channel)));
+
+
+            _emotes.Remove(emotes);
+        }
+
+
+        private IEnumerable<IMessageFragment> ParseTextFragment(string msg, string channel)
         {
             var fragments = new List<IMessageFragment>();
 
-            foreach (var frag in message.Message.Split(' '))
+            foreach (var frag in msg.Split(' '))
             {
-                var res = _globalEmotes.Lookup(frag);
-                if (res.HasValue)
+                var res1 = _globalEmotes.Lookup(frag);
+                if (res1.HasValue)
                 {
-                    fragments.Add(new EmoteFragment(res.Value));
+                    fragments.Add(new EmoteFragment(res1.Value));
+                    break;
+                }
+
+                var res2 = _userEmotes.Lookup(channel);
+                if (res2.HasValue)
+                {
+                    var res3 = res2.Value.Cache.Lookup(frag);
+                    if (res3.HasValue)
+                    {
+                        fragments.Add(new EmoteFragment(res3.Value));
+                        break;
+                    }
+                }
+
+                if (fragments.LastOrDefault() is TextFragment text)
+                {
+                    text.Text += ' ' + frag;
                 }
                 else
                 {
-                    var last = fragments.LastOrDefault();
-                    if (last is TextFragment text)
-                    {
-                        text.Text += ' ' + frag;
-                    }
-                    else
-                    {
-                        fragments.Add(new TextFragment {Text = frag});
-                    }
+                    fragments.Add(new TextFragment(frag));
                 }
             }
 
@@ -64,16 +208,32 @@ namespace ChatModApp.Services
         }
 
 
-        private async Task Connect(User user)
+        private async Task<Unit> Connect(User user, CancellationToken cancel)
         {
-            var emotes = await _apiService.V5.Users.GetUserEmotesAsync(user.Id, _authService.TwitchAccessToken);
+            var globalEmotes = await _apiService.V5.Users.GetUserEmotesAsync(user.Id, _authService.TwitchAccessToken);
 
-            var emoteList =
-                (from emoteSet in emotes.EmoteSets
-                    from emote in emoteSet.Value
-                    select new TwitchEmote(emote.Id, emote.Code));
+            var globalTwitchEmotes =
+                (from emoteSet in globalEmotes.EmoteSets
+                 from emote in emoteSet.Value
+                 select new TwitchGlobalEmote(emote.Id, emote.Code));
 
-            _globalEmotes.AddOrUpdate(emoteList);
+            var globalBttvEmotes = await _bttvApi.GetGlobalEmotes();
+
+
+            _emotes.Edit(updater =>
+            {
+                updater.Clear();
+                updater.AddOrUpdate(globalTwitchEmotes.Select(
+                                        emote => new EmoteKeyValue(
+                                            new EmoteKey(EmoteKey.EmoteType.Twitch | EmoteKey.EmoteType.Global, emote),
+                                            emote)));
+                updater.AddOrUpdate(globalBttvEmotes.Select(
+                                        emote => new EmoteKeyValue(
+                                            new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Global, emote),
+                                            emote)));
+            });
+
+            return Unit.Default;
         }
     }
 }
