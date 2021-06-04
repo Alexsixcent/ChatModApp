@@ -3,7 +3,7 @@ using System.Net.Http;
 using ChatModApp.Models;
 using Refit;
 
-namespace ChatModApp.Services
+namespace ChatModApp.Services.ApiClients
 {
     public interface IAuthApi
     {
