@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using ChatModApp.Services;
 using DynamicData;
 using ReactiveUI;
@@ -39,21 +40,24 @@ namespace ChatModApp.ViewModels
 
             _chatService.ChatMessageReceived
                         .Where(message => message.Channel == Channel)
-                        .Subscribe(message => _chatMessages.Add(new ChatMessageViewModel
+                        .Subscribe(message =>
                         {
-                            Username = message.Username,
-                            Message = emotesService.GetMessageFragments(message),
-                            UsernameColor = message.Color
-                        }))
+                            _chatMessages.Add(new ChatMessageViewModel
+                            {
+                                Username = message.DisplayName,
+                                Message = emotesService.GetMessageFragments(message),
+                                UsernameColor = message.Color
+                            });
+                        })
                         .DisposeWith(_disposables);
         }
 
-        public void Initialize()
+        public Task Initialize()
         {
             if (string.IsNullOrWhiteSpace(Channel))
                 throw new ArgumentNullException(nameof(Channel));
 
-            _chatService.JoinChannel(Channel);
+            return _chatService.JoinChannel(Channel);
         }
 
         public void Dispose()
@@ -61,7 +65,9 @@ namespace ChatModApp.ViewModels
             _disposables.Dispose();
 
             if (Channel is not null)
+            {
                 _chatService.LeaveChannel(Channel);
+            }
         }
     }
 }
