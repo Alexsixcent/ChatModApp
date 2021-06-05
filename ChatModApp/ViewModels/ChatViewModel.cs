@@ -52,12 +52,12 @@ namespace ChatModApp.ViewModels
                         .DisposeWith(_disposables);
         }
 
-        public Task Initialize()
+        public void Initialize()
         {
             if (string.IsNullOrWhiteSpace(Channel))
                 throw new ArgumentNullException(nameof(Channel));
 
-            return _chatService.JoinChannel(Channel);
+            _chatService.JoinChannel(Channel);
         }
 
         public void Dispose()

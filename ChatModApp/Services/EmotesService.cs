@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,53 +11,87 @@ using ChatModApp.Models.Emotes;
 using ChatModApp.Services.ApiClients;
 using ChatModApp.Tools;
 using DynamicData;
-using Tools;
 using Tools.Extensions;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client.Models;
-using EmoteKeyValue = System.Collections.Generic.KeyValuePair<ChatModApp.Models.Emotes.EmoteKey, ChatModApp.Models.IEmote>;
+using EmoteKeyValue =
+    System.Collections.Generic.KeyValuePair<ChatModApp.Models.Emotes.EmoteKey, ChatModApp.Models.IEmote>;
 
 namespace ChatModApp.Services
 {
-    public class EmotesService : IService
+    public class EmotesService : IDisposable
     {
-        public IObservableCache<IGroup<IEmote, string, EmoteKey.EmoteType>, EmoteKey.EmoteType> GlobalEmoteGroups { get; }
+        public IObservableCache<IGroup<IEmote, string, EmoteKey.EmoteType>, EmoteKey.EmoteType> GlobalEmoteGroups
+        {
+            get;
+        }
 
         public IObservableCache<Grouping<Grouping<IEmote, string, EmoteKey.EmoteType>, EmoteKey.EmoteType, string>,
             string> UserEmoteGroups { get; }
 
         private readonly TwitchApiService _apiService;
+        private readonly TwitchChatService _chatService;
         private readonly AuthenticationService _authService;
         private readonly IBttvApi _bttvApi;
+        private readonly IFfzApi _ffzApi;
 
+        private readonly CompositeDisposable _disposable;
         private readonly SourceCache<EmoteKeyValue, EmoteKey> _emotes;
         private readonly IObservableCache<IEmote, string> _globalEmotes;
         private readonly IObservableCache<Grouping<IEmote, string, string>, string> _userEmotes;
 
-        public EmotesService(TwitchApiService apiService, AuthenticationService authService, IBttvApi bttvApi)
+        public EmotesService(TwitchApiService apiService, AuthenticationService authService, IBttvApi bttvApi,
+                             TwitchChatService chatService, IFfzApi ffzApi)
         {
+            _disposable = new CompositeDisposable();
             _emotes = new SourceCache<EmoteKeyValue, EmoteKey>(kv => kv.Key);
             _apiService = apiService;
             _authService = authService;
             _bttvApi = bttvApi;
+            _chatService = chatService;
+            _ffzApi = ffzApi;
 
             _apiService.UserConnected
-                       .SelectMany(Connect)
-                       .Subscribe();
+                       .SelectMany(LoadGlobalEmotes)
+                       .Subscribe()
+                       .DisposeWith(_disposable);
+
+            _chatService.ChannelsJoined.Connect()
+                        .OnItemAdded(async s => await LoadChannelEmotes(s))
+                        .OnItemRemoved(UnloadChannelEmotes)
+                        .Subscribe()
+                        .DisposeWith(_disposable);
+
+            _globalEmotes = _emotes.Connect()
+                                   .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Global))
+                                   .ChangeKey(kv => kv.Key.Code)
+                                   .Transform(kv => kv.Value)
+                                   .AsObservableCache();
+
+            _userEmotes = _emotes.Connect()
+                                 .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Member))
+                                 .Group(kv => kv.Key.Channel)
+                                 .Transform(group => new Grouping<IEmote, string, string>(
+                                                group.Key,
+                                                group.Cache.Connect().ChangeKey(kv => kv.Value.Code)
+                                                     .Transform(pair => pair.Value).AsObservableCache()))
+                                 .DisposeMany()
+                                 .AsObservableCache();
+
 
             GlobalEmoteGroups = _emotes.Connect()
-                             .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Global))
-                             .Group(kv => kv.Key.Type)
-                             .Transform(group =>
-                                            (IGroup<IEmote, string, EmoteKey.EmoteType>) new
-                                                Grouping<IEmote, string, EmoteKey.EmoteType>(
-                                                    group.Key,
-                                                    group.Cache.Connect()
-                                                         .ChangeKey(kv => kv.Value.Code)
-                                                         .Transform(pair => pair.Value)
-                                                         .AsObservableCache()))
-                             .DisposeMany()
-                             .AsObservableCache();
+                                       .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Global))
+                                       .Group(kv => kv.Key.Type)
+                                       .Transform(group =>
+                                                      (IGroup<IEmote, string, EmoteKey.EmoteType>) new
+                                                          Grouping<IEmote, string, EmoteKey.EmoteType>(
+                                                              group.Key,
+                                                              group.Cache.Connect()
+                                                                   .ChangeKey(kv => kv.Value.Code)
+                                                                   .Transform(pair => pair.Value)
+                                                                   .AsObservableCache()))
+                                       .DisposeMany()
+                                       .AsObservableCache();
 
             UserEmoteGroups = _emotes.Connect()
                                      .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Member))
@@ -80,23 +115,15 @@ namespace ChatModApp.Services
                                      .DisposeMany()
                                      .AsObservableCache();
 
-            _globalEmotes = _emotes.Connect()
-                                  .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Global))
-                                  .ChangeKey(kv => kv.Key.Code)
-                                  .Transform(kv => kv.Value)
-                                  .AsObservableCache();
+            _emotes.DisposeWith(_disposable);
+            _globalEmotes.DisposeWith(_disposable);
+            _userEmotes.DisposeWith(_disposable);
 
-            _userEmotes = _emotes.Connect()
-                                 .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Member))
-                                 .Group(kv => kv.Key.Channel)
-                                 .Transform(group => new Grouping<IEmote, string, string>(
-                                                group.Key,
-                                                group.Cache.Connect().ChangeKey(kv => kv.Value.Code)
-                                                     .Transform(pair => pair.Value).AsObservableCache()))
-                                 .DisposeMany().AsObservableCache();
+            GlobalEmoteGroups.DisposeWith(_disposable);
+            UserEmoteGroups.DisposeWith(_disposable);
         }
 
-        public Task Initialize() => Task.CompletedTask;
+        public void Dispose() => _disposable.Dispose();
 
         public IEnumerable<IMessageFragment> GetMessageFragments(ChatMessage chatMessage)
         {
@@ -118,7 +145,8 @@ namespace ChatModApp.Services
                     if (emote.StartIndex - lastEndIndex > 1)
                     {
                         fragments.AddRange(
-                            ParseTextFragment(msg.SubstringAbs(lastEndIndex, emote.StartIndex - 1), chatMessage.Channel));
+                            ParseTextFragment(msg.SubstringAbs(lastEndIndex, emote.StartIndex - 1),
+                                              chatMessage.Channel));
                     }
 
                     fragments.Add(new EmoteFragment(new TwitchEmote(int.Parse(emote.Id), emote.Name)));
@@ -134,28 +162,36 @@ namespace ChatModApp.Services
             return fragments;
         }
 
-        public async Task LoadChannelEmotes(string channel)
+        private async Task LoadChannelEmotes(string channel)
         {
             var res = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> {channel});
 
-            var id = res.Users.Single().Id;
+            var id = int.Parse(res.Users.Single().Id);
 
-            var emotes = await _bttvApi.GetUserEmotes(int.Parse(id));
+            var bttvEmotes = await _bttvApi.GetUserEmotes(id);
+
+            var ffzEmotes = await _ffzApi.GetChannelEmotes(id);
 
             _emotes.Edit(updater =>
             {
-                updater.AddOrUpdate(emotes.ChannelEmotes.Select(
+                updater.AddOrUpdate(bttvEmotes.ChannelEmotes.Select(
                                         emote => new EmoteKeyValue(
                                             new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
                                                          channel), emote)));
-                updater.AddOrUpdate(emotes.SharedEmotes.Select(
+                updater.AddOrUpdate(bttvEmotes.SharedEmotes.Select(
                                         emote => new EmoteKeyValue(
                                             new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
                                                          channel), emote)));
+
+                updater.AddOrUpdate(ffzEmotes.Sets.SelectMany(pair => pair.Value.Emoticons)
+                                             .Select(emote => new EmoteKeyValue(
+                                                         new EmoteKey(
+                                                             EmoteKey.EmoteType.FrankerZ | EmoteKey.EmoteType.Member,
+                                                             emote, channel), emote)));
             });
         }
 
-        public void UnloadChannelEmotes(string channel)
+        private void UnloadChannelEmotes(string channel)
         {
             var group = UserEmoteGroups.Lookup(channel);
             if (!@group.HasValue)
@@ -180,7 +216,7 @@ namespace ChatModApp.Services
                 if (res1.HasValue)
                 {
                     fragments.Add(new EmoteFragment(res1.Value));
-                    break;
+                    continue;
                 }
 
                 var res2 = _userEmotes.Lookup(channel);
@@ -190,7 +226,7 @@ namespace ChatModApp.Services
                     if (res3.HasValue)
                     {
                         fragments.Add(new EmoteFragment(res3.Value));
-                        break;
+                        continue;
                     }
                 }
 
@@ -208,7 +244,7 @@ namespace ChatModApp.Services
         }
 
 
-        private async Task<Unit> Connect(User user, CancellationToken cancel)
+        private async Task<Unit> LoadGlobalEmotes(User user, CancellationToken cancel)
         {
             var globalEmotes = await _apiService.V5.Users.GetUserEmotesAsync(user.Id, _authService.TwitchAccessToken);
 
@@ -219,6 +255,9 @@ namespace ChatModApp.Services
 
             var globalBttvEmotes = await _bttvApi.GetGlobalEmotes();
 
+            var ffzRes = await _ffzApi.GetGlobalEmotes();
+
+            var globalFfzEmotes = ffzRes.DefaultSets.Select(key => ffzRes.Sets[key]).SelectMany(set => set.Emoticons);
 
             _emotes.Edit(updater =>
             {
@@ -231,6 +270,10 @@ namespace ChatModApp.Services
                                         emote => new EmoteKeyValue(
                                             new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Global, emote),
                                             emote)));
+                updater.AddOrUpdate(globalFfzEmotes.Select(
+                                        emote => new EmoteKeyValue(
+                                            new EmoteKey(EmoteKey.EmoteType.FrankerZ | EmoteKey.EmoteType.Global,
+                                                         emote), emote)));
             });
 
             return Unit.Default;

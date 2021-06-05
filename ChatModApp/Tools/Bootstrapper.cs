@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Windows.Storage;
 using ChatModApp.Services;
 using ChatModApp.Services.ApiClients;
@@ -17,8 +15,6 @@ using ReactiveUI;
 using Refit;
 using Splat;
 using Splat.Microsoft.Extensions.DependencyInjection;
-using Tools;
-using Tools.Extensions;
 using LogLevel = NLog.LogLevel;
 using Registrations = Akavache.Registrations;
 
@@ -73,14 +69,6 @@ namespace ChatModApp.Tools
             Container = host.Services;
         }
 
-        public static Task InitServices()
-        {
-            var tasks = Container.GetServices<IService>()
-                .Select(s => s.Initialize());
-
-            return Task.WhenAll(tasks);
-        }
-
         private static void ConfigureServices(IServiceCollection services)
         {
             var resolver = Locator.CurrentMutable;
@@ -93,6 +81,10 @@ namespace ChatModApp.Tools
             services
                 .AddRefitClient<IBttvApi>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.betterttv.net/3/cached"));
+
+            services
+                .AddRefitClient<IFfzApi>()
+                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.frankerfacez.com/v1"));
             
             services
                 .AddSingleton<MainViewModel>()

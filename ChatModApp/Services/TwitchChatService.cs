@@ -16,15 +16,13 @@ namespace ChatModApp.Services
         public IObservable<ChatMessage> ChatMessageReceived { get; }
 
         private readonly AuthenticationService _authService;
-        private readonly EmotesService _emotesService;
         private readonly TwitchClient _client;
 
         private readonly SourceList<string> _joinedChannels;
 
-        public TwitchChatService(TwitchApiService apiService, AuthenticationService authService, EmotesService emotesService)
+        public TwitchChatService(TwitchApiService apiService, AuthenticationService authService)
         {
             _authService = authService;
-            _emotesService = emotesService;
 
             _joinedChannels = new SourceList<string>();
             _client = new TwitchClient();
@@ -41,20 +39,16 @@ namespace ChatModApp.Services
 
         public Task Initialize() => Task.CompletedTask;
 
-        public Task JoinChannel(string channel)
+        public void JoinChannel(string channel)
         {
             _client.JoinChannel(channel);
             _joinedChannels.Add(channel);
-
-            return _emotesService.LoadChannelEmotes(channel);
         }
 
         public void LeaveChannel(string channel)
         {
             _client.LeaveChannel(channel);
             _joinedChannels.Remove(channel);
-
-            _emotesService.UnloadChannelEmotes(channel);
         }
 
 
