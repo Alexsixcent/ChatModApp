@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using ChatModApp.Models;
+using ChatModApp.Models.Chat.Fragments;
 using ReactiveUI;
 
 namespace ChatModApp.ViewModels

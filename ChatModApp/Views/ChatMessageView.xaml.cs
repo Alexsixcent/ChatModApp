@@ -1,8 +1,10 @@
 ﻿using System;
 using Windows.UI.Text;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 using ChatModApp.Models;
+using ChatModApp.Models.Chat.Fragments;
 using ChatModApp.Tools.Extensions;
 using ChatModApp.ViewModels;
 using Microsoft.Toolkit.Uwp.UI.Controls;
@@ -31,8 +33,9 @@ namespace ChatModApp.Views
                 _badges = new Span();
                 _username = new Run
                 {
-                    Text = ViewModel.Username, FontWeight = FontWeights.Bold,
-                    Foreground = new SolidColorBrush(ViewModel.UsernameColor.ToUiColor(byte.MaxValue))
+                    Text = ViewModel.Username,
+                    FontWeight = FontWeights.Bold,
+                    Foreground = new SolidColorBrush(ViewModel.UsernameColor.ToUiColor())
                 };
                 _message = new Span();
 
@@ -56,15 +59,22 @@ namespace ChatModApp.Views
         {
             return fragment switch
             {
-                TextFragment text => new Run {Text = text.Text},
-                EmoteFragment emote => new InlineUIContainer
+                TextFragment textFrag => new Run {Text = textFrag.Text},
+                EmoteFragment emoteFrag => new InlineUIContainer
                 {
                     Child = new ImageEx
                     {
-                        IsCacheEnabled = true, 
-                        Source = emote.Emote.Uri, 
-                        Stretch = Stretch.None
+                        IsCacheEnabled = true,
+                        Source = emoteFrag.Emote.Uri,
+                        Stretch = Stretch.None, 
+                        Margin = new Thickness(2,0,2,0)
                     }
+                },
+                UriFragment uriFrag => new Hyperlink
+                {
+                    Inlines = {new Run {Text = uriFrag.Text}},
+                    NavigateUri = uriFrag.Uri,
+                    UnderlineStyle = UnderlineStyle.None,
                 },
                 _ => throw new ArgumentException("Fragment not of valid type.")
             };

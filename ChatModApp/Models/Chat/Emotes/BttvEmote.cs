@@ -1,7 +1,7 @@
 ﻿using System;
 using Refit;
 
-namespace ChatModApp.Models.Emotes
+namespace ChatModApp.Models.Chat.Emotes
 {
     public interface IBttvEmote : IEmote
     {

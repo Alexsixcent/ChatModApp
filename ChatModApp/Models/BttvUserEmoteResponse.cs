@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using ChatModApp.Models.Emotes;
+using ChatModApp.Models.Chat.Emotes;
 using Refit;
 
 namespace ChatModApp.Models

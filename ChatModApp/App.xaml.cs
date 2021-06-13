@@ -5,9 +5,11 @@ using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using ChatModApp.Services;
 using ChatModApp.Tools;
 using ChatModApp.Views;
 using ReactiveUI;
+using Splat;
 
 namespace ChatModApp
 {
@@ -42,7 +44,7 @@ namespace ChatModApp
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override void OnLaunched(LaunchActivatedEventArgs e)
+        protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
             _autoSuspendHelper.OnLaunched(e);
 
@@ -54,8 +56,12 @@ namespace ChatModApp
                 rootFrame = new Frame();
                 rootFrame.NavigationFailed += OnNavigationFailed;
 
-                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                if (e.PreviousExecutionState != ApplicationExecutionState.Running &&
+                    e.PreviousExecutionState != ApplicationExecutionState.Suspended)
                 {
+                    var stateService = Locator.Current.GetService<GlobalStateService>();
+                    await stateService.Initialize();
+
                     //TODO: Load state from previously suspended application
                 }
 
@@ -63,9 +69,9 @@ namespace ChatModApp
                 Window.Current.Content = rootFrame;
             }
 
-            if (e.PrelaunchActivated) 
+            if (e.PrelaunchActivated)
                 return;
-            
+
             if (rootFrame.Content is null)
             {
                 // When the navigation stack isn't restored navigate to the first page,
@@ -73,6 +79,7 @@ namespace ChatModApp
                 // parameter
                 rootFrame.Navigate(typeof(MainView), e.Arguments);
             }
+
             // Ensure the current window is active
             Window.Current.Activate();
         }
@@ -101,7 +108,8 @@ namespace ChatModApp
             deferral.Complete();
         }
 
-        private static void OnUnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e) => e.Handled = true;
+        private static void OnUnhandledException(object sender, Windows.UI.Xaml.UnhandledExceptionEventArgs e) =>
+            e.Handled = true;
 
         private static void OnUnobservedException(object sender, UnobservedTaskExceptionEventArgs e) => e.SetObserved();
     }

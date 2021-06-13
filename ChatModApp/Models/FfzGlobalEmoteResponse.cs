@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using ChatModApp.Models.Emotes;
+using ChatModApp.Models.Chat.Emotes;
 
 namespace ChatModApp.Models
 {

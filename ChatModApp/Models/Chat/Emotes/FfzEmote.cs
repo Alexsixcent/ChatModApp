@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using Tools.Extensions;
 
-namespace ChatModApp.Models.Emotes
+namespace ChatModApp.Models.Chat.Emotes
 {
     public class FfzEmote : IEmote
     {

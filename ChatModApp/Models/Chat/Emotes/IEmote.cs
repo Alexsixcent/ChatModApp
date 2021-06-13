@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChatModApp.Models
+namespace ChatModApp.Models.Chat.Emotes
 {
     public interface IEmote
     {

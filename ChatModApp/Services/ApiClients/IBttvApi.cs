@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using ChatModApp.Models;
-using ChatModApp.Models.Emotes;
+using ChatModApp.Models.Chat.Emotes;
 using Refit;
 
 namespace ChatModApp.Services.ApiClients

@@ -29,42 +29,43 @@ namespace ChatModApp.Tools
             Registrations.Start("ChatModApp");
 
             var host = Host
-                .CreateDefaultBuilder()
-                .ConfigureLogging(builder =>
-                {
-                    builder.ClearProviders();
-                    builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
+                       .CreateDefaultBuilder()
+                       .ConfigureLogging(builder =>
+                       {
+                           builder.ClearProviders();
+                           builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
 
-                    var config = new LoggingConfiguration();
+                           var config = new LoggingConfiguration();
 
-                    var logConsole = new ConsoleTarget
-                    {
-                        AutoFlush = true,
-                        DetectConsoleAvailable = false
-                    };
+                           var logConsole = new ConsoleTarget
+                           {
+                               AutoFlush = true,
+                               DetectConsoleAvailable = false
+                           };
 
-                    var logFile = new FileTarget{
-                        FileName = Path.Combine(ApplicationData.Current.LocalCacheFolder.Path, "globalLogs.log"),
-                        KeepFileOpen = true,
-                        AutoFlush = true,
-                        ConcurrentWrites = false,
-                        DeleteOldFileOnStartup = true
-                    };
+                           var logFile = new FileTarget
+                           {
+                               FileName = Path.Combine(ApplicationData.Current.LocalCacheFolder.Path, "globalLogs.log"),
+                               KeepFileOpen = true,
+                               AutoFlush = true,
+                               ConcurrentWrites = false,
+                               DeleteOldFileOnStartup = true
+                           };
 
-                    config.AddRule(LogLevel.Trace, LogLevel.Fatal, logConsole);
-                    config.AddRule(LogLevel.Trace, LogLevel.Fatal, logFile);
+                           config.AddRule(LogLevel.Trace, LogLevel.Fatal, logConsole);
+                           config.AddRule(LogLevel.Trace, LogLevel.Fatal, logFile);
 
-                    builder.AddNLog(config);
-                    builder.AddConsole();
-                })
-                .ConfigureServices(services =>
-                {
-                    services.UseMicrosoftDependencyResolver();
+                           builder.AddNLog(config);
+                           builder.AddConsole();
+                       })
+                       .ConfigureServices(services =>
+                       {
+                           services.UseMicrosoftDependencyResolver();
 
-                    ConfigureServices(services);
-                })
-                .UseEnvironment(Environments.Development)
-                .Build();
+                           ConfigureServices(services);
+                       })
+                       .UseEnvironment(Environments.Development)
+                       .Build();
 
             Container = host.Services;
         }
@@ -85,7 +86,7 @@ namespace ChatModApp.Tools
             services
                 .AddRefitClient<IFfzApi>()
                 .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.frankerfacez.com/v1"));
-            
+
             services
                 .AddSingleton<MainViewModel>()
                 .AddSingleton<AuthenticationViewModel>()
@@ -94,6 +95,7 @@ namespace ChatModApp.Tools
                 .AddTransient<ChatTabItemViewModel>()
                 .AddTransient<ChatTabPromptViewModel>()
 
+                .AddSingleton<GlobalStateService>()
                 .AddSingleton<AuthenticationService>()
                 .AddSingleton<TwitchApiService>()
                 .AddSingleton<TwitchChatService>()

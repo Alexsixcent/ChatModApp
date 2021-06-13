@@ -76,27 +76,28 @@
     <Use64BitCompiler>true</Use64BitCompiler>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Converters\ChatMessageTemplateSelector.cs" />
     <Compile Include="Converters\GenericConverter.cs" />
     <Compile Include="Models\BttvUserEmoteResponse.cs" />
-    <Compile Include="Models\Emotes\BttvEmote.cs" />
-    <Compile Include="Models\EmoteFragment.cs" />
-    <Compile Include="Models\Emotes\FfzEmote.cs" />
-    <Compile Include="Models\Emotes\IEmote.cs" />
+    <Compile Include="Models\Chat\Emotes\BttvEmote.cs" />
+    <Compile Include="Models\Chat\Fragments\EmoteFragment.cs" />
+    <Compile Include="Models\Chat\Emotes\FfzEmote.cs" />
+    <Compile Include="Models\Chat\Emotes\IEmote.cs" />
+    <Compile Include="Models\Chat\Fragments\UriFragment.cs" />
     <Compile Include="Models\FfzUserEmoteResponse.cs" />
-    <Compile Include="Models\IMessageFragment.cs" />
-    <Compile Include="Models\TextFragment.cs" />
+    <Compile Include="Models\Chat\Fragments\IMessageFragment.cs" />
+    <Compile Include="Models\Chat\Fragments\TextFragment.cs" />
     <Compile Include="Models\TwitchAuthResponseType.cs" />
     <Compile Include="Models\TwitchAuthScope.cs" />
     <Compile Include="Models\TwitchAuthQueryParams.cs" />
-    <Compile Include="Models\Emotes\TwitchEmote.cs" />
+    <Compile Include="Models\Chat\Emotes\TwitchEmote.cs" />
     <Compile Include="Models\FfzGlobalEmoteResponse.cs" />
     <Compile Include="Services\ApiClients\IBttvApi.cs" />
     <Compile Include="Services\ApiClients\IFfzApi.cs" />
     <Compile Include="Services\AuthenticationService.cs" />
-    <Compile Include="Models\Emotes\EmoteKey.cs" />
+    <Compile Include="Models\Chat\Emotes\EmoteKey.cs" />
     <Compile Include="Services\EmotesService.cs" />
     <Compile Include="Services\ApiClients\IAuthApi.cs" />
+    <Compile Include="Services\GlobalStateService.cs" />
     <Compile Include="Tools\Grouping.cs" />
     <Compile Include="Services\TwitchApiService.cs" />
     <Compile Include="Tools\AkavacheSuspensionDriver.cs" />

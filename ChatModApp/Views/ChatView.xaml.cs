@@ -2,8 +2,6 @@
 using ChatModApp.ViewModels;
 using ReactiveUI;
 
-// The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
-
 namespace ChatModApp.Views
 {
     public class ChatViewBase : ReactiveUserControl<ChatViewModel>

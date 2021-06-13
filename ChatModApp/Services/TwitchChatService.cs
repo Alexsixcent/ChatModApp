@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using DynamicData;
 using Microsoft.Extensions.Logging;
-using Tools;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -13,7 +11,7 @@ using TwitchLib.Communication.Models;
 
 namespace ChatModApp.Services
 {
-    public class TwitchChatService : IService
+    public class TwitchChatService
     {
         public IObservableList<string> ChannelsJoined { get; }
         public IObservable<ChatMessage> ChatMessageReceived { get; }
@@ -50,8 +48,6 @@ namespace ChatModApp.Services
                                   .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
                                   .Select(pattern => pattern.EventArgs.ChatMessage);
         }
-
-        public Task Initialize() => Task.CompletedTask;
 
         public void JoinChannel(string channel)
         {

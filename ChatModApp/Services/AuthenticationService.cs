@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using System.Web;
 using ChatModApp.Models;
 using ReactiveUI;
-using Tools;
 using Tools.Extensions;
 
 namespace ChatModApp.Services
 {
-    public class AuthenticationService : IService
+    public class AuthenticationService 
     {
         public const string ClientId = "110gs3dzgr2bj3ask88vqi7mnczk02";
 
@@ -47,8 +45,6 @@ namespace ChatModApp.Services
             connectable.Connect();
             AccessTokenChanged = connectable;
         }
-
-        public Task Initialize() => Task.CompletedTask;
 
         public (Uri Uri, TwitchAuthQueryParams QueryParams) GenerateAuthUri()
         {

@@ -4,7 +4,6 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Tools;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
@@ -12,7 +11,7 @@ using TwitchLib.Api.V5;
 
 namespace ChatModApp.Services
 {
-    public class TwitchApiService : IService
+    public class TwitchApiService
     {
         public IObservable<User> UserConnected { get; }
 
@@ -29,8 +28,6 @@ namespace ChatModApp.Services
                                        .Select(Connect)
                                        .SelectMany(GetCurrentUser);
         }
-
-        public Task Initialize() => Task.CompletedTask;
 
         private Unit Connect(string accessToken)
         {

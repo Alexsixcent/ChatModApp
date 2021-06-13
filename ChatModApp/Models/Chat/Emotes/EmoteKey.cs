@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChatModApp.Models.Emotes
+namespace ChatModApp.Models.Chat.Emotes
 {
     public sealed class EmoteKey
     {
