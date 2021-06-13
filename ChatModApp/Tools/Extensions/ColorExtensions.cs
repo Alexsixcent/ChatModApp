@@ -1,5 +1,4 @@
-﻿using System;
-using UiColor = Windows.UI.Color;
+﻿using UiColor = Windows.UI.Color;
 using SysColor = System.Drawing.Color;
 
 namespace ChatModApp.Tools.Extensions

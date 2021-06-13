@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Globalization;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using ChatModApp.Services;
 using DynamicData;
 using ReactiveUI;
+using Tools.Extensions;
 
 
 namespace ChatModApp.ViewModels
@@ -46,7 +48,9 @@ namespace ChatModApp.ViewModels
                             {
                                 Username = message.DisplayName,
                                 Message = emotesService.GetMessageFragments(message),
-                                UsernameColor = message.Color
+                                UsernameColor = string.IsNullOrEmpty(message.ColorHex)
+                                    ? Color.Gray
+                                    : Color.FromArgb(int.Parse(message.ColorHex.TrimStart(1), NumberStyles.HexNumber))
                             });
                         })
                         .DisposeWith(_disposables);
