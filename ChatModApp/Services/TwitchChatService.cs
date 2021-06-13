@@ -2,11 +2,14 @@
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using DynamicData;
+using Microsoft.Extensions.Logging;
 using Tools;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
+using TwitchLib.Communication.Clients;
+using TwitchLib.Communication.Models;
 
 namespace ChatModApp.Services
 {
@@ -20,12 +23,22 @@ namespace ChatModApp.Services
 
         private readonly SourceList<string> _joinedChannels;
 
-        public TwitchChatService(TwitchApiService apiService, AuthenticationService authService)
+        public TwitchChatService(TwitchApiService apiService, AuthenticationService authService,
+                                 ILogger<TwitchClient> clientLogger)
         {
             _authService = authService;
 
             _joinedChannels = new SourceList<string>();
-            _client = new TwitchClient();
+
+            var clientOptions = new ClientOptions
+            {
+                MessagesAllowedInPeriod = 10000,
+                ThrottlingPeriod = TimeSpan.FromSeconds(1)
+            };
+
+            var customSocketClient = new WebSocketClient(clientOptions);
+
+            _client = new TwitchClient(customSocketClient, logger: clientLogger);
 
             apiService.UserConnected
                       .Subscribe(Connect);
@@ -33,8 +46,9 @@ namespace ChatModApp.Services
             ChannelsJoined = _joinedChannels.Connect()
                                             .AsObservableList();
 
-            ChatMessageReceived = Observable.FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
-                                            .Select(pattern => pattern.EventArgs.ChatMessage);
+            ChatMessageReceived = Observable
+                                  .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
+                                  .Select(pattern => pattern.EventArgs.ChatMessage);
         }
 
         public Task Initialize() => Task.CompletedTask;

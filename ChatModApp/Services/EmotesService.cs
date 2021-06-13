@@ -149,7 +149,7 @@ namespace ChatModApp.Services
                                               chatMessage.Channel));
                     }
 
-                    fragments.Add(new EmoteFragment(new TwitchEmote(int.Parse(emote.Id), emote.Name)));
+                    fragments.Add(new EmoteFragment(new TwitchEmote(emote.Id, emote.Name)));
                     lastEndIndex = emote.EndIndex + 1;
                 }
 
@@ -251,7 +251,7 @@ namespace ChatModApp.Services
             var globalTwitchEmotes =
                 (from emoteSet in globalEmotes.EmoteSets
                  from emote in emoteSet.Value
-                 select new TwitchGlobalEmote(emote.Id, emote.Code));
+                 select new TwitchGlobalEmote(emote.Id.ToString(), emote.Code));
 
             var globalBttvEmotes = await _bttvApi.GetGlobalEmotes();
 
