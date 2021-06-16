@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using DynamicData;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,7 @@ using TwitchLib.Communication.Models;
 
 namespace ChatModApp.Services
 {
-    public class TwitchChatService
+    public class TwitchChatService : IDisposable
     {
         public IObservableList<string> ChannelsJoined { get; }
         public IObservable<ChatMessage> ChatMessageReceived { get; }
@@ -19,14 +20,15 @@ namespace ChatModApp.Services
         private readonly AuthenticationService _authService;
         private readonly TwitchClient _client;
 
-        private readonly SourceList<string> _joinedChannels;
+        private readonly CompositeDisposable _disposables;
 
         public TwitchChatService(TwitchApiService apiService, AuthenticationService authService,
                                  ILogger<TwitchClient> clientLogger)
         {
+            var joinedChannels = new SourceList<string>();
             _authService = authService;
 
-            _joinedChannels = new SourceList<string>();
+            _disposables = new CompositeDisposable();
 
             var clientOptions = new ClientOptions
             {
@@ -41,25 +43,31 @@ namespace ChatModApp.Services
             apiService.UserConnected
                       .Subscribe(Connect);
 
-            ChannelsJoined = _joinedChannels.Connect()
+            ChannelsJoined = joinedChannels.Connect()
                                             .AsObservableList();
 
             ChatMessageReceived = Observable
-                                  .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
-                                  .Select(pattern => pattern.EventArgs.ChatMessage);
+                              .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
+                              .Select(pattern => pattern.EventArgs.ChatMessage);
+
+            Observable.FromEventPattern<OnJoinedChannelArgs>(_client, nameof(_client.OnJoinedChannel))
+                      .Select(pattern => pattern.EventArgs.Channel)
+                      .Subscribe(s => joinedChannels.Add(s))
+                      .DisposeWith(_disposables);
+
+            Observable.FromEventPattern<OnLeftChannelArgs>(_client, nameof(_client.OnLeftChannel))
+                      .Select(pattern => pattern.EventArgs.Channel)
+                      .Subscribe(s => joinedChannels.Remove(s))
+                      .DisposeWith(_disposables);
+
+            joinedChannels.DisposeWith(_disposables);
         }
 
-        public void JoinChannel(string channel)
-        {
-            _client.JoinChannel(channel);
-            _joinedChannels.Add(channel);
-        }
+        public void JoinChannel(string channel) => _client.JoinChannel(channel);
 
-        public void LeaveChannel(string channel)
-        {
-            _client.LeaveChannel(channel);
-            _joinedChannels.Remove(channel);
-        }
+        public void LeaveChannel(string channel) => _client.LeaveChannel(channel);
+
+        public void Dispose() => _disposables.Dispose();
 
 
         private void Connect(User user)
