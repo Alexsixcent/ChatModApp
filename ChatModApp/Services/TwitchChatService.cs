@@ -44,7 +44,7 @@ namespace ChatModApp.Services
                       .Subscribe(Connect);
 
             ChannelsJoined = joinedChannels.Connect()
-                                            .AsObservableList();
+                                           .AsObservableList();
 
             ChatMessageReceived = Observable
                               .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))

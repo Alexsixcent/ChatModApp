@@ -6,15 +6,11 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ChatModApp.Models;
 using ChatModApp.Models.Chat.Emotes;
-using ChatModApp.Models.Chat.Fragments;
 using ChatModApp.Services.ApiClients;
 using ChatModApp.Tools;
 using DynamicData;
-using Tools.Extensions;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
-using TwitchLib.Client.Models;
 using EmoteKeyValue =
     System.Collections.Generic.KeyValuePair<ChatModApp.Models.Chat.Emotes.EmoteKey,
         ChatModApp.Models.Chat.Emotes.IEmote>;
@@ -23,6 +19,9 @@ namespace ChatModApp.Services
 {
     public class EmotesService : IDisposable
     {
+        public IObservableCache<IEmote, string> GlobalEmotes { get; }
+        public IObservableCache<Grouping<IEmote, string, string>, string> UserEmotes { get; }
+
         public IObservableCache<IGroup<IEmote, string, EmoteKey.EmoteType>, EmoteKey.EmoteType> GlobalEmoteGroups
         {
             get;
@@ -31,7 +30,6 @@ namespace ChatModApp.Services
         public IObservableCache<Grouping<Grouping<IEmote, string, EmoteKey.EmoteType>, EmoteKey.EmoteType, string>,
             string> UserEmoteGroups { get; }
 
-        private readonly GlobalStateService _globalStateService;
         private readonly TwitchApiService _apiService;
         private readonly TwitchChatService _chatService;
         private readonly AuthenticationService _authService;
@@ -40,11 +38,9 @@ namespace ChatModApp.Services
 
         private readonly CompositeDisposable _disposable;
         private readonly SourceCache<EmoteKeyValue, EmoteKey> _emotes;
-        private readonly IObservableCache<IEmote, string> _globalEmotes;
-        private readonly IObservableCache<Grouping<IEmote, string, string>, string> _userEmotes;
 
         public EmotesService(TwitchApiService apiService, AuthenticationService authService, IBttvApi bttvApi,
-                             TwitchChatService chatService, IFfzApi ffzApi, GlobalStateService globalStateService)
+                             TwitchChatService chatService, IFfzApi ffzApi)
         {
             _disposable = new CompositeDisposable();
             _emotes = new SourceCache<EmoteKeyValue, EmoteKey>(kv => kv.Key);
@@ -53,7 +49,6 @@ namespace ChatModApp.Services
             _bttvApi = bttvApi;
             _chatService = chatService;
             _ffzApi = ffzApi;
-            _globalStateService = globalStateService;
 
             _apiService.UserConnected
                        .SelectMany(LoadGlobalEmotes)
@@ -66,21 +61,23 @@ namespace ChatModApp.Services
                         .Subscribe()
                         .DisposeWith(_disposable);
 
-            _globalEmotes = _emotes.Connect()
-                                   .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Global))
-                                   .ChangeKey(kv => kv.Key.Code)
-                                   .Transform(kv => kv.Value)
-                                   .AsObservableCache();
+            GlobalEmotes = _emotes.Connect()
+                                  .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Global))
+                                  .ChangeKey(kv => kv.Key.Code)
+                                  .Transform(kv => kv.Value)
+                                  .AsObservableCache();
 
-            _userEmotes = _emotes.Connect()
-                                 .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Member))
-                                 .Group(kv => kv.Key.Channel)
-                                 .Transform(group => new Grouping<IEmote, string, string>(
-                                                group.Key,
-                                                group.Cache.Connect().ChangeKey(kv => kv.Value.Code)
-                                                     .Transform(pair => pair.Value).AsObservableCache()))
-                                 .DisposeMany()
-                                 .AsObservableCache();
+            UserEmotes = _emotes.Connect()
+                                .Filter(kv => kv.Key.Type.HasFlag(EmoteKey.EmoteType.Member))
+                                .Group(kv => kv.Key.Channel)
+                                .Transform(group => new Grouping<IEmote, string, string>(
+                                               group.Key,
+                                               group.Cache.Connect()
+                                                    .ChangeKey(kv => kv.Value.Code)
+                                                    .Transform(pair => pair.Value)
+                                                    .AsObservableCache()))
+                                .DisposeMany()
+                                .AsObservableCache();
 
 
             GlobalEmoteGroups = _emotes.Connect()
@@ -120,137 +117,14 @@ namespace ChatModApp.Services
                                      .AsObservableCache();
 
             _emotes.DisposeWith(_disposable);
-            _globalEmotes.DisposeWith(_disposable);
-            _userEmotes.DisposeWith(_disposable);
+            GlobalEmotes.DisposeWith(_disposable);
+            UserEmotes.DisposeWith(_disposable);
 
             GlobalEmoteGroups.DisposeWith(_disposable);
             UserEmoteGroups.DisposeWith(_disposable);
         }
 
         public void Dispose() => _disposable.Dispose();
-
-        public IEnumerable<IMessageFragment> GetMessageFragments(ChatMessage chatMessage)
-        {
-            var msg = chatMessage.Message;
-            var fragments = new List<IMessageFragment>();
-
-
-            if (chatMessage.EmoteSet.Emotes.Count == 0)
-            {
-                fragments.AddRange(ParseTextFragment(msg, chatMessage.Channel, false, false));
-            }
-            else
-            {
-                chatMessage.EmoteSet.Emotes.Sort((left, right) => left.StartIndex.CompareTo(right.StartIndex));
-
-                var lastEndIndex = 0;
-                foreach (var emote in chatMessage.EmoteSet.Emotes)
-                {
-                    if (emote.StartIndex - lastEndIndex > 1)
-                    {
-                        fragments.AddRange(
-                            ParseTextFragment(msg.SubstringAbs(lastEndIndex, emote.StartIndex - 1),
-                                              chatMessage.Channel, lastEndIndex == 0));
-                    }
-
-                    fragments.Add(new EmoteFragment(new TwitchEmote(emote.Id, emote.Name)));
-                    lastEndIndex = emote.EndIndex + 1;
-                }
-
-                if (lastEndIndex < msg.Length - 1)
-                {
-                    fragments.AddRange(ParseTextFragment(msg.Substring(lastEndIndex), chatMessage.Channel,
-                                                         endSpace: false));
-                }
-            }
-
-            return fragments;
-        }
-
-        private IEnumerable<IMessageFragment> ParseTextFragment(string msg, string channel, bool startSpace = true,
-                                                                bool endSpace = true)
-        {
-            var fragments = new List<IMessageFragment>();
-
-            foreach (var frag in msg.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-            {
-                var res1 = _globalEmotes.Lookup(frag);
-                if (res1.HasValue)
-                {
-                    fragments.Add(new EmoteFragment(res1.Value));
-                    continue;
-                }
-
-                var res2 = _userEmotes.Lookup(channel);
-                if (res2.HasValue)
-                {
-                    var res3 = res2.Value.Cache.Lookup(frag);
-                    if (res3.HasValue)
-                    {
-                        fragments.Add(new EmoteFragment(res3.Value));
-                        continue;
-                    }
-                }
-
-                if (HasValidHost(frag) &&
-                    Uri.TryCreate(frag, UriKind.RelativeOrAbsolute, out var uriRes))
-                {
-                    if (uriRes.IsAbsoluteUri)
-                    {
-                        if (uriRes.Scheme == Uri.UriSchemeHttp || uriRes.Scheme == Uri.UriSchemeHttps)
-                        {
-                            fragments.Add(new UriFragment(uriRes));
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        fragments.Add(new UriFragment(new UriBuilder(frag)
-                        {
-                            Scheme = Uri.UriSchemeHttps,
-                            Port = -1
-                        }.Uri, frag));
-                        continue;
-                    }
-                }
-
-                if (fragments.LastOrDefault() is TextFragment text)
-                {
-                    text.Text += frag + ' ';
-                }
-                else
-                {
-                    fragments.Add(new TextFragment(' ' + frag + ' '));
-                }
-            }
-
-            if (!startSpace && fragments.First() is TextFragment firstFrag)
-                firstFrag.Text = firstFrag.Text.TrimStart(' ');
-
-            if (!endSpace && fragments.Last() is TextFragment lastFrag)
-                lastFrag.Text = lastFrag.Text.TrimEnd(' ');
-
-            return fragments;
-        }
-
-        private bool HasValidHost(string uri)
-        {
-            var host = uri
-                       .TrimStart("http://")
-                       .TrimStart("https://")
-                       .Split('/', StringSplitOptions.RemoveEmptyEntries)
-                       .FirstOrDefault();
-
-            if (string.IsNullOrEmpty(host))
-                return false;
-
-            var i = host.LastIndexOf('.');
-
-            return i > 0
-                   && !uri.StartsWith('.')
-                   && !uri.EndsWith('.')
-                   && _globalStateService.TLDs.Contains(host.Substring(i + 1).ToLowerInvariant());
-        }
 
 
         private async Task LoadChannelEmotes(string channel)

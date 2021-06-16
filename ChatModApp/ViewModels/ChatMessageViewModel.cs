@@ -7,8 +7,17 @@ namespace ChatModApp.ViewModels
 {
     public class ChatMessageViewModel : ReactiveObject
     {
-        public string Username { get; set; }
-        public IEnumerable<IMessageFragment> Message { get; set; }
-        public Color UsernameColor { get; set; }
+        public ChatMessageViewModel(string id, string username, IEnumerable<IMessageFragment> message, Color usernameColor)
+        {
+            Id = id;
+            Username = username;
+            Message = message;
+            UsernameColor = usernameColor;
+        }
+
+        public string Id { get; }
+        public string Username { get; }
+        public IEnumerable<IMessageFragment> Message { get; }
+        public Color UsernameColor { get; }
     }
 }
