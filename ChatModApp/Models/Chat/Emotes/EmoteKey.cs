@@ -35,16 +35,9 @@ namespace ChatModApp.Models.Chat.Emotes
         }
 
 
-        public override bool Equals(object obj)
-        {
-            if (obj is EmoteKey other)
-            {
-                return Type == other.Type && Code == other.Code && Channel == other.Channel;
-            }
+        public override bool Equals(object obj) =>
+            obj is EmoteKey other && Type == other.Type && Code == other.Code && Channel == other.Channel;
 
-            return false;
-        }
-
-        public override int GetHashCode() => Tuple.Create(Type, Code, Channel).GetHashCode();
+        public override int GetHashCode() => (Type, Code, Channel).GetHashCode();
     }
 }

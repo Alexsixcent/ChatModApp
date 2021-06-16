@@ -3,14 +3,11 @@ using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
-using ChatModApp.Models;
 using ChatModApp.Models.Chat.Fragments;
 using ChatModApp.Tools.Extensions;
 using ChatModApp.ViewModels;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using ReactiveUI;
-
-// The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace ChatModApp.Views
 {
@@ -20,6 +17,8 @@ namespace ChatModApp.Views
 
     public sealed partial class ChatMessageView
     {
+        private const int InlineImagesVerticalOffset = 2;
+
         private Span _badges;
         private Run _username;
         private Span _message;
@@ -38,6 +37,21 @@ namespace ChatModApp.Views
                     Foreground = new SolidColorBrush(ViewModel.UsernameColor.ToUiColor())
                 };
                 _message = new Span();
+
+                foreach (var badge in ViewModel.Badges)
+                {
+                    _badges.Inlines.Add(new InlineUIContainer
+                    {
+                        Child = new ImageEx
+                        {
+                            IsCacheEnabled = true,
+                            Source = badge.Small,
+                            Stretch = Stretch.None,
+                            Margin = new Thickness(2, 0, 2, 0),
+                            RenderTransform = new TranslateTransform {Y = InlineImagesVerticalOffset}
+                        }
+                    });
+                }
 
                 foreach (var fragment in ViewModel.Message)
                 {
@@ -59,16 +73,17 @@ namespace ChatModApp.Views
         {
             return fragment switch
             {
-                TextFragment textFrag => new Run {Text = textFrag.Text},
+                TextFragment textFrag => new Run { Text = textFrag.Text },
                 EmoteFragment emoteFrag => new InlineUIContainer
                 {
                     Child = new ImageEx
                     {
                         IsCacheEnabled = true,
                         Source = emoteFrag.Emote.Uri,
-                        Stretch = Stretch.None, 
-                        Margin = new Thickness(2,0,2,0)
-                    }
+                        Stretch = Stretch.None,
+                        Margin = new Thickness(2, 0, 2, 0),
+                        RenderTransform = new TranslateTransform {Y = InlineImagesVerticalOffset}
+                    },
                 },
                 UriFragment uriFrag => new Hyperlink
                 {

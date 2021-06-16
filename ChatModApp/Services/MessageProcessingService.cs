@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using ChatModApp.Models.Chat;
 using ChatModApp.Models.Chat.Emotes;
 using ChatModApp.Models.Chat.Fragments;
 using ChatModApp.ViewModels;
@@ -11,15 +12,17 @@ using TwitchLib.Client.Models;
 
 namespace ChatModApp.Services
 {
-    public class MessageProccessingService
+    public class MessageProcessingService
     {
         private readonly GlobalStateService _globalStateService;
         private readonly EmotesService _emotesService;
+        private readonly TwitchChatService _chatService;
 
-        public MessageProccessingService(GlobalStateService globalStateService, EmotesService emotesService)
+        public MessageProcessingService(GlobalStateService globalStateService, EmotesService emotesService, TwitchChatService chatService)
         {
             _globalStateService = globalStateService;
             _emotesService = emotesService;
+            _chatService = chatService;
         }
 
         public ChatMessageViewModel ProcessMessageViewModel(ChatMessage message)
@@ -27,6 +30,7 @@ namespace ChatModApp.Services
             return new(
                 message.Id,
                 message.DisplayName,
+                GetMessageBadges(message),
                 GetMessageFragments(message),
                 string.IsNullOrEmpty(message.ColorHex)
                     ? Color.Gray
@@ -35,6 +39,19 @@ namespace ChatModApp.Services
                                   NumberStyles.HexNumber)));
         }
 
+        private IEnumerable<IChatBadge> GetMessageBadges(ChatMessage chatMessage)
+        {
+            var badges = new List<TwitchChatBadge>();
+
+            foreach (var (setId, id) in chatMessage.Badges)
+            {
+               badges.AddRange(_chatService.ChatBadges.Items
+                                       .Where(chatBadge => chatBadge.SetId==setId && chatBadge.Id==id)
+                                       .Where(badge => badge.Channel == chatMessage.Channel || badge.Channel == string.Empty));
+            }
+
+            return badges;
+        }
 
         private IEnumerable<IMessageFragment> GetMessageFragments(ChatMessage chatMessage)
         {

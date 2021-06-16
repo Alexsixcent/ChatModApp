@@ -22,7 +22,7 @@ namespace ChatModApp.ViewModels
 
         private readonly TwitchChatService _chatService;
 
-        public ChatViewModel(TwitchChatService chatService, MessageProccessingService messageProccessingService)
+        public ChatViewModel(TwitchChatService chatService, MessageProcessingService messageProcessingService)
         {
             new SourceList<ChatMessageViewModel>();
             _disposables = new CompositeDisposable();
@@ -30,7 +30,7 @@ namespace ChatModApp.ViewModels
 
             _chatService.ChatMessageReceived
                         .Where(message => message.Channel == Channel)
-                        .Select(messageProccessingService.ProcessMessageViewModel)
+                        .Select(messageProcessingService.ProcessMessageViewModel)
                         .ToObservableChangeSet(model => model.Id)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Bind(out ChatMessages)

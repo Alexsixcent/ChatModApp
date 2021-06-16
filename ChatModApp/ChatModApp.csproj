@@ -83,6 +83,8 @@
     <Compile Include="Models\Chat\Emotes\FfzEmote.cs" />
     <Compile Include="Models\Chat\Emotes\IEmote.cs" />
     <Compile Include="Models\Chat\Fragments\UriFragment.cs" />
+    <Compile Include="Models\Chat\IChatBadge.cs" />
+    <Compile Include="Models\Chat\TwitchChatBadge.cs" />
     <Compile Include="Models\FfzUserEmoteResponse.cs" />
     <Compile Include="Models\Chat\Fragments\IMessageFragment.cs" />
     <Compile Include="Models\Chat\Fragments\TextFragment.cs" />
@@ -98,7 +100,7 @@
     <Compile Include="Services\EmotesService.cs" />
     <Compile Include="Services\ApiClients\IAuthApi.cs" />
     <Compile Include="Services\GlobalStateService.cs" />
-    <Compile Include="Services\MessageProccessingService.cs" />
+    <Compile Include="Services\MessageProcessingService.cs" />
     <Compile Include="Tools\Grouping.cs" />
     <Compile Include="Services\TwitchApiService.cs" />
     <Compile Include="Tools\AkavacheSuspensionDriver.cs" />

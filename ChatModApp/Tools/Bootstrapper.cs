@@ -100,7 +100,7 @@ namespace ChatModApp.Tools
                 .AddSingleton<TwitchApiService>()
                 .AddSingleton<TwitchChatService>()
                 .AddSingleton<EmotesService>()
-                .AddSingleton<MessageProccessingService>();
+                .AddSingleton<MessageProcessingService>();
         }
     }
 }

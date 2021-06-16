@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
+using ChatModApp.Models.Chat;
 using DynamicData;
 using Microsoft.Extensions.Logging;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
@@ -16,7 +21,9 @@ namespace ChatModApp.Services
     {
         public IObservableList<string> ChannelsJoined { get; }
         public IObservable<ChatMessage> ChatMessageReceived { get; }
+        public IObservableList<TwitchChatBadge> ChatBadges { get; }
 
+        private readonly TwitchApiService _apiService;
         private readonly AuthenticationService _authService;
         private readonly TwitchClient _client;
 
@@ -26,29 +33,33 @@ namespace ChatModApp.Services
                                  ILogger<TwitchClient> clientLogger)
         {
             var joinedChannels = new SourceList<string>();
+            _disposables = new CompositeDisposable();
+            _apiService = apiService;
             _authService = authService;
 
-            _disposables = new CompositeDisposable();
 
             var clientOptions = new ClientOptions
             {
                 MessagesAllowedInPeriod = 10000,
                 ThrottlingPeriod = TimeSpan.FromSeconds(1)
             };
-
-            var customSocketClient = new WebSocketClient(clientOptions);
-
-            _client = new TwitchClient(customSocketClient, logger: clientLogger);
+            _client = new TwitchClient(new WebSocketClient(clientOptions), logger: clientLogger);
 
             apiService.UserConnected
-                      .Subscribe(Connect);
+                      .Subscribe(Connect)
+                      .DisposeWith(_disposables);
+
+            var globalBadges = Observable.FromEventPattern<OnConnectedArgs>(_client, nameof(_client.OnConnected))
+                      .Select(_ => GetGlobalChatBadges().ToObservable())
+                      .Concat()
+                      .ToObservableChangeSet();
 
             ChannelsJoined = joinedChannels.Connect()
                                            .AsObservableList();
 
             ChatMessageReceived = Observable
-                              .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
-                              .Select(pattern => pattern.EventArgs.ChatMessage);
+                                  .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
+                                  .Select(pattern => pattern.EventArgs.ChatMessage);
 
             Observable.FromEventPattern<OnJoinedChannelArgs>(_client, nameof(_client.OnJoinedChannel))
                       .Select(pattern => pattern.EventArgs.Channel)
@@ -60,11 +71,19 @@ namespace ChatModApp.Services
                       .Subscribe(s => joinedChannels.Remove(s))
                       .DisposeWith(_disposables);
 
+
+                ChatBadges = ChannelsJoined.Connect()
+                                           .TransformAsync(GetChannelChatBadges)
+                                           .TransformMany(badges => badges)
+                                           .Or(globalBadges)
+                                           .AsObservableList();
+
             joinedChannels.DisposeWith(_disposables);
+            ChatBadges.DisposeWith(_disposables);
+            ChannelsJoined.DisposeWith(_disposables);
         }
 
         public void JoinChannel(string channel) => _client.JoinChannel(channel);
-
         public void LeaveChannel(string channel) => _client.LeaveChannel(channel);
 
         public void Dispose() => _disposables.Dispose();
@@ -74,6 +93,37 @@ namespace ChatModApp.Services
         {
             _client.Initialize(new ConnectionCredentials(user.Login, _authService.TwitchAccessToken));
             _client.Connect();
+        }
+
+        private async Task<IEnumerable<TwitchChatBadge>> GetChannelChatBadges(string channel)
+        {
+            var res1 = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> {channel});
+            var user = res1.Users.Single();
+
+            var res2 = await _apiService.Helix.Chat.GetChannelChatBadges(user.Id);
+
+            return from emoteSet in res2.EmoteSet
+                   from version in emoteSet.Versions
+                   select new TwitchChatBadge(channel,
+                                              emoteSet.SetId,
+                                              version.Id,
+                                              new Uri(version.ImageUrl1x),
+                                              new Uri(version.ImageUrl2x),
+                                              new Uri(version.ImageUrl4x));
+        }
+
+        private async Task<IEnumerable<TwitchChatBadge>> GetGlobalChatBadges()
+        {
+            var res = await _apiService.Helix.Chat.GetGlobalChatBadges();
+
+            return from emoteSet in res.EmoteSet
+                   from version in emoteSet.Versions
+                   select new TwitchChatBadge(string.Empty,
+                                              emoteSet.SetId,
+                                              version.Id,
+                                              new Uri(version.ImageUrl1x),
+                                              new Uri(version.ImageUrl2x),
+                                              new Uri(version.ImageUrl4x));
         }
     }
 }

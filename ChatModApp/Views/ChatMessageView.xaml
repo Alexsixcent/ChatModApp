@@ -11,6 +11,12 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <RichTextBlock Name="MessageTextBlock" TextWrapping="WrapWholeWords" TextAlignment="Left" VerticalAlignment="Center"/>
+
+    <RichTextBlock Name="MessageTextBlock"
+                   TextWrapping="WrapWholeWords"
+                   TextAlignment="Left"
+                   VerticalAlignment="Center"
+                   FontSize="16" />
+
 
 </local:ChatMessageViewBase>

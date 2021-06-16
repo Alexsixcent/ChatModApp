@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using TwitchLib.Api;
 using TwitchLib.Api.Helix;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
@@ -20,9 +21,9 @@ namespace ChatModApp.Services
 
         private readonly TwitchAPI _api;
 
-        public TwitchApiService(AuthenticationService authService)
+        public TwitchApiService(ILoggerFactory apiLoggerFactory, AuthenticationService authService)
         {
-            _api = new TwitchAPI();
+            _api = new TwitchAPI(apiLoggerFactory);
 
             UserConnected = authService.AccessTokenChanged
                                        .Select(Connect)
