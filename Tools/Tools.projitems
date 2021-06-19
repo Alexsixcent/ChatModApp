@@ -12,7 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\QueryExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\ServiceCollectionExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\StringExtension.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\UriExtension.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\WeatherForecast.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PeriodicTask.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ReactiveTabViewItem.cs" />

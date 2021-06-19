@@ -24,7 +24,6 @@ namespace ChatModApp.ViewModels
 
         public ChatViewModel(TwitchChatService chatService, MessageProcessingService messageProcessingService)
         {
-            new SourceList<ChatMessageViewModel>();
             _disposables = new CompositeDisposable();
             _chatService = chatService;
 

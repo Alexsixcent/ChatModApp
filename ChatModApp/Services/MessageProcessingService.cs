@@ -18,7 +18,8 @@ namespace ChatModApp.Services
         private readonly EmotesService _emotesService;
         private readonly TwitchChatService _chatService;
 
-        public MessageProcessingService(GlobalStateService globalStateService, EmotesService emotesService, TwitchChatService chatService)
+        public MessageProcessingService(GlobalStateService globalStateService, EmotesService emotesService,
+                                        TwitchChatService chatService)
         {
             _globalStateService = globalStateService;
             _emotesService = emotesService;
@@ -45,9 +46,10 @@ namespace ChatModApp.Services
 
             foreach (var (setId, id) in chatMessage.Badges)
             {
-               badges.AddRange(_chatService.ChatBadges.Items
-                                       .Where(chatBadge => chatBadge.SetId==setId && chatBadge.Id==id)
-                                       .Where(badge => badge.Channel == chatMessage.Channel || badge.Channel == string.Empty));
+                badges.AddRange(_chatService.ChatBadges.Items
+                                            .Where(chatBadge => chatBadge.SetId == setId && chatBadge.Id == id)
+                                            .Where(badge => badge.Channel == chatMessage.Channel ||
+                                                            badge.Channel == string.Empty));
             }
 
             return badges;
@@ -148,11 +150,18 @@ namespace ChatModApp.Services
                 }
             }
 
-            if (!startSpace && fragments.First() is TextFragment firstFrag)
-                firstFrag.Text = firstFrag.Text.TrimStart(' ');
+            if (fragments.Count == 0)
+            {
+                fragments.Add(new TextFragment(msg));
+            }
+            else
+            {
+                if (!startSpace && fragments.First() is TextFragment firstFrag)
+                    firstFrag.Text = firstFrag.Text.TrimStart(' ');
 
-            if (!endSpace && fragments.Last() is TextFragment lastFrag)
-                lastFrag.Text = lastFrag.Text.TrimEnd(' ');
+                if (!endSpace && fragments.Last() is TextFragment lastFrag)
+                    lastFrag.Text = lastFrag.Text.TrimEnd(' ');
+            }
 
             return fragments;
         }
