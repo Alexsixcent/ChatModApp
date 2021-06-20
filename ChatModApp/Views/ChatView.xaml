@@ -15,7 +15,7 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <ListView Name="ChatList">
+        <ListView Name="ChatList" SelectionMode="None">
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ItemsStackPanel CacheLength="2" Orientation="Vertical"

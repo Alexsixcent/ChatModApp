@@ -26,29 +26,35 @@ namespace ChatModApp.Services
             _chatService = chatService;
         }
 
-        public ChatMessageViewModel ProcessMessageViewModel(ChatMessage message)
+        public ChatMessageViewModel ProcessReceivedMessage(ChatMessage message)
         {
             return new(
                 message.Id,
                 message.DisplayName,
-                GetMessageBadges(message),
+                GetMessageBadges(message.Channel, message.Badges),
                 GetMessageFragments(message),
-                string.IsNullOrEmpty(message.ColorHex)
-                    ? Color.Gray
-                    : Color.FromArgb(
-                        int.Parse(message.ColorHex.TrimStart(1),
-                                  NumberStyles.HexNumber)));
+                GetColorFromTwitchHex(message.ColorHex));
         }
 
-        private IEnumerable<IChatBadge> GetMessageBadges(ChatMessage chatMessage)
+        public ChatMessageViewModel ProcessSentMessage(SentMessage message)
+        {
+            return new(
+                Guid.NewGuid().ToString("N"),
+                message.DisplayName,
+                GetMessageBadges(message.Channel, message.Badges),
+                ParseTextFragment(message.Message, message.Channel, false, false),
+                GetColorFromTwitchHex(message.ColorHex));
+        }
+
+        private IEnumerable<IChatBadge> GetMessageBadges(string channel, IEnumerable<KeyValuePair<string, string>> badgePairs)
         {
             var badges = new List<TwitchChatBadge>();
 
-            foreach (var (setId, id) in chatMessage.Badges)
+            foreach (var (setId, id) in badgePairs)
             {
                 badges.AddRange(_chatService.ChatBadges.Items
                                             .Where(chatBadge => chatBadge.SetId == setId && chatBadge.Id == id)
-                                            .Where(badge => badge.Channel == chatMessage.Channel ||
+                                            .Where(badge => badge.Channel == channel ||
                                                             badge.Channel == string.Empty));
             }
 
@@ -183,6 +189,15 @@ namespace ChatModApp.Services
                    && !uri.StartsWith('.')
                    && !uri.EndsWith('.')
                    && _globalStateService.TLDs.Contains(host.Substring(i + 1).ToLowerInvariant());
+        }
+
+        private static Color GetColorFromTwitchHex(string hex)
+        {
+            return string.IsNullOrWhiteSpace(hex)
+                ? Color.Gray
+                : Color.FromArgb(
+                    int.Parse(hex.TrimStart(1),
+                              NumberStyles.HexNumber));
         }
     }
 }

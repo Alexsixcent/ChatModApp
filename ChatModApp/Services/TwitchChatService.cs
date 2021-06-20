@@ -20,8 +20,10 @@ namespace ChatModApp.Services
     public class TwitchChatService : IDisposable
     {
         public IObservableList<string> ChannelsJoined { get; }
-        public IObservable<ChatMessage> ChatMessageReceived { get; }
         public IObservableList<TwitchChatBadge> ChatBadges { get; }
+        public IObservable<ChatMessage> ChatMessageReceived { get; }
+        public IObservable<SentMessage> ChatMessageSent { get; }
+
 
         private readonly TwitchApiService _apiService;
         private readonly AuthenticationService _authService;
@@ -50,9 +52,9 @@ namespace ChatModApp.Services
                       .DisposeWith(_disposables);
 
             var globalBadges = Observable.FromEventPattern<OnConnectedArgs>(_client, nameof(_client.OnConnected))
-                      .Select(_ => GetGlobalChatBadges().ToObservable())
-                      .Concat()
-                      .ToObservableChangeSet();
+                                         .Select(_ => GetGlobalChatBadges().ToObservable())
+                                         .Concat()
+                                         .ToObservableChangeSet();
 
             ChannelsJoined = joinedChannels.Connect()
                                            .AsObservableList();
@@ -60,6 +62,10 @@ namespace ChatModApp.Services
             ChatMessageReceived = Observable
                                   .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
                                   .Select(pattern => pattern.EventArgs.ChatMessage);
+
+            ChatMessageSent = Observable
+                              .FromEventPattern<OnMessageSentArgs>(_client, nameof(_client.OnMessageSent))
+                              .Select(pattern => pattern.EventArgs.SentMessage);
 
             Observable.FromEventPattern<OnJoinedChannelArgs>(_client, nameof(_client.OnJoinedChannel))
                       .Select(pattern => pattern.EventArgs.Channel)
@@ -71,12 +77,11 @@ namespace ChatModApp.Services
                       .Subscribe(s => joinedChannels.Remove(s))
                       .DisposeWith(_disposables);
 
-
-                ChatBadges = ChannelsJoined.Connect()
-                                           .TransformAsync(GetChannelChatBadges)
-                                           .TransformMany(badges => badges)
-                                           .Or(globalBadges)
-                                           .AsObservableList();
+            ChatBadges = ChannelsJoined.Connect()
+                                       .TransformAsync(GetChannelChatBadges)
+                                       .TransformMany(badges => badges)
+                                       .Or(globalBadges)
+                                       .AsObservableList();
 
             joinedChannels.DisposeWith(_disposables);
             ChatBadges.DisposeWith(_disposables);
@@ -85,6 +90,8 @@ namespace ChatModApp.Services
 
         public void JoinChannel(string channel) => _client.JoinChannel(channel);
         public void LeaveChannel(string channel) => _client.LeaveChannel(channel);
+
+        public void SendMessage(string channel, string message) => _client.SendMessage(channel, message);
 
         public void Dispose() => _disposables.Dispose();
 

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ChatModApp.Services;
 using DynamicData;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 
 namespace ChatModApp.ViewModels
@@ -15,6 +17,12 @@ namespace ChatModApp.ViewModels
         public IScreen? HostScreen { get; set; }
 
         public string? Channel { get; set; }
+
+        public ReactiveCommand<string, Unit> SendMessageCommand { get; }
+
+        [Reactive]
+        public string MessageText { get; set; }
+
         public readonly ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages;
 
 
@@ -27,14 +35,27 @@ namespace ChatModApp.ViewModels
             _disposables = new CompositeDisposable();
             _chatService = chatService;
 
+
+            var messageSent= _chatService.ChatMessageSent
+                        .Where(message => message.Channel == Channel)
+                        .Select(messageProcessingService.ProcessSentMessage);
+
             _chatService.ChatMessageReceived
                         .Where(message => message.Channel == Channel)
-                        .Select(messageProcessingService.ProcessMessageViewModel)
+                        .Select(messageProcessingService.ProcessReceivedMessage)
+                        .Merge(messageSent)
                         .ToObservableChangeSet(model => model.Id)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Bind(out ChatMessages)
                         .Subscribe()
                         .DisposeWith(_disposables);
+
+            MessageText = string.Empty;
+            SendMessageCommand = ReactiveCommand.Create<string>(s =>
+            {
+                _chatService.SendMessage(Channel, s);
+                MessageText = string.Empty;
+            });
         }
 
         public void Initialize()
