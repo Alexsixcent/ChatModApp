@@ -193,13 +193,13 @@
       <Version>7.1.17</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection">
-      <Version>6.0.0-preview.4.21253.7</Version>
+      <Version>6.0.0-preview.5.21301.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting">
-      <Version>6.0.0-preview.4.21253.7</Version>
+      <Version>6.0.0-preview.5.21301.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging">
-      <Version>6.0.0-preview.4.21253.7</Version>
+      <Version>6.0.0-preview.5.21301.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.12</Version>
@@ -214,16 +214,16 @@
       <Version>4.7.10</Version>
     </PackageReference>
     <PackageReference Include="NLog.Extensions.Logging">
-      <Version>1.7.2</Version>
+      <Version>1.7.3</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI">
-      <Version>13.3.2</Version>
+      <Version>14.1.1</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Events">
-      <Version>13.3.2</Version>
+      <Version>14.1.1</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Fody">
-      <Version>13.3.2</Version>
+      <Version>14.1.1</Version>
     </PackageReference>
     <PackageReference Include="Refit">
       <Version>6.0.38</Version>
@@ -243,11 +243,6 @@
     <PackageReference Include="TwitchLib.Client">
       <Version>3.2.3-preview-94b33cd801bf51e1d81b179ce10c7d896072b4c3</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\.editorconfig">
-      <Link>.editorconfig</Link>
-    </None>
   </ItemGroup>
   <Import Project="..\Tools\Tools.projitems" Label="Shared" />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
