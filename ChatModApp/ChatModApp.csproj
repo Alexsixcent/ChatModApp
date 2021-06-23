@@ -109,7 +109,7 @@
     </Compile>
     <Compile Include="Tools\Bootstrapper.cs" />
     <Compile Include="Tools\AppState.cs" />
-    <Compile Include="Tools\DependencyResolverExtensions.cs" />
+    <Compile Include="Tools\Extensions\DependencyResolverExtensions.cs" />
     <Compile Include="Tools\Extensions\ColorExtensions.cs" />
     <Compile Include="Tools\ViewLocator.cs" />
     <Compile Include="ViewModels\AuthenticationViewModel.cs" />

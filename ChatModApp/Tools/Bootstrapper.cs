@@ -4,6 +4,7 @@ using System.Reflection;
 using Windows.Storage;
 using ChatModApp.Services;
 using ChatModApp.Services.ApiClients;
+using ChatModApp.Tools.Extensions;
 using ChatModApp.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
