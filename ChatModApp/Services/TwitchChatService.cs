@@ -107,7 +107,7 @@ namespace ChatModApp.Services
             var res1 = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> {channel});
             var user = res1.Users.Single();
 
-            var res2 = await _apiService.Helix.Chat.GetChannelChatBadges(user.Id);
+            var res2 = await _apiService.Helix.Chat.GetChannelChatBadgesAsync(user.Id);
 
             return from emoteSet in res2.EmoteSet
                    from version in emoteSet.Versions
@@ -121,7 +121,7 @@ namespace ChatModApp.Services
 
         private async Task<IEnumerable<TwitchChatBadge>> GetGlobalChatBadges()
         {
-            var res = await _apiService.Helix.Chat.GetGlobalChatBadges();
+            var res = await _apiService.Helix.Chat.GetGlobalChatBadgesAsync();
 
             return from emoteSet in res.EmoteSet
                    from version in emoteSet.Versions

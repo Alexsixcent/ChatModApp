@@ -190,58 +190,58 @@
       <Version>7.3.1</Version>
     </PackageReference>
     <PackageReference Include="DynamicData">
-      <Version>7.1.17</Version>
+      <Version>7.3.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection">
-      <Version>6.0.0-preview.5.21301.5</Version>
+      <Version>6.0.0-preview.7.21377.19</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting">
-      <Version>6.0.0-preview.5.21301.5</Version>
+      <Version>6.0.0-preview.7.21377.19</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging">
-      <Version>6.0.0-preview.5.21301.5</Version>
+      <Version>6.0.0-preview.7.21377.19</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.12</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
-      <Version>7.0.2</Version>
+      <Version>7.1.0-rc1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.6.0-prerelease.210430001</Version>
+      <Version>2.7.0-prerelease.210827001</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.7.10</Version>
+      <Version>5.0.0-preview.1</Version>
     </PackageReference>
     <PackageReference Include="NLog.Extensions.Logging">
-      <Version>1.7.3</Version>
+      <Version>5.0.0-preview.1</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI">
-      <Version>14.1.1</Version>
+      <Version>15.1.1</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Events">
-      <Version>14.1.1</Version>
+      <Version>15.1.1</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Fody">
-      <Version>14.1.1</Version>
+      <Version>16.2.1</Version>
     </PackageReference>
     <PackageReference Include="Refit">
-      <Version>6.0.38</Version>
+      <Version>6.0.94</Version>
     </PackageReference>
     <PackageReference Include="Refit.HttpClientFactory">
-      <Version>6.0.38</Version>
+      <Version>6.0.94</Version>
     </PackageReference>
     <PackageReference Include="Splat">
-      <Version>11.1.1</Version>
+      <Version>13.1.1</Version>
     </PackageReference>
     <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection">
-      <Version>11.1.1</Version>
+      <Version>13.1.1</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">
-      <Version>3.2.4-preview-fc7c5711a8dfc22ae7b2777b6dcabd03a5aac089</Version>
+      <Version>3.2.5-preview-9a3c9a73b72f479e1c27fec4e1c7ec77dd69f125</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Client">
-      <Version>3.2.3-preview-94b33cd801bf51e1d81b179ce10c7d896072b4c3</Version>
+      <Version>3.2.3</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="..\Tools\Tools.projitems" Label="Shared" />
