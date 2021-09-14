@@ -234,7 +234,12 @@
     <PackageReference Include="Splat">
       <Version>13.1.1</Version>
     </PackageReference>
-    <PackageReference Include="Splat.Microsoft.Extensions.DependencyInjection">
+    <PackageReference Include="Splat.DependencyInjection.SourceGenerator">
+      <Version>1.1.13</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Splat.DryIoc">
       <Version>13.1.1</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">

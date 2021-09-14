@@ -18,8 +18,6 @@ namespace ChatModApp
     /// </summary>
     sealed partial class App
     {
-        private readonly AutoSuspendHelper _autoSuspendHelper;
-
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
@@ -27,10 +25,6 @@ namespace ChatModApp
         public App()
         {
             Bootstrapper.Init();
-
-            _autoSuspendHelper = new AutoSuspendHelper(this);
-            RxApp.SuspensionHost.CreateNewAppState = () => new AppState();
-            RxApp.SuspensionHost.SetupDefaultSuspendResume(new AkavacheSuspensionDriver<AppState>());
 
             InitializeComponent();
             Suspending += OnSuspending;
@@ -46,8 +40,6 @@ namespace ChatModApp
         /// <param name="e">Details about the launch request and process.</param>
         protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
-            _autoSuspendHelper.OnLaunched(e);
-
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
             if (Window.Current.Content is not Frame rootFrame)

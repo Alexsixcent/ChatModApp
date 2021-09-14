@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Windows.Storage;
 using ChatModApp.Services;
 using ChatModApp.Services.ApiClients;
 using ChatModApp.Tools.Extensions;
 using ChatModApp.ViewModels;
+using DryIoc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -15,20 +17,15 @@ using NLog.Targets;
 using ReactiveUI;
 using Refit;
 using Splat;
-using Splat.Microsoft.Extensions.DependencyInjection;
+using Splat.DryIoc;
 using LogLevel = NLog.LogLevel;
-using Registrations = Akavache.Registrations;
 
 namespace ChatModApp.Tools
 {
     public static class Bootstrapper
     {
-        public static IServiceProvider Container { get; private set; }
-
         public static void Init()
         {
-            Registrations.Start("ChatModApp");
-
             var host = Host
                        .CreateDefaultBuilder()
                        .ConfigureLogging(builder =>
@@ -61,47 +58,61 @@ namespace ChatModApp.Tools
                        })
                        .ConfigureServices(services =>
                        {
-                           services.UseMicrosoftDependencyResolver();
+                           services
+                               .AddRefitClient<IBttvApi>()
+                               .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.betterttv.net/3/cached"));
 
-                           ConfigureServices(services);
+                           services
+                               .AddRefitClient<IFfzApi>()
+                               .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.frankerfacez.com/v1"));
                        })
                        .UseEnvironment(Environments.Development)
                        .Build();
 
-            Container = host.Services;
+            ConfigureServices(host.Services);
         }
 
-        private static void ConfigureServices(IServiceCollection services)
+        private static void ConfigureServices(IServiceProvider services)
         {
+            var container = new Container();
+            container.UseDryIocDependencyResolver();
+
             var resolver = Locator.CurrentMutable;
+
             resolver.InitializeSplat();
             resolver.InitializeReactiveUI();
 
+            //#TODO: Streamline client registration process, RestEase migration ?
+            container.UseInstance(services.GetRequiredService<IBttvApi>());
+            container.UseInstance(services.GetRequiredService<IFfzApi>());
+            container.UseInstance(services.GetRequiredService<ILoggerFactory>());
+
+            var loggerFactoryMethod = typeof(LoggerFactoryExtensions).GetMethods(BindingFlags.Static | BindingFlags.Public)
+                                                                     .First(
+                                                                         info => info.Name == nameof(LoggerFactoryExtensions.CreateLogger) &&
+                                                                             info.IsGenericMethod);
+
+            container.Register(typeof(ILogger<>), made: Made.Of(req => loggerFactoryMethod.MakeGenericMethod(req.ServiceType.GenericTypeArguments.First())));
+
+
             resolver.RegisterLazySingleton(() => new ViewLocator(), typeof(IViewLocator));
-            resolver.RegisterViewsForViewModels(Assembly.GetExecutingAssembly(), "ChatModApp.Views");
+            container.RegisterViewsForViewModels(Assembly.GetExecutingAssembly(), "ChatModApp.Views");
 
-            services
-                .AddRefitClient<IBttvApi>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.betterttv.net/3/cached"));
 
-            services
-                .AddRefitClient<IFfzApi>()
-                .ConfigureHttpClient(c => c.BaseAddress = new Uri("https://api.frankerfacez.com/v1"));
+            container.Register<MainViewModel>(Reuse.Singleton);
+            container.Register<AuthenticationViewModel>(Reuse.Singleton);
+            container.Register<ChatTabViewModel>(Reuse.Singleton);
 
-            services
-                .AddSingleton<MainViewModel>()
-                .AddSingleton<AuthenticationViewModel>()
-                .AddSingleton<ChatTabViewModel>()
-                .AddTransient<ChatViewModel>()
-                .AddTransient<ChatTabItemViewModel>()
-                .AddTransient<ChatTabPromptViewModel>()
+            container.Register<GlobalStateService>(Reuse.Singleton);
+            container.Register<AuthenticationService>(Reuse.Singleton);
+            container.Register<TwitchApiService>(Reuse.Singleton);
+            container.Register<TwitchChatService>(Reuse.Singleton);
+            container.Register<EmotesService>(Reuse.Singleton);
+            container.Register<MessageProcessingService>(Reuse.Singleton);
 
-                .AddSingleton<GlobalStateService>()
-                .AddSingleton<AuthenticationService>()
-                .AddSingleton<TwitchApiService>()
-                .AddSingleton<TwitchChatService>()
-                .AddSingleton<EmotesService>()
-                .AddSingleton<MessageProcessingService>();
+            container.Register<ChatViewModel>(setup: Setup.With(allowDisposableTransient: true));
+            container.Register<ChatTabItemViewModel>(setup: Setup.With(allowDisposableTransient: true));
+            container.Register<ChatTabPromptViewModel>(setup: Setup.With(allowDisposableTransient: true));
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
+using DryIoc;
 using ReactiveUI;
-using Splat;
 
 namespace ChatModApp.Tools.Extensions
 {
@@ -17,11 +16,11 @@ namespace ChatModApp.Tools.Extensions
         /// <param name="resolver">The dependency injection resolver to register the Views with.</param>
         /// <param name="assembly">The assembly to search using reflection for IViewFor classes.</param>
         /// <param name="parentNamespace">The parent namespace of the views.</param>
-        public static void RegisterViewsForViewModels(this IMutableDependencyResolver resolver, Assembly assembly,
+        public static void RegisterViewsForViewModels(this IContainer container, Assembly assembly,
                                                       string parentNamespace = "")
         {
-            if (resolver is null)
-                throw new ArgumentNullException(nameof(resolver));
+            if (container is null)
+                throw new ArgumentNullException(nameof(container));
 
             if (assembly is null)
                 throw new ArgumentNullException(nameof(assembly));
@@ -52,25 +51,22 @@ namespace ChatModApp.Tools.Extensions
                 var contractSource = ti.GetCustomAttribute<ViewContractAttribute>();
                 var contract = contractSource is not null ? contractSource.Contract : string.Empty;
 
-                RegisterType(resolver, ti, ivf, contract);
+                RegisterType(container, ti, ivf, contract);
             }
         }
 
-        private static void RegisterType(IMutableDependencyResolver resolver, TypeInfo ti, Type serviceType,
+        private static void RegisterType(IContainer container, TypeInfo ti, Type serviceType,
                                          string contract)
         {
-            var factory = TypeFactory(ti);
-            if (ti.GetCustomAttribute<SingleInstanceViewAttribute>() is not null)
-            {
-                resolver.RegisterLazySingleton(factory, serviceType, contract);
-            }
-            else
-            {
-                resolver.Register(factory, serviceType, contract);
-            }
+            var constructor = GetConstructor(ti);
+            
+            container.Register(serviceType, ti.UnderlyingSystemType,
+                               ti.GetCustomAttribute<SingleInstanceViewAttribute>() is not null
+                                   ? Reuse.Singleton
+                                   : Reuse.Transient, Made.Of(constructor));
         }
 
-        private static Func<object> TypeFactory(TypeInfo typeInfo)
+        private static ConstructorInfo GetConstructor(TypeInfo typeInfo)
         {
             var parameterlessConstructor =
                 typeInfo.DeclaredConstructors.FirstOrDefault(ci => ci.IsPublic && !ci.GetParameters().Any());
@@ -80,7 +76,7 @@ namespace ChatModApp.Tools.Extensions
                     $"Failed to register type {typeInfo.FullName} because it's missing a parameter-less constructor.");
             }
 
-            return Expression.Lambda<Func<object>>(Expression.New(parameterlessConstructor)).Compile();
+            return parameterlessConstructor;
         }
     }
 }

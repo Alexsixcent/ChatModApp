@@ -8,15 +8,11 @@ using Tools.Extensions;
 
 namespace ChatModApp.Services
 {
-    public class AuthenticationService 
+    public class AuthenticationService
     {
         public const string ClientId = "110gs3dzgr2bj3ask88vqi7mnczk02";
 
-        public string TwitchAccessToken
-        {
-            get => RxApp.SuspensionHost.GetAppState<AppState>().TwitchAccessToken;
-            private set => RxApp.SuspensionHost.GetAppState<AppState>().TwitchAccessToken = value;
-        }
+        public string TwitchAccessToken { get; private set; }
 
         public bool IsAuthenticated => !string.IsNullOrWhiteSpace(TwitchAccessToken);
         public IObservable<string> AccessTokenChanged { get; }
