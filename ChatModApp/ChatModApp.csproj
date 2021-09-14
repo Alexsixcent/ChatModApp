@@ -223,7 +223,7 @@
       <Version>15.1.1</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Fody">
-      <Version>16.2.1</Version>
+      <Version>16.2.6</Version>
     </PackageReference>
     <PackageReference Include="Refit">
       <Version>6.0.94</Version>
@@ -232,15 +232,15 @@
       <Version>6.0.94</Version>
     </PackageReference>
     <PackageReference Include="Splat">
-      <Version>13.1.1</Version>
+      <Version>13.1.10</Version>
     </PackageReference>
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator">
-      <Version>1.1.13</Version>
+      <Version>1.1.33</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Splat.DryIoc">
-      <Version>13.1.1</Version>
+      <Version>13.1.10</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">
       <Version>3.2.5-preview-9a3c9a73b72f479e1c27fec4e1c7ec77dd69f125</Version>
