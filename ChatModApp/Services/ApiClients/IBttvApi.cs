@@ -12,6 +12,6 @@ namespace ChatModApp.Services.ApiClients
         public Task<List<BttvUserEmote>> GetGlobalEmotes();
 
         [Get("/users/twitch/{id}")]
-        public Task<BttvUserEmoteResponse> GetUserEmotes([AliasAs("id")] int userId);
+        public Task<ApiResponse<BttvUserEmoteResponse>> GetUserEmotes([AliasAs("id")] int userId);
     }
 }

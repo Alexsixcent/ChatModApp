@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ChatModApp.Models;
 using ChatModApp.Models.Chat.Emotes;
 using ChatModApp.Services.ApiClients;
 using ChatModApp.Tools;
@@ -129,30 +130,35 @@ namespace ChatModApp.Services
 
         private async Task LoadChannelEmotes(string channel)
         {
-            var res = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> {channel});
+            var res1 = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> {channel});
 
-            var id = int.Parse(res.Users.Single().Id);
+            var id = int.Parse(res1.Users.Single().Id);
 
-            var bttvEmotes = await _bttvApi.GetUserEmotes(id);
-
-            var ffzEmotes = await _ffzApi.GetChannelEmotes(id);
-
+            var res2 = await _bttvApi.GetUserEmotes(id);
+            var res3 = await _ffzApi.GetChannelEmotes(id);
+            
             _emotes.Edit(updater =>
             {
-                updater.AddOrUpdate(bttvEmotes.ChannelEmotes.Select(
-                                        emote => new EmoteKeyValue(
-                                            new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
-                                                         channel), emote)));
-                updater.AddOrUpdate(bttvEmotes.SharedEmotes.Select(
-                                        emote => new EmoteKeyValue(
-                                            new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
-                                                         channel), emote)));
+                if (res2.IsSuccessStatusCode)
+                {
+                    updater.AddOrUpdate(res2.Content.ChannelEmotes.Select(
+                                    emote => new EmoteKeyValue(
+                                        new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
+                                                     channel), emote)));
+                    updater.AddOrUpdate(res2.Content.SharedEmotes.Select(
+                                            emote => new EmoteKeyValue(
+                                                new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
+                                                             channel), emote))); 
+                }
 
-                updater.AddOrUpdate(ffzEmotes.Sets.SelectMany(pair => pair.Value.Emoticons)
-                                             .Select(emote => new EmoteKeyValue(
-                                                         new EmoteKey(
-                                                             EmoteKey.EmoteType.FrankerZ | EmoteKey.EmoteType.Member,
-                                                             emote, channel), emote)));
+                if (res3.IsSuccessStatusCode)
+                {
+                    updater.AddOrUpdate(res3.Content.Sets.SelectMany(pair => pair.Value.Emoticons)
+                                                         .Select(emote => new EmoteKeyValue(
+                                                                     new EmoteKey(
+                                                                         EmoteKey.EmoteType.FrankerZ | EmoteKey.EmoteType.Member,
+                                                                         emote, channel), emote))); 
+                }
             });
         }
 
