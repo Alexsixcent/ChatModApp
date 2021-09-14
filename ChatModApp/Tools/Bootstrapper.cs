@@ -83,9 +83,9 @@ namespace ChatModApp.Tools
             resolver.InitializeReactiveUI();
 
             //#TODO: Streamline client registration process, RestEase migration ?
-            container.UseInstance(services.GetRequiredService<IBttvApi>());
-            container.UseInstance(services.GetRequiredService<IFfzApi>());
-            container.UseInstance(services.GetRequiredService<ILoggerFactory>());
+            container.RegisterInstance(services.GetRequiredService<IBttvApi>());
+            container.RegisterInstance(services.GetRequiredService<IFfzApi>());
+            container.RegisterInstance(services.GetRequiredService<ILoggerFactory>());
 
             var loggerFactoryMethod = typeof(LoggerFactoryExtensions).GetMethods(BindingFlags.Static | BindingFlags.Public)
                                                                      .First(
