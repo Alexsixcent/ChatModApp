@@ -88,6 +88,7 @@
     <Compile Include="Models\FfzUserEmoteResponse.cs" />
     <Compile Include="Models\Chat\Fragments\IMessageFragment.cs" />
     <Compile Include="Models\Chat\Fragments\TextFragment.cs" />
+    <Compile Include="Models\IChatTabItem.cs" />
     <Compile Include="Models\TwitchAuthResponseType.cs" />
     <Compile Include="Models\TwitchAuthScope.cs" />
     <Compile Include="Models\TwitchAuthQueryParams.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="Services\ApiClients\IFfzApi.cs" />
     <Compile Include="Services\AuthenticationService.cs" />
     <Compile Include="Models\Chat\Emotes\EmoteKey.cs" />
+    <Compile Include="Services\ChatTabService.cs" />
     <Compile Include="Services\EmotesService.cs" />
     <Compile Include="Services\ApiClients\IAuthApi.cs" />
     <Compile Include="Services\GlobalStateService.cs" />

@@ -20,10 +20,10 @@ namespace ChatModApp.Views
 
             this.WhenActivated(disposables =>
             {
-                this.Bind(ViewModel, vm => vm.Channel, v => v.ChannelNameBox.Text)
+                this.Bind(ViewModel, vm => vm.ChannelField, v => v.ChannelNameBox.Text)
                     .DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.OpenCommand, v => v.OpenButton, vm => vm.Channel)
+                this.BindCommand(ViewModel, vm => vm.OpenCommand, v => v.OpenButton, vm => vm.ChannelField)
                     .DisposeWith(disposables);
             });
         }

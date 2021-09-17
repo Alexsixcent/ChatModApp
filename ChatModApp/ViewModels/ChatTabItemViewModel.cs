@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Reactive.Disposables;
+using ChatModApp.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
 
 namespace ChatModApp.ViewModels
 {
-    public class ChatTabItemViewModel : ReactiveObject, IScreen, IDisposable
+    public class ChatTabItemViewModel : ReactiveObject, IChatTabItem, IScreen, IDisposable
     {
         [Reactive]
         public string Title { get; set; }
+        public string Channel { get; set; }
+
+        public Guid Id { get; }
         public RoutingState Router { get; }
 
         private readonly CompositeDisposable _disposables;
@@ -17,14 +20,17 @@ namespace ChatModApp.ViewModels
         public ChatTabItemViewModel(ChatTabPromptViewModel promptViewModel)
         {
             _disposables = new CompositeDisposable();
+            Id = Guid.NewGuid();
             Title = "ChatTab";
             Router = new RoutingState();
 
             promptViewModel.HostScreen = this;
+            promptViewModel.ParentTabId = Id;
+
             Router.NavigateAndReset
-                .Execute(promptViewModel)
-                .Subscribe()
-                .DisposeWith(_disposables);
+                  .Execute(promptViewModel)
+                  .Subscribe()
+                  .DisposeWith(_disposables);
 
             promptViewModel.DisposeWith(_disposables);
         }

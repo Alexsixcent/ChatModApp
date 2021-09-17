@@ -109,6 +109,7 @@ namespace ChatModApp.Tools
             container.Register<TwitchChatService>(Reuse.Singleton);
             container.Register<EmotesService>(Reuse.Singleton);
             container.Register<MessageProcessingService>(Reuse.Singleton);
+            container.Register<ChatTabService>(Reuse.Singleton);
 
             container.Register<ChatViewModel>(setup: Setup.With(allowDisposableTransient: true));
             container.Register<ChatTabItemViewModel>(setup: Setup.With(allowDisposableTransient: true));
