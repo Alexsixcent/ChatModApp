@@ -25,8 +25,9 @@
             </ListView.ItemTemplate>
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <ItemsStackPanel CacheLength="2" Orientation="Vertical"
-                                     ItemsUpdatingScrollMode="KeepLastItemInView" />
+                    <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView"
+                                     VerticalAlignment="Bottom"
+                                     Orientation="Vertical"/>
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>
         </ListView>
