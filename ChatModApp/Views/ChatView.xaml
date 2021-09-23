@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:views="using:ChatModApp.Views" xmlns:viewmodels="using:ChatModApp.ViewModels"
+    xmlns:reactiveUi="using:ReactiveUI"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
@@ -16,6 +17,12 @@
         </Grid.RowDefinitions>
 
         <ListView Name="ChatList" SelectionMode="None">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <reactiveUi:ViewModelViewHost ViewModel="{Binding Mode=OneWay}" VerticalContentAlignment="Stretch"
+                                                  HorizontalContentAlignment="Stretch" IsTabStop="False" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ItemsStackPanel CacheLength="2" Orientation="Vertical"

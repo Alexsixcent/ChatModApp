@@ -22,10 +22,16 @@
       the application package. The asterisks are not wildcards.
     -->
     <Assembly Name="*Application*" Dynamic="Required All" />
-    
-    
+
+
     <!-- Add your application specific runtime directives here. -->
+    <Namespace Name="Microsoft.UI.Xaml.Controls" Dynamic="Required Public" />
+    <Namespace Name="Microsoft.Extensions.Logging" Activate="Required Public" />
+    <Namespace Name="Microsoft.Extensions.Options" Activate="Required Public" />
+    <Namespace Name="Microsoft.Extensions.Hosting" Activate="Required Public" />
 
-
+    <Type Name="Microsoft.Extensions.Http.LoggingHttpMessageHandlerBuilderFilter" Activate="Required Public" />
+    <Type Name="Microsoft.Extensions.Http.HttpClientFactoryOptions" Activate="Required Public" />
+    <Type Name="Windows.Foundation.TypedEventHandler`2" MarshalObject="Required All"/>
   </Application>
 </Directives>
