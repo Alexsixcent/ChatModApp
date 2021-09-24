@@ -1,5 +1,8 @@
 ﻿using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using Windows.UI.Xaml.Controls;
 using ChatModApp.ViewModels;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using ReactiveUI;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
@@ -9,9 +12,6 @@ namespace ChatModApp.Views
 
     public class ChatTabPromptViewBase : ReactivePage<ChatTabPromptViewModel> { }
 
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class ChatTabPromptView
     {
         public ChatTabPromptView()
@@ -20,11 +20,17 @@ namespace ChatModApp.Views
 
             this.WhenActivated(disposables =>
             {
-                this.Bind(ViewModel, vm => vm.ChannelField, v => v.ChannelNameBox.Text)
+                this.OneWayBind(ViewModel, vm => vm.ChannelSuggestions, v => v.ChannelSuggestBox.ItemsSource)
                     .DisposeWith(disposables);
 
-                this.BindCommand(ViewModel, vm => vm.OpenCommand, v => v.OpenButton, vm => vm.ChannelField)
+                this.Bind(ViewModel, vm => vm.Channel, v => v.ChannelSuggestBox.Text)
                     .DisposeWith(disposables);
+
+                ChannelSuggestBox.Events()
+                                 .QuerySubmitted
+                                 .Select(tuple => tuple.args.ChosenSuggestion as ChannelSuggestionViewModel)
+                                 .WhereNotNull()
+                                 .InvokeCommand(ViewModel, vm => vm.SelectionCommand);
             });
         }
     }

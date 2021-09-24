@@ -117,6 +117,7 @@
     <Compile Include="Tools\Extensions\ColorExtensions.cs" />
     <Compile Include="Tools\ViewLocator.cs" />
     <Compile Include="ViewModels\AuthenticationViewModel.cs" />
+    <Compile Include="ViewModels\ChannelSuggestionViewModel.cs" />
     <Compile Include="ViewModels\ChatMessageViewModel.cs" />
     <Compile Include="Services\TwitchChatService.cs" />
     <Compile Include="ViewModels\ChatTabItemViewModel.cs" />
@@ -126,6 +127,9 @@
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\AuthenticationView.xaml.cs">
       <DependentUpon>AuthenticationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ChannelSuggestionView.xaml.cs">
+      <DependentUpon>ChannelSuggestionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ChatTabPromptView.xaml.cs">
       <DependentUpon>ChatTabPromptView.xaml</DependentUpon>
@@ -165,6 +169,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="Views\AuthenticationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ChannelSuggestionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

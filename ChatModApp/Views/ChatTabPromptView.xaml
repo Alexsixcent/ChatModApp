@@ -9,13 +9,12 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <StackPanel Orientation="Vertical">
-        <TextBox Name="ChannelNameBox" 
-                 Header="Enter the channel name" 
-                 PlaceholderText="Channel"
-                 Margin="5,0"/>
-        <Button Name="OpenButton" 
-                Content="Open"
-                Margin="5"
-                HorizontalAlignment="Right"/>
+        <AutoSuggestBox Name="ChannelSuggestBox" 
+                        Header="Enter the channel name" 
+                        PlaceholderText="Channel" 
+                        Margin="5,0"
+                        QueryIcon="Find"
+                        UpdateTextOnSelect="False">
+        </AutoSuggestBox>
     </StackPanel>
 </local:ChatTabPromptViewBase>

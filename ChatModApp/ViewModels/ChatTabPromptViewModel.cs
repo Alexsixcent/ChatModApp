@@ -1,9 +1,20 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using ChatModApp.Services;
+using DynamicData;
+using DynamicData.Binding;
+using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using ReactiveUI.Validation.Helpers;
 
 namespace ChatModApp.ViewModels
 {
@@ -11,37 +22,67 @@ namespace ChatModApp.ViewModels
     {
         public string UrlPathSegment => Guid.NewGuid().ToString().Substring(0, 5);
         public IScreen HostScreen { get; set; }
-        public ReactiveCommand<string, Unit> OpenCommand { get; }
+        public Guid ParentTabId { get; set; }
+
+        public ReadOnlyObservableCollection<ChannelSuggestionViewModel> ChannelSuggestions;
+        public ReactiveCommand<ChannelSuggestionViewModel, Unit> SelectionCommand { get; }
 
         [Reactive]
-        public string ChannelField { get; private set; }
-
-        public Guid ParentTabId { get; set; }
+        public string Channel { get; set; }
 
 
         private readonly CompositeDisposable _disposables;
+        private readonly ChatViewModel _chatViewModel;
+        private readonly ChatTabService _tabService;
+        private readonly TwitchApiService _apiService;
 
-        public ChatTabPromptViewModel(ChatViewModel chatViewModel, ChatTabService tabService)
+        public ChatTabPromptViewModel(ChatViewModel chatViewModel, ChatTabService tabService,
+                                      TwitchApiService apiService)
         {
             _disposables = new CompositeDisposable();
-            ChannelField = string.Empty;
+            _chatViewModel = chatViewModel;
+            _tabService = tabService;
+            _apiService = apiService;
+            Channel = string.Empty;
 
-            OpenCommand = ReactiveCommand.Create<string>(s =>
-            {
-                var tab = tabService.TabCache.Lookup(ParentTabId).Value;
-                tab.Title = tab.Channel = s;
+            this.WhenAnyValue(vm => vm.Channel)
+                .Where(s => !string.IsNullOrWhiteSpace(s))
+                .Throttle(TimeSpan.FromSeconds(0.3), RxApp.TaskpoolScheduler)
+                .SelectMany(SearchChannels)
+                .ToObservableChangeSet(20)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Bind(out ChannelSuggestions)
+                .Subscribe()
+                .DisposeWith(_disposables);
 
-                chatViewModel.Channel = s;
-                chatViewModel.HostScreen = HostScreen;
-                HostScreen.Router.Navigate.Execute(chatViewModel).Subscribe();
+            SelectionCommand = ReactiveCommand.Create<ChannelSuggestionViewModel>(OpenChannel);
 
-                chatViewModel.Initialize();
-            });
-
-            OpenCommand.DisposeWith(_disposables);
-            chatViewModel.DisposeWith(_disposables);
+            SelectionCommand.DisposeWith(_disposables);
+            _chatViewModel.DisposeWith(_disposables);
         }
 
         public void Dispose() => _disposables.Dispose();
+
+
+        private async Task<IEnumerable<ChannelSuggestionViewModel>> SearchChannels(string searchTerm, CancellationToken cancel)
+        {
+            var res = await _apiService.Helix.Search.SearchChannelsAsync(searchTerm);
+
+            return res.Channels.Select(ch => new ChannelSuggestionViewModel(ch.BroadcasterLogin, ch.DisplayName, new Uri(ch.ThumbnailUrl), ch.IsLive));
+        }
+
+        private void OpenChannel(ChannelSuggestionViewModel channel)
+        {
+            var tab = _tabService.TabCache.Lookup(ParentTabId).Value;
+            tab.Title = tab.Channel = channel.DisplayName;
+
+            _chatViewModel.Channel = channel.Login;
+            _chatViewModel.HostScreen = HostScreen;
+            HostScreen.Router.Navigate.Execute(_chatViewModel)
+                      .Subscribe()
+                      .DisposeWith(_disposables);
+
+            _chatViewModel.Initialize();
+        }
     }
 }
