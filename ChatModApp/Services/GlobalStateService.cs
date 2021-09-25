@@ -10,7 +10,7 @@ namespace ChatModApp.Services
 {
     public class GlobalStateService
     {
-        public ImmutableHashSet<string> TLDs { get; private set; }
+        public ImmutableHashSet<string> TLDs { get; private set; } 
 
         public async Task Initialize()
         {

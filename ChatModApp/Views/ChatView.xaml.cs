@@ -40,7 +40,7 @@ namespace ChatModApp.Views
                 SubmitButton.Events().Click
                             .Select(_ => ChatBox.Text)
                             .Merge(enterDown)
-                            .InvokeCommand(ViewModel.SendMessageCommand)
+                            .InvokeCommand(ViewModel, vm => vm.SendMessageCommand)
                             .DisposeWith(disposables);
             });
         }

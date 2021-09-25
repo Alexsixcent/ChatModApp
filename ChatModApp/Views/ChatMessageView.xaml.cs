@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Documents;
@@ -8,6 +9,7 @@ using ChatModApp.Tools.Extensions;
 using ChatModApp.ViewModels;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using ReactiveUI;
+using Color = System.Drawing.Color;
 
 namespace ChatModApp.Views
 {
@@ -32,9 +34,9 @@ namespace ChatModApp.Views
                 _badges = new Span();
                 _username = new Run
                 {
-                    Text = ViewModel.Username,
+                    Text = ViewModel?.Username,
                     FontWeight = FontWeights.Bold,
-                    Foreground = new SolidColorBrush(ViewModel.UsernameColor.ToUiColor())
+                    Foreground = new SolidColorBrush(ViewModel?.UsernameColor.ToUiColor() ?? Color.Gray.ToUiColor())
                 };
                 _message = new Span();
 

@@ -24,6 +24,7 @@ namespace ChatModApp.Services
 
         public AuthenticationService()
         {
+            TwitchAccessToken = string.Empty;
             Scopes = new List<TwitchAuthScope>
             {
                 TwitchAuthScope.ChatRead,

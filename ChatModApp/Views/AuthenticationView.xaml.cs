@@ -4,14 +4,12 @@ using Windows.UI.Xaml.Controls;
 using ChatModApp.ViewModels;
 using ReactiveUI;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=234238
-
 namespace ChatModApp.Views
 {
     public class AuthenticationViewBase : ReactivePage<AuthenticationViewModel> { }
 
     /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
+    /// The authentication page.
     /// </summary>
     public sealed partial class AuthenticationView
     {

@@ -6,7 +6,7 @@ namespace ChatModApp.Models.Chat.Emotes
     public interface IBttvEmote : IEmote
     {
         public string Id { get; set; }
-        public string Code { get; set; }
+        public new string Code { get; set; }
         public string ImageType { get; set; }
     }
 

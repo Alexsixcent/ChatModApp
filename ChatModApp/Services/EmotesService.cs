@@ -6,7 +6,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ChatModApp.Models;
 using ChatModApp.Models.Chat.Emotes;
 using ChatModApp.Services.ApiClients;
 using ChatModApp.Tools;

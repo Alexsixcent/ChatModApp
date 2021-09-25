@@ -16,14 +16,14 @@ namespace ChatModApp.Tools
 
         public TViewModel ViewModel
         {
-            get => (TViewModel) GetValue(ViewModelProperty);
+            get => (TViewModel)GetValue(ViewModelProperty);
             set => SetValue(ViewModelProperty, value);
         }
 
         object IViewFor.ViewModel
         {
             get => ViewModel;
-            set => ViewModel=(TViewModel)value;
+            set => ViewModel = (TViewModel)value;
         }
     }
 }

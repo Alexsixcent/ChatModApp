@@ -56,6 +56,8 @@ namespace ChatModApp.ViewModels
                 _chatService.SendMessage(Channel, s);
                 MessageText = string.Empty;
             });
+
+            SendMessageCommand.DisposeWith(_disposables);
         }
 
         public void Initialize()

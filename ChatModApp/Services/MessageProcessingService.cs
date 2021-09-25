@@ -18,7 +18,8 @@ namespace ChatModApp.Services
         private readonly EmotesService _emotesService;
         private readonly TwitchChatService _chatService;
 
-        public MessageProcessingService(GlobalStateService globalStateService, EmotesService emotesService,
+        public MessageProcessingService(GlobalStateService globalStateService, 
+                                        EmotesService emotesService,
                                         TwitchChatService chatService)
         {
             _globalStateService = globalStateService;
