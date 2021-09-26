@@ -1,13 +1,13 @@
 ﻿using System;
-using Windows.UI;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using ChatModApp.Models.Chat.Fragments;
 using ChatModApp.Tools.Extensions;
 using ChatModApp.ViewModels;
-using Microsoft.Toolkit.Uwp.UI.Controls;
 using ReactiveUI;
 using Color = System.Drawing.Color;
 
@@ -44,10 +44,9 @@ namespace ChatModApp.Views
                 {
                     _badges.Inlines.Add(new InlineUIContainer
                     {
-                        Child = new ImageEx
+                        Child = new Image
                         {
-                            IsCacheEnabled = true,
-                            Source = badge.Small,
+                            Source = new BitmapImage(badge.Small),
                             Stretch = Stretch.None,
                             Margin = new Thickness(2, 0, 2, 0),
                             RenderTransform = new TranslateTransform {Y = InlineImagesVerticalOffset}
@@ -78,10 +77,9 @@ namespace ChatModApp.Views
                 TextFragment textFrag => new Run { Text = textFrag.Text },
                 EmoteFragment emoteFrag => new InlineUIContainer
                 {
-                    Child = new ImageEx
+                    Child = new Image
                     {
-                        IsCacheEnabled = true,
-                        Source = emoteFrag.Emote.Uri,
+                        Source = new BitmapImage(emoteFrag.Emote.Uri),
                         Stretch = Stretch.None,
                         Margin = new Thickness(2, 0, 2, 0),
                         RenderTransform = new TranslateTransform {Y = InlineImagesVerticalOffset}
