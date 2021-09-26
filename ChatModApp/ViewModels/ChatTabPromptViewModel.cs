@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,11 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using ChatModApp.Services;
 using DynamicData;
-using DynamicData.Binding;
-using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using ReactiveUI.Validation.Helpers;
 
 namespace ChatModApp.ViewModels
 {
