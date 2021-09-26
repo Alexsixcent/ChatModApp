@@ -124,26 +124,26 @@
     <Compile Include="ViewModels\ChatTabViewModel.cs" />
     <Compile Include="ViewModels\ChatViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="Views\AuthenticationView.xaml.cs">
+    <Compile Include="Views\Pages\AuthenticationView.xaml.cs">
       <DependentUpon>AuthenticationView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ChannelSuggestionView.xaml.cs">
+    <Compile Include="Views\Controls\ChannelSuggestionView.xaml.cs">
       <DependentUpon>ChannelSuggestionView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ChatTabPromptView.xaml.cs">
+    <Compile Include="Views\Pages\ChatTabPromptView.xaml.cs">
       <DependentUpon>ChatTabPromptView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ChatTabView.xaml.cs">
+    <Compile Include="Views\Pages\ChatTabView.xaml.cs">
       <DependentUpon>ChatTabView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\ChatView.xaml.cs">
+    <Compile Include="Views\Pages\ChatView.xaml.cs">
       <DependentUpon>ChatView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\MainView.xaml.cs">
+    <Compile Include="Views\Pages\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Views\ChatMessageView.xaml.cs">
+    <Compile Include="Views\Controls\ChatMessageView.xaml.cs">
       <DependentUpon>ChatMessageView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -167,31 +167,34 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="Views\AuthenticationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ChannelSuggestionView.xaml">
+    <Page Include="Views\Pages\AuthenticationView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ChatTabPromptView.xaml">
+    <Page Include="Views\Controls\ChannelSuggestionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ChatTabView.xaml">
+    <Page Include="Views\Pages\ChatTabPromptView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\ChatView.xaml">
+    <Page Include="Views\Pages\ChatTabView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\MainView.xaml">
+    <Page Include="Views\Pages\ChatView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Pages\MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\ChatMessageView.xaml">
+    <Page Include="Views\Controls\ChatMessageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
