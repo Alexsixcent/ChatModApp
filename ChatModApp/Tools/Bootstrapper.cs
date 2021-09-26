@@ -94,8 +94,6 @@ namespace ChatModApp.Tools
 
             container.Register(typeof(ILogger<>), made: Made.Of(req => loggerFactoryMethod.MakeGenericMethod(req.ServiceType.GenericTypeArguments.First())));
 
-
-            resolver.RegisterLazySingleton(() => new ViewLocator(), typeof(IViewLocator));
             container.RegisterViewsForViewModels(Assembly.GetExecutingAssembly(), "ChatModApp.Views");
 
 

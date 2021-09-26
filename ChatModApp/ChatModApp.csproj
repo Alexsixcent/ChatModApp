@@ -115,7 +115,6 @@
     <Compile Include="Tools\AppState.cs" />
     <Compile Include="Tools\Extensions\DependencyResolverExtensions.cs" />
     <Compile Include="Tools\Extensions\ColorExtensions.cs" />
-    <Compile Include="Tools\ViewLocator.cs" />
     <Compile Include="ViewModels\AuthenticationViewModel.cs" />
     <Compile Include="ViewModels\ChannelSuggestionViewModel.cs" />
     <Compile Include="ViewModels\ChatMessageViewModel.cs" />
