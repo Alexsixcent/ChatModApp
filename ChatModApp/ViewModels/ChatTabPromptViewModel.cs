@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using ChatModApp.Services;
 using DynamicData;
+using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -17,10 +18,10 @@ namespace ChatModApp.ViewModels
     public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableViewModel
     {
         public string UrlPathSegment => Guid.NewGuid().ToString().Substring(0, 5);
-        public IScreen HostScreen { get; set; }
+        public IScreen? HostScreen { get; set; }
         public Guid ParentTabId { get; set; }
 
-        public ReadOnlyObservableCollection<ChannelSuggestionViewModel> ChannelSuggestions;
+        public readonly ReadOnlyObservableCollection<ChannelSuggestionViewModel> ChannelSuggestions;
         public ReactiveCommand<ChannelSuggestionViewModel, Unit> SelectionCommand { get; }
 
         [Reactive]
@@ -32,8 +33,7 @@ namespace ChatModApp.ViewModels
         private readonly ChatTabService _tabService;
         private readonly TwitchApiService _apiService;
 
-        public ChatTabPromptViewModel(ChatViewModel chatViewModel, ChatTabService tabService,
-                                      TwitchApiService apiService)
+        public ChatTabPromptViewModel(ChatViewModel chatViewModel, ChatTabService tabService, TwitchApiService apiService)
         {
             _disposables = new CompositeDisposable();
             _chatViewModel = chatViewModel;
@@ -43,9 +43,10 @@ namespace ChatModApp.ViewModels
 
             this.WhenAnyValue(vm => vm.Channel)
                 .Where(s => !string.IsNullOrWhiteSpace(s))
-                .Throttle(TimeSpan.FromSeconds(0.3), RxApp.TaskpoolScheduler)
+                .Throttle(TimeSpan.FromMilliseconds(250), RxApp.TaskpoolScheduler)
                 .SelectMany(SearchChannels)
                 .ToObservableChangeSet(20)
+                .Sort(SortExpressionComparer<ChannelSuggestionViewModel>.Descending(model => model.IsLive))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Bind(out ChannelSuggestions)
                 .Subscribe()
@@ -74,7 +75,7 @@ namespace ChatModApp.ViewModels
 
             _chatViewModel.Channel = channel.Login;
             _chatViewModel.HostScreen = HostScreen;
-            HostScreen.Router.Navigate.Execute(_chatViewModel)
+            HostScreen?.Router.Navigate.Execute(_chatViewModel)
                       .Subscribe()
                       .DisposeWith(_disposables);
 
