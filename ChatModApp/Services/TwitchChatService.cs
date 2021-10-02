@@ -5,9 +5,11 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
+using ChatModApp.Models;
 using ChatModApp.Models.Chat;
 using DynamicData;
 using Microsoft.Extensions.Logging;
+using ReactiveUI;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -19,7 +21,7 @@ namespace ChatModApp.Services
 {
     public class TwitchChatService : IDisposable
     {
-        public IObservableList<string> ChannelsJoined { get; }
+        public IObservable<IChangeSet<ITwitchChannel>> ChannelsJoined { get; }
         public IObservableList<TwitchChatBadge> ChatBadges { get; }
         public IObservable<ChatMessage> ChatMessageReceived { get; }
         public IObservable<SentMessage> ChatMessageSent { get; }
@@ -31,14 +33,14 @@ namespace ChatModApp.Services
 
         private readonly CompositeDisposable _disposables;
 
-        public TwitchChatService(TwitchApiService apiService, AuthenticationService authService,
+        public TwitchChatService(TwitchApiService apiService,
+                                 AuthenticationService authService,
+                                 ChatTabService tabService,
                                  ILogger<TwitchClient> clientLogger)
         {
-            var joinedChannels = new SourceList<string>();
             _disposables = new CompositeDisposable();
             _apiService = apiService;
             _authService = authService;
-
 
             var clientOptions = new ClientOptions
             {
@@ -56,42 +58,35 @@ namespace ChatModApp.Services
                                          .Concat()
                                          .ToObservableChangeSet();
 
-            ChannelsJoined = joinedChannels.Connect()
-                                           .AsObservableList();
-
             ChatMessageReceived = Observable
                                   .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
+                                  .ObserveOn(RxApp.TaskpoolScheduler)
                                   .Select(pattern => pattern.EventArgs.ChatMessage);
 
             ChatMessageSent = Observable
                               .FromEventPattern<OnMessageSentArgs>(_client, nameof(_client.OnMessageSent))
+                              .ObserveOn(RxApp.TaskpoolScheduler)
                               .Select(pattern => pattern.EventArgs.SentMessage);
 
-            Observable.FromEventPattern<OnJoinedChannelArgs>(_client, nameof(_client.OnJoinedChannel))
-                      .Select(pattern => pattern.EventArgs.Channel)
-                      .Subscribe(s => joinedChannels.Add(s))
-                      .DisposeWith(_disposables);
+            ChannelsJoined = tabService.Tabs
+                                       .AutoRefresh(item => item.Channel)
+                                       .Filter(channel => channel.Channel is not null)
+                                       .DistinctValues(item => item.Channel);
 
-            Observable.FromEventPattern<OnLeftChannelArgs>(_client, nameof(_client.OnLeftChannel))
-                      .Select(pattern => pattern.EventArgs.Channel)
-                      .Subscribe(s => joinedChannels.Remove(s))
-                      .DisposeWith(_disposables);
-
-            ChatBadges = ChannelsJoined.Connect()
-                                       .TransformAsync(GetChannelChatBadges)
+            ChatBadges = ChannelsJoined.TransformAsync(GetChannelChatBadges)
                                        .TransformMany(badges => badges)
                                        .Or(globalBadges)
                                        .AsObservableList();
+            ChannelsJoined
+                .OnItemAdded(channel => _client.JoinChannel(channel.Login))
+                .OnItemRemoved(channel => _client.LeaveChannel(channel.Login))
+                .Subscribe()
+                .DisposeWith(_disposables);
 
-            joinedChannels.DisposeWith(_disposables);
             ChatBadges.DisposeWith(_disposables);
-            ChannelsJoined.DisposeWith(_disposables);
         }
 
-        public void JoinChannel(string channel) => _client.JoinChannel(channel);
-        public void LeaveChannel(string channel) => _client.LeaveChannel(channel);
-
-        public void SendMessage(string channel, string message) => _client.SendMessage(channel, message);
+        public void SendMessage(ITwitchChannel channel, string message) => _client.SendMessage(channel.Login, message);
 
         public void Dispose() => _disposables.Dispose();
 
@@ -102,9 +97,9 @@ namespace ChatModApp.Services
             _client.Connect();
         }
 
-        private async Task<IEnumerable<TwitchChatBadge>> GetChannelChatBadges(string channel)
+        private async Task<IEnumerable<TwitchChatBadge>> GetChannelChatBadges(ITwitchChannel channel)
         {
-            var res1 = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> {channel});
+            var res1 = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> { channel.Login });
             var user = res1.Users.Single();
 
             var res2 = await _apiService.Helix.Chat.GetChannelChatBadgesAsync(user.Id);
@@ -125,8 +120,7 @@ namespace ChatModApp.Services
 
             return from emoteSet in res.EmoteSet
                    from version in emoteSet.Versions
-                   select new TwitchChatBadge(string.Empty,
-                                              emoteSet.SetId,
+                   select new TwitchChatBadge(emoteSet.SetId,
                                               version.Id,
                                               new Uri(version.ImageUrl1x),
                                               new Uri(version.ImageUrl2x),

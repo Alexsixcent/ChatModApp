@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
 using ChatModApp.Services;
+using DryIoc;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using Splat;
 
 namespace ChatModApp.ViewModels
 {
@@ -23,13 +22,14 @@ namespace ChatModApp.ViewModels
         public int OpenedTabIndex { get; private set; }
 
         public readonly ObservableCollectionExtended<ChatTabItemViewModel> ChatTabs;
-
-
+        
         private readonly ChatTabService _tabService;
+        private readonly IContainer _container;
 
-        public ChatTabViewModel(TwitchChatService chatService, ChatTabService tabService)
+        public ChatTabViewModel(ChatTabService tabService, IContainer container)
         {
             _tabService = tabService;
+            _container = container;
             ChatTabs = new ObservableCollectionExtended<ChatTabItemViewModel>();
 
             AddTabCommand = ReactiveCommand.Create(AddTab);
@@ -44,7 +44,7 @@ namespace ChatModApp.ViewModels
 
         private void AddTab()
         {
-            var newTab = Locator.Current.GetService<ChatTabItemViewModel>();
+            var newTab= _container.Resolve<ChatTabItemViewModel>();
             newTab.Title = "New tab";
 
             _tabService.AddTab(newTab);

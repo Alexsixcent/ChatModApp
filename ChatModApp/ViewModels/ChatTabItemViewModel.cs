@@ -10,7 +10,8 @@ namespace ChatModApp.ViewModels
     {
         [Reactive]
         public string Title { get; set; }
-        public string Channel { get; set; }
+        [Reactive]
+        public ITwitchChannel? Channel { get; set; }
 
         public Guid Id { get; }
         public RoutingState Router { get; }

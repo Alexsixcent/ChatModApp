@@ -4,16 +4,25 @@ namespace ChatModApp.Models.Chat
 {
     public class TwitchChatBadge : IChatBadge
     {
-        public string Channel { get; }
+        public ITwitchChannel? Channel { get; }
         public string SetId { get; }
         public string Id { get; }
         public Uri Small { get; }
         public Uri Medium { get; }
         public Uri Large { get; }
 
-        public TwitchChatBadge(string channel, string setId, string id, Uri small, Uri medium, Uri large)
+        public TwitchChatBadge(ITwitchChannel channel, string setId, string id, Uri small, Uri medium, Uri large)
         {
             Channel = channel;
+            SetId = setId;
+            Id = id;
+            Small = small;
+            Medium = medium;
+            Large = large;
+        }
+
+        public TwitchChatBadge(string setId, string id, Uri small, Uri medium, Uri large)
+        {
             SetId = setId;
             Id = id;
             Small = small;

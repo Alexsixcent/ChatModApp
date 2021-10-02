@@ -55,8 +55,8 @@ namespace ChatModApp.Services
             {
                 badges.AddRange(_chatService.ChatBadges.Items
                                             .Where(chatBadge => chatBadge.SetId == setId && chatBadge.Id == id)
-                                            .Where(badge => badge.Channel == channel ||
-                                                            badge.Channel == string.Empty));
+                                            .Where(badge => badge.Channel is null ||
+                                                            badge.Channel.Login == channel));
             }
 
             return badges;

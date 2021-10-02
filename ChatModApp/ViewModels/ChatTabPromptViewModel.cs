@@ -7,6 +7,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ChatModApp.Models;
 using ChatModApp.Services;
 using DynamicData;
 using DynamicData.Binding;
@@ -68,18 +69,19 @@ namespace ChatModApp.ViewModels
             return res.Channels.Select(ch => new ChannelSuggestionViewModel(ch.BroadcasterLogin, ch.DisplayName, new Uri(ch.ThumbnailUrl), ch.IsLive));
         }
 
-        private void OpenChannel(ChannelSuggestionViewModel channel)
+        private void OpenChannel(ChannelSuggestionViewModel suggestion)
         {
+            var channel = new TwitchChannel(suggestion.DisplayName, suggestion.Login);
             var tab = _tabService.TabCache.Lookup(ParentTabId).Value;
-            tab.Title = tab.Channel = channel.DisplayName;
 
-            _chatViewModel.Channel = channel.Login;
+            tab.Channel = new TwitchChannel(channel.DisplayName, channel.Login);
+            tab.Title = channel.DisplayName;
+            _chatViewModel.Channel = channel;
             _chatViewModel.HostScreen = HostScreen;
+            
             HostScreen?.Router.Navigate.Execute(_chatViewModel)
                       .Subscribe()
                       .DisposeWith(_disposables);
-
-            _chatViewModel.Initialize();
         }
     }
 }

@@ -91,11 +91,13 @@
     <Compile Include="Models\Chat\Fragments\IMessageFragment.cs" />
     <Compile Include="Models\Chat\Fragments\TextFragment.cs" />
     <Compile Include="Models\IChatTabItem.cs" />
+    <Compile Include="Models\ITwitchChannel.cs" />
     <Compile Include="Models\TwitchAuthResponseType.cs" />
     <Compile Include="Models\TwitchAuthScope.cs" />
     <Compile Include="Models\TwitchAuthQueryParams.cs" />
     <Compile Include="Models\Chat\Emotes\TwitchEmote.cs" />
     <Compile Include="Models\FfzGlobalEmoteResponse.cs" />
+    <Compile Include="Models\TwitchChannel.cs" />
     <Compile Include="Services\ApiClients\IBttvApi.cs" />
     <Compile Include="Services\ApiClients\IFfzApi.cs" />
     <Compile Include="Services\AuthenticationService.cs" />

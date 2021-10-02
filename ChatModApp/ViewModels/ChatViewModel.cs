@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using ChatModApp.Models;
 using ChatModApp.Services;
 using DynamicData;
 using ReactiveUI;
@@ -16,7 +17,7 @@ namespace ChatModApp.ViewModels
         public string UrlPathSegment => Guid.NewGuid().ToString().Substring(0, 5);
         public IScreen? HostScreen { get; set; }
 
-        public string? Channel { get; set; }
+        public ITwitchChannel? Channel { get; set; }
 
         public ReactiveCommand<string, Unit> SendMessageCommand { get; }
 
@@ -27,7 +28,6 @@ namespace ChatModApp.ViewModels
 
 
         private readonly CompositeDisposable _disposables;
-
         private readonly TwitchChatService _chatService;
 
         public ChatViewModel(TwitchChatService chatService, MessageProcessingService messageProcessingService)
@@ -35,13 +35,12 @@ namespace ChatModApp.ViewModels
             _disposables = new CompositeDisposable();
             _chatService = chatService;
 
-
             var messageSent= _chatService.ChatMessageSent
-                        .Where(message => message.Channel == Channel)
-                        .Select(messageProcessingService.ProcessSentMessage);
+                                         .Where(message => message.Channel == Channel?.Login)
+                                         .Select(messageProcessingService.ProcessSentMessage);
 
             _chatService.ChatMessageReceived
-                        .Where(message => message.Channel == Channel)
+                        .Where(message => message.Channel == Channel?.Login)
                         .Select(messageProcessingService.ProcessReceivedMessage)
                         .Merge(messageSent)
                         .ToObservableChangeSet(model => model.Id)
@@ -53,29 +52,13 @@ namespace ChatModApp.ViewModels
             MessageText = string.Empty;
             SendMessageCommand = ReactiveCommand.Create<string>(s =>
             {
-                _chatService.SendMessage(Channel, s);
+                _chatService.SendMessage(Channel!, s);
                 MessageText = string.Empty;
             });
 
             SendMessageCommand.DisposeWith(_disposables);
         }
 
-        public void Initialize()
-        {
-            if (string.IsNullOrWhiteSpace(Channel))
-                throw new ArgumentNullException(nameof(Channel));
-
-            _chatService.JoinChannel(Channel);
-        }
-
-        public void Dispose()
-        {
-            _disposables.Dispose();
-
-            if (Channel is not null)
-            {
-                _chatService.LeaveChannel(Channel);
-            }
-        }
+        public void Dispose() => _disposables.Dispose();
     }
 }

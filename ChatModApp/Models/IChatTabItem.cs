@@ -1,11 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace ChatModApp.Models
 {
-    public interface IChatTabItem
+    public interface IChatTabItem : INotifyPropertyChanged
     {
         Guid Id { get; }
         string Title { get; set; }
-        string Channel { get; set; }
+        ITwitchChannel? Channel { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ChatModApp.Models;
 using ChatModApp.Models.Chat.Emotes;
 using ChatModApp.Services.ApiClients;
 using ChatModApp.Tools;
@@ -55,7 +56,7 @@ namespace ChatModApp.Services
                        .Subscribe()
                        .DisposeWith(_disposable);
 
-            _chatService.ChannelsJoined.Connect()
+            _chatService.ChannelsJoined
                         .OnItemAdded(async s => await LoadChannelEmotes(s))
                         .OnItemRemoved(UnloadChannelEmotes)
                         .Subscribe()
@@ -127,9 +128,9 @@ namespace ChatModApp.Services
         public void Dispose() => _disposable.Dispose();
 
 
-        private async Task LoadChannelEmotes(string channel)
+        private async Task LoadChannelEmotes(ITwitchChannel channel)
         {
-            var res1 = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> {channel});
+            var res1 = await _apiService.Helix.Users.GetUsersAsync(logins: new List<string> {channel.Login});
 
             var id = int.Parse(res1.Users.Single().Id);
 
@@ -143,11 +144,11 @@ namespace ChatModApp.Services
                     updater.AddOrUpdate(res2.Content.ChannelEmotes.Select(
                                     emote => new EmoteKeyValue(
                                         new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
-                                                     channel), emote)));
+                                                     channel.Login), emote)));
                     updater.AddOrUpdate(res2.Content.SharedEmotes.Select(
                                             emote => new EmoteKeyValue(
                                                 new EmoteKey(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member, emote,
-                                                             channel), emote))); 
+                                                             channel.Login), emote))); 
                 }
 
                 if (res3.IsSuccessStatusCode)
@@ -156,21 +157,20 @@ namespace ChatModApp.Services
                                                          .Select(emote => new EmoteKeyValue(
                                                                      new EmoteKey(
                                                                          EmoteKey.EmoteType.FrankerZ | EmoteKey.EmoteType.Member,
-                                                                         emote, channel), emote))); 
+                                                                         emote, channel.Login), emote))); 
                 }
             });
         }
 
-        private void UnloadChannelEmotes(string channel)
+        private void UnloadChannelEmotes(ITwitchChannel channel)
         {
-            var group = UserEmoteGroups.Lookup(channel);
+            var group = UserEmoteGroups.Lookup(channel.Login);
             if (!@group.HasValue)
                 return;
 
             var emotes =
                 @group.Value.Cache.Items.SelectMany(
-                    grouping => grouping.Cache.Items.Select(emote => new EmoteKey(grouping.Key, emote, channel)));
-
+                    grouping => grouping.Cache.Items.Select(emote => new EmoteKey(grouping.Key, emote, channel.Login)));
 
             _emotes.Remove(emotes);
         }
