@@ -23,7 +23,6 @@ namespace ChatModApp.ViewModels
 
         [Reactive]
         public string MessageText { get; set; }
-
         public readonly ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages;
 
 

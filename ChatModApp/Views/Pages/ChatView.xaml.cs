@@ -1,14 +1,14 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Windows.System;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
 using ChatModApp.ViewModels;
 using ReactiveUI;
+using EventExtensions = Windows.UI.Xaml.EventExtensions;
 using WinCore = Windows.UI.Core;
 
-namespace ChatModApp.Views
+namespace ChatModApp.Views.Pages
 {
     public class ChatViewBase : ReactiveUserControl<ChatViewModel>
     {
@@ -20,30 +20,32 @@ namespace ChatModApp.Views
         {
             InitializeComponent();
 
-            ChatBox.PreviewKeyDown += HandleNewLineSkip;
-
             this.WhenActivated(disposables =>
             {
-                this.OneWayBind(ViewModel, vm => vm.ChatMessages, v => v.ChatList.ItemsSource)
+                this.OneWayBind(ViewModel, vm => vm.ChatMessages, v => v.MessagesCollection.ItemsSource)
                     .DisposeWith(disposables);
 
                 this.Bind(ViewModel, vm => vm.MessageText, v => v.ChatBox.Text)
                     .DisposeWith(disposables);
 
-                var enterDown = ChatBox.Events().KeyUp
-                                       .Where(args => args.Key == VirtualKey.Enter &&
-                                                      !WinCore.CoreWindow.GetForCurrentThread()
-                                                              .GetKeyState(VirtualKey.Shift)
-                                                              .HasFlag(WinCore.CoreVirtualKeyStates.Down))
-                                       .Select(_ => ChatBox.Text);
+                var enterDown = EventExtensions.Events(ChatBox).KeyUp
+                                               .Where(args => args.Key == VirtualKey.Enter &&
+                                                              !WinCore.CoreWindow.GetForCurrentThread()
+                                                                      .GetKeyState(VirtualKey.Shift)
+                                                                      .HasFlag(WinCore.CoreVirtualKeyStates.Down))
+                                               .Select(_ => ChatBox.Text);
 
                 SubmitButton.Events().Click
                             .Select(_ => ChatBox.Text)
                             .Merge(enterDown)
                             .InvokeCommand(ViewModel, vm => vm.SendMessageCommand)
                             .DisposeWith(disposables);
+                
+                ChatBox.PreviewKeyDown += HandleNewLineSkip;
             });
         }
+
+
 
         private static void HandleNewLineSkip(object sender, KeyRoutedEventArgs e)
         {
