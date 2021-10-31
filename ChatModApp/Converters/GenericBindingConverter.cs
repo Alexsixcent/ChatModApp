@@ -4,7 +4,7 @@ using ReactiveUI;
 
 namespace ChatModApp.Converters
 {
-    public abstract class GenericConverter<TSource, TResult> : IBindingTypeConverter
+    public abstract class GenericBindingConverter<TSource, TResult> : IBindingTypeConverter
     {
         public abstract int GetAffinityForObjects(Type fromType, Type toType);
 

@@ -79,7 +79,8 @@
     <Optimize>false</Optimize>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Converters\GenericConverter.cs" />
+    <Compile Include="Converters\GenericBindingConverter.cs" />
+    <Compile Include="Converters\SystemToUiColorBindingConverter.cs" />
     <Compile Include="Models\BttvUserEmoteResponse.cs" />
     <Compile Include="Models\Chat\Emotes\BttvEmote.cs" />
     <Compile Include="Models\Chat\Fragments\EmoteFragment.cs" />
@@ -108,6 +109,7 @@
     <Compile Include="Services\ApiClients\IAuthApi.cs" />
     <Compile Include="Services\GlobalStateService.cs" />
     <Compile Include="Services\MessageProcessingService.cs" />
+    <Compile Include="Views\Controls\MessageCollectionView\MessageCollectionDictionary.xaml.cs" />
     <Compile Include="Tools\Grouping.cs" />
     <Compile Include="Services\TwitchApiService.cs" />
     <Compile Include="Tools\AkavacheSuspensionDriver.cs" />
@@ -129,6 +131,8 @@
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="Views\Controls\MessageCollectionView\MessageCollectionView.cs" />
     <Compile Include="Views\Controls\MessageCollectionView\MessageCollectionView.Properties.cs" />
+    <Compile Include="Views\Controls\MessageView\MessageView.cs" />
+    <Compile Include="Views\Controls\MessageView\MessageView.Properties.cs" />
     <Compile Include="Views\Pages\AuthenticationView.xaml.cs">
       <DependentUpon>AuthenticationView.xaml</DependentUpon>
     </Compile>
@@ -148,9 +152,6 @@
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Views\Controls\ChatMessageView.xaml.cs">
-      <DependentUpon>ChatMessageView.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -173,7 +174,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\Controls\MessageCollectionView\MessageCollectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Controls\MessageView\MessageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -200,10 +209,6 @@
     <Page Include="Views\Pages\MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Controls\ChatMessageView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

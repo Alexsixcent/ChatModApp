@@ -17,7 +17,6 @@
         <messageCollectionView:MessageCollectionView x:Name="MessagesCollection" 
                                                      Margin="5,0"/>
 
-
         <StackPanel Grid.Row="1"
                     Orientation="Vertical">
             <TextBox Name="ChatBox"
