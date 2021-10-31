@@ -184,6 +184,9 @@ namespace ChatModApp.Services
             if (string.IsNullOrEmpty(host))
                 return false;
 
+            if (uri.HasConsecutiveChar(".", 2))
+                return false;
+
             var i = host.LastIndexOf('.');
 
             return i > 0
