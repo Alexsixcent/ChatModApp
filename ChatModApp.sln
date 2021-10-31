@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatModApp", "ChatModApp\Ch
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Tools", "Tools\Tools.shproj", "{79439F80-8DD9-44FF-925A-99FB42483F6E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EFC16843-DFA0-4793-BA7B-C73C5EC40C7D}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Tools\Tools.projitems*{04c11854-b9ba-4b8a-bd47-177045e4b838}*SharedItemsImports = 4

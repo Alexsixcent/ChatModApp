@@ -1,7 +1,34 @@
-﻿namespace Tools.Extensions
+﻿using System;
+using System.Globalization;
+
+namespace Tools.Extensions
 {
     public static class StringExtension
     {
+        //Inspired by https://codereview.stackexchange.com/a/102623
+        public static bool HasConsecutiveChar(this string source, string s, int repeatCount = 2)
+        {
+            if (s is null) 
+                throw new ArgumentNullException(nameof(s));
+            if (repeatCount < 1)
+                throw new ArgumentOutOfRangeException(nameof(repeatCount), $"The sequence length can't be negative or zero");
+
+            var charEnumerator = StringInfo.GetTextElementEnumerator(source);
+            var count = 0;
+            while (charEnumerator.MoveNext())
+            {
+                if (s == charEnumerator.GetTextElement())
+                {
+                    if (++count >= repeatCount)
+                        return true;
+                }
+                else
+                    count = 0;
+            }
+
+            return false;
+        }
+
         public static string TrimStart(this string target, string trimString)
         {
             if (string.IsNullOrEmpty(trimString))
