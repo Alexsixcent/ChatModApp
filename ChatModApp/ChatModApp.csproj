@@ -216,31 +216,31 @@
       <Version>7.3.1</Version>
     </PackageReference>
     <PackageReference Include="DynamicData">
-      <Version>7.3.1</Version>
+      <Version>7.4.3</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection">
-      <Version>6.0.0-rc.1.21451.13</Version>
+      <Version>6.0.0-rc.2.21480.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting">
-      <Version>6.0.0-rc.1.21451.13</Version>
+      <Version>6.0.0-rc.2.21480.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging">
-      <Version>6.0.0-rc.1.21451.13</Version>
+      <Version>6.0.0-rc.2.21480.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.2.12</Version>
+      <Version>6.2.13</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
-      <Version>7.1.0-rc2</Version>
+      <Version>7.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
       <Version>2.8.0-prerelease.210927001</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>5.0.0-preview.1</Version>
+      <Version>5.0.0-preview.3</Version>
     </PackageReference>
     <PackageReference Include="NLog.Extensions.Logging">
-      <Version>5.0.0-preview.1</Version>
+      <Version>5.0.0-preview.3</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI">
       <Version>15.1.1</Version>
@@ -249,16 +249,16 @@
       <Version>15.1.1</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Fody">
-      <Version>16.2.6</Version>
+      <Version>16.3.8</Version>
     </PackageReference>
     <PackageReference Include="Refit">
-      <Version>6.0.94</Version>
+      <Version>6.1.15</Version>
     </PackageReference>
     <PackageReference Include="Refit.HttpClientFactory">
-      <Version>6.0.94</Version>
+      <Version>6.1.15</Version>
     </PackageReference>
     <PackageReference Include="Splat">
-      <Version>13.1.10</Version>
+      <Version>13.1.30</Version>
     </PackageReference>
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator">
       <Version>1.1.33</Version>
@@ -266,13 +266,13 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Splat.DryIoc">
-      <Version>13.1.10</Version>
+      <Version>13.1.30</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">
-      <Version>3.2.5-preview-9a3c9a73b72f479e1c27fec4e1c7ec77dd69f125</Version>
+      <Version>3.3.1-preview-65841cb1054530e5d51ed5935d6805da25a97c50</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Client">
-      <Version>3.2.3</Version>
+      <Version>3.2.5-preview-eb210b24b724f0df6e3ce9566fe25ba3ce6ab13f</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
