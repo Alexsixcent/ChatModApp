@@ -30,13 +30,4 @@ public sealed partial class MessageCollectionView
         get => (ScrollingStateFlags)GetValue(ScrollingStateProperty);
         private set => SetValue(ScrollingStateProperty, value);
     }
-
-    public static readonly DependencyProperty PausingStateProperty = DependencyProperty.Register(
-        "PausingState", typeof(PauseStateFlags), typeof(MessageCollectionView), new PropertyMetadata(PauseStateFlags.Scrolling));
-
-    public PauseStateFlags PausingState
-    {
-        get => (PauseStateFlags)GetValue(PausingStateProperty);
-        set => SetValue(PausingStateProperty, value);
-    }
 }

@@ -15,8 +15,12 @@
             <Setter.Value>
                 <ControlTemplate TargetType="local:MessageCollectionView">
                     <Grid>
-                        <ScrollViewer x:Name="ScrollViewer"
-                                      ui:ScrollViewerExtensions.EnableMiddleClickScrolling="True">
+                        <controls:ScrollView x:Name="ScrollView" 
+                                             VerticalScrollBarVisibility="Auto"
+                                             VerticalScrollMode="Enabled"
+                                             HorizontalScrollMode="Disabled"
+                                             VerticalAnchorRatio="1"
+                                             HorizontalAnchorRatio="0">
                             <controls:ItemsRepeater x:Name="ItemsRepeater"
                                                     ItemsSource="{TemplateBinding ItemsSource}"
                                                     VerticalCacheLength="0" HorizontalCacheLength="0"
@@ -39,7 +43,7 @@
                                 </controls:ItemsRepeater.Layout>
 
                             </controls:ItemsRepeater>
-                        </ScrollViewer>
+                        </controls:ScrollView>
                         <Button Grid.Row="0" x:Name="ScrollButton" Opacity="0"
                                 VerticalAlignment="Bottom" HorizontalAlignment="Right"
                                 MaxWidth="100" Margin="30, 20">

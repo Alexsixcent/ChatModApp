@@ -1,42 +1,37 @@
-﻿using System;
-using System.Collections.Specialized;
-using Windows.UI.Xaml;
+﻿using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls;
 
 namespace ChatModApp.Views.Controls.MessageCollectionView
 {
+#pragma warning disable CS8305 // Type is for evaluation purposes only and is subject to change or removal in future updates.
     [TemplatePart(Name = PartItemsRepeater, Type = typeof(ItemsRepeater))]
-    [TemplatePart(Name = PartScrollViewer, Type = typeof(ScrollViewer))]
+    [TemplatePart(Name = PartScrollView, Type = typeof(ScrollView))]
     [TemplatePart(Name = PartScrollButton, Type = typeof(Button))]
     public sealed partial class MessageCollectionView : Control
     {
         private const string PartItemsRepeater = "ItemsRepeater";
-        private const string PartScrollViewer = "ScrollViewer";
+        private const string PartScrollView = "ScrollView";
         private const string PartScrollButton = "ScrollButton";
 
-        private ScrollViewer? _scrollViewer;
+        private ScrollView? _scrollViewer;
         private ItemsRepeater? _itemsRepeater;
         private Button? _scrollButton;
 
+        private double _lastScrollVerticalOffset;
 
         public enum ScrollingStateFlags
         {
-            None,
             Auto,
-            Manual
-        }
-
-        public enum PauseStateFlags
-        {
-            Scrolling,
-            ScrollPaused,
-            HoverPaused
+            Manual,
+            Hover //TODO: Implement scrolling pause
         }
 
         public MessageCollectionView()
         {
             DefaultStyleKey = typeof(MessageCollectionView);
+
+            RegisterPropertyChangedCallback(ScrollingStateProperty, OnScrollingStateChanged);
         }
 
         protected override void OnApplyTemplate()
@@ -45,7 +40,7 @@ namespace ChatModApp.Views.Controls.MessageCollectionView
 
             if (_itemsRepeater is not null)
             {
-                _itemsRepeater.ItemsSourceView.CollectionChanged -= ItemsSourceViewOnCollectionChanged;
+                //TODO
             }
 
             if (_scrollViewer is not null)
@@ -59,12 +54,12 @@ namespace ChatModApp.Views.Controls.MessageCollectionView
             }
 
             _itemsRepeater = (ItemsRepeater)GetTemplateChild(PartItemsRepeater);
-            _scrollViewer = (ScrollViewer)GetTemplateChild(PartScrollViewer);
+            _scrollViewer = (ScrollView)GetTemplateChild(PartScrollView);
             _scrollButton = (Button)GetTemplateChild(PartScrollButton);
 
             if (_itemsRepeater is not null)
             {
-                _itemsRepeater.ItemsSourceView.CollectionChanged += ItemsSourceViewOnCollectionChanged;
+                //TODO
             }
 
             if (_scrollViewer is not null)
@@ -78,49 +73,38 @@ namespace ChatModApp.Views.Controls.MessageCollectionView
             }
         }
 
-        private void ItemsSourceViewOnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void ScrollViewerOnViewChanged(ScrollView sender, object args)
         {
-            if (IsSticky && e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace)
+            var scrollDiff = _lastScrollVerticalOffset - _scrollViewer!.VerticalOffset;
+            if (scrollDiff > 0 && !IsNearBottom())
             {
-                ScrollToEnd();
+                //Scrolled up away from bottom, so disable auto scrolling
+                ScrollingState = ScrollingStateFlags.Manual;
             }
+            else if (ScrollingState is not ScrollingStateFlags.Auto && scrollDiff < 0 && IsNearBottom())
+            {
+                //Scrolled down into sticky zone, so enable auto scrolling
+                ScrollingState = ScrollingStateFlags.Auto;
+            }
+
+            _lastScrollVerticalOffset = _scrollViewer.VerticalOffset;
+        }
+
+        private void OnScrollingStateChanged(DependencyObject sender, DependencyProperty dp)
+        {
+            _scrollButton!.Opacity = ScrollingState is ScrollingStateFlags.Auto ? 0d : 1d;
         }
 
         private void ScrollButtonOnClick(object sender, RoutedEventArgs e) => ScrollToEnd();
 
-        private void ScrollViewerOnViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
-        {
-            if (ScrollingState is ScrollingStateFlags.Auto)
-            {
-                ScrollingState = ScrollingStateFlags.None;
-                return;
-            }
+        private bool IsNearBottom(double verticalOffset) =>
+            _scrollViewer!.ScrollableHeight - verticalOffset < _scrollViewer.ViewportHeight*0.02;
 
+        private bool IsNearBottom() => IsNearBottom(_scrollViewer!.VerticalOffset);
 
-            if (_scrollViewer!.ScrollableHeight < 0 ||
-                Math.Abs(_scrollViewer.VerticalOffset - _scrollViewer.ScrollableHeight) < 0.1)
-            {
-                if (e.IsIntermediate) return;
-
-                // Scrolled to bottom
-                _scrollButton!.Opacity = 0d;
-                ScrollingState = ScrollingStateFlags.Auto;
-                PausingState = PauseStateFlags.Scrolling;
-            }
-            else
-            {
-                _scrollButton!.Opacity = 1d;
-                ScrollingState = ScrollingStateFlags.Manual;
-                PausingState = PauseStateFlags.ScrollPaused;
-            }
-        }
-
-        private void ScrollToEnd()
-        {
-            _scrollButton!.Opacity = 0d;
-            ScrollingState = ScrollingStateFlags.Auto;
-            PausingState = PauseStateFlags.Scrolling;
-            _scrollViewer?.ChangeView(null, _scrollViewer.ScrollableHeight, null, true);
-        }
+        private void ScrollToEnd() =>
+            _scrollViewer!.ScrollTo(0d, _scrollViewer.ExtentHeight,
+                                    new(ScrollingAnimationMode.Disabled));
     }
+#pragma warning restore CS8305 // Type is for evaluation purposes only and is subject to change or removal in future updates.
 }
