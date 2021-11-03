@@ -7,111 +7,103 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using ChatModApp.Models.Chat.Fragments;
 
-namespace ChatModApp.Views.Controls.MessageView
+namespace ChatModApp.Views.Controls.MessageView;
+
+[TemplatePart(Name = PartRichTextBlock, Type = typeof(RichTextBlock))]
+public partial class MessageView : Control
 {
-    [TemplatePart(Name = PartRichTextBlock, Type = typeof(RichTextBlock))]
-    public partial class MessageView : Control
+    private const string PartRichTextBlock = nameof(RichTextBlock);
+    private const int InlineImagesVerticalOffset = 2;
+    private readonly Span _badges;
+    private readonly Span _message;
+    private readonly Run _separator = new() { Text = ": " };
+    private readonly Run _username;
+    private RichTextBlock? _richTextBlock;
+
+    public MessageView()
     {
-        private const string PartRichTextBlock = nameof(RichTextBlock);
+        DefaultStyleKey = typeof(MessageView);
 
-        private RichTextBlock? _richTextBlock;
-        private readonly Span _badges;
-        private readonly Run _username;
-        private readonly Span _message;
-        private readonly Run _separator = new() { Text = ": " };
-
-        private const int InlineImagesVerticalOffset = 2;
-
-        public MessageView()
+        _badges = new();
+        _username = new()
         {
-            DefaultStyleKey = typeof(MessageView);
+            Text = "placeholder",
+            FontWeight = FontWeights.Bold
+        };
+        _message = new();
 
-            _badges = new Span();
-            _username = new Run
-            {
-                Text = "placeholder",
-                FontWeight = FontWeights.Bold
-            };
-            _message = new Span();
+        RegisterPropertyChangedCallback(MessageFragmentsProperty, OnMessageChanged);
+        RegisterPropertyChangedCallback(ChatBadgesProperty, OnBadgesChanged);
+        RegisterPropertyChangedCallback(UsernameProperty, OnUsernameChanged);
+        RegisterPropertyChangedCallback(UsernameColorProperty, OnUserColorChanged);
+    }
 
-            RegisterPropertyChangedCallback(MessageFragmentsProperty, OnMessageChanged);
-            RegisterPropertyChangedCallback(ChatBadgesProperty, OnBadgesChanged);
-            RegisterPropertyChangedCallback(UsernameProperty, OnUsernameChanged);
-            RegisterPropertyChangedCallback(UsernameColorProperty, OnUserColorChanged);
-        }
+    protected override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
 
-        protected override void OnApplyTemplate()
+        _richTextBlock = (RichTextBlock)GetTemplateChild(PartRichTextBlock);
+
+        _richTextBlock.Blocks.Add(new Paragraph
         {
-            base.OnApplyTemplate();
+            Inlines = { _badges, _username, _separator, _message }
+        });
+    }
 
-            _richTextBlock = (RichTextBlock)GetTemplateChild(PartRichTextBlock);
-
-            _richTextBlock.Blocks.Add(new Paragraph
+    protected static Inline CreateFragmentInline(IMessageFragment fragment)
+    {
+        return fragment switch
+        {
+            TextFragment textFrag => new Run { Text = textFrag.Text },
+            EmoteFragment emoteFrag => new InlineUIContainer
             {
-                Inlines = { _badges, _username, _separator, _message }
+                Child = new Image
+                {
+                    Source = new BitmapImage(emoteFrag.Emote.Uri),
+                    Stretch = Stretch.None,
+                    Margin = new(2, 0, 2, 0),
+                    RenderTransform = new TranslateTransform { Y = InlineImagesVerticalOffset }
+                }
+            },
+            UriFragment uriFrag => new Hyperlink
+            {
+                Inlines = { new Run { Text = uriFrag.Text } },
+                NavigateUri = uriFrag.Uri,
+                UnderlineStyle = UnderlineStyle.None
+            },
+            _ => throw new ArgumentException("Fragment not of valid type.")
+        };
+    }
+
+    private void OnMessageChanged(DependencyObject sender, DependencyProperty dp)
+    {
+        _message.Inlines.Clear();
+        foreach (var frag in MessageFragments) _message.Inlines.Add(CreateFragmentInline(frag));
+    }
+
+    private void OnBadgesChanged(DependencyObject sender, DependencyProperty dp)
+    {
+        _badges.Inlines.Clear();
+        foreach (var badge in ChatBadges)
+            _badges.Inlines.Add(new InlineUIContainer
+            {
+                Child = new Image
+                {
+                    Source = new BitmapImage(badge.Small),
+                    Stretch = Stretch.None,
+                    Margin = new(2, 0, 2, 0),
+                    RenderTransform = new TranslateTransform { Y = InlineImagesVerticalOffset }
+                }
             });
-        }
+    }
 
-        private void OnMessageChanged(DependencyObject sender, DependencyProperty dp)
-        {
-            _message.Inlines.Clear();
-            foreach (var frag in MessageFragments)
-            {
-                _message.Inlines.Add(CreateFragmentInline(frag));
-            }
-        }
+    private void OnUsernameChanged(DependencyObject sender, DependencyProperty dp)
+    {
+        _username.Text = Username;
+    }
 
-        private void OnBadgesChanged(DependencyObject sender, DependencyProperty dp)
-        {
-            _badges.Inlines.Clear();
-            foreach (var badge in ChatBadges)
-            {
-                _badges.Inlines.Add(new InlineUIContainer
-                {
-                    Child = new Image
-                    {
-                        Source = new BitmapImage(badge.Small),
-                        Stretch = Stretch.None,
-                        Margin = new Thickness(2, 0, 2, 0),
-                        RenderTransform = new TranslateTransform { Y = InlineImagesVerticalOffset }
-                    }
-                });
-            }
-        }
-
-        private void OnUsernameChanged(DependencyObject sender, DependencyProperty dp)
-        {
-            _username.Text = Username;
-        }
-
-        private void OnUserColorChanged(DependencyObject sender, DependencyProperty dp)
-        {
-            _username.Foreground = new SolidColorBrush(UsernameColor);
-        }
-
-        protected static Inline CreateFragmentInline(IMessageFragment fragment)
-        {
-            return fragment switch
-            {
-                TextFragment textFrag => new Run { Text = textFrag.Text },
-                EmoteFragment emoteFrag => new InlineUIContainer
-                {
-                    Child = new Image
-                    {
-                        Source = new BitmapImage(emoteFrag.Emote.Uri),
-                        Stretch = Stretch.None,
-                        Margin = new Thickness(2, 0, 2, 0),
-                        RenderTransform = new TranslateTransform { Y = InlineImagesVerticalOffset }
-                    },
-                },
-                UriFragment uriFrag => new Hyperlink
-                {
-                    Inlines = { new Run { Text = uriFrag.Text } },
-                    NavigateUri = uriFrag.Uri,
-                    UnderlineStyle = UnderlineStyle.None,
-                },
-                _ => throw new ArgumentException("Fragment not of valid type.")
-            };
-        }
+    private void OnUserColorChanged(DependencyObject sender, DependencyProperty dp)
+    {
+        _username.Foreground = new SolidColorBrush(UsernameColor);
     }
 }

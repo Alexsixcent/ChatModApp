@@ -4,30 +4,25 @@ using Windows.UI.Xaml.Controls;
 using ChatModApp.ViewModels;
 using ReactiveUI;
 
-namespace ChatModApp.Views
+namespace ChatModApp.Views.Pages;
+
+public class AuthenticationViewBase : ReactivePage<AuthenticationViewModel> { }
+
+/// <summary>
+///     The authentication page.
+/// </summary>
+public sealed partial class AuthenticationView
 {
-    public class AuthenticationViewBase : ReactivePage<AuthenticationViewModel> { }
-
-    /// <summary>
-    /// The authentication page.
-    /// </summary>
-    public sealed partial class AuthenticationView
+    public AuthenticationView()
     {
-        public AuthenticationView()
+        InitializeComponent();
+
+        this.WhenActivated(disposable =>
         {
-            InitializeComponent();
+            this.OneWayBind(ViewModel, vm => vm.AuthUri, v => v.AuthWebView.Source).DisposeWith(disposable);
 
-            this.WhenActivated(disposable =>
-            {
-                this.OneWayBind(ViewModel, vm => vm.AuthUri, v => v.AuthWebView.Source)
-                    .DisposeWith(disposable);
-
-                AuthWebView.Events()
-                    .NavigationStarting
-                    .Select(args => args.args)
-                    .InvokeCommand(ViewModel.AuthCompleteCommand)
-                    .DisposeWith(disposable);
-            });
-        }
+            AuthWebView.Events().NavigationStarting.Select(args => args.args).InvokeCommand(ViewModel.AuthCompleteCommand)
+                       .DisposeWith(disposable);
+        });
     }
 }

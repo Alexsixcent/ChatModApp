@@ -1,20 +1,20 @@
-﻿<local:ChatTabPromptViewBase
-    x:Class="ChatModApp.Views.ChatTabPromptView"
+﻿<pages:ChatTabPromptViewBase
+    x:Class="ChatModApp.Views.Pages.ChatTabPromptView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:ChatModApp.Views"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:pages="using:ChatModApp.Views.Pages"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <StackPanel Orientation="Vertical">
-        <AutoSuggestBox Name="ChannelSuggestBox" 
-                        Header="Enter the channel name" 
-                        PlaceholderText="Channel" 
+        <AutoSuggestBox Name="ChannelSuggestBox"
+                        Header="Enter the channel name"
+                        PlaceholderText="Channel"
                         Margin="5,0"
                         QueryIcon="Find"
-                        UpdateTextOnSelect="False">
-        </AutoSuggestBox>
+                        UpdateTextOnSelect="False" />
     </StackPanel>
-</local:ChatTabPromptViewBase>
+</pages:ChatTabPromptViewBase>

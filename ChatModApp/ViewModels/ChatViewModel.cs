@@ -9,55 +9,47 @@ using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
+namespace ChatModApp.ViewModels;
 
-namespace ChatModApp.ViewModels
+public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
 {
-    public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
+    public readonly ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages;
+    public ITwitchChannel? Channel { get; set; }
+    public ReactiveCommand<string, Unit> SendMessageCommand { get; }
+
+    [Reactive]
+    public string MessageText { get; set; }
+
+    public string UrlPathSegment => Guid.NewGuid().ToString().Substring(0, 5);
+    public IScreen? HostScreen { get; set; }
+
+    private readonly CompositeDisposable _disposables;
+
+    public ChatViewModel(TwitchChatService chatService, MessageProcessingService messageProcessingService)
     {
-        public string UrlPathSegment => Guid.NewGuid().ToString().Substring(0, 5);
-        public IScreen? HostScreen { get; set; }
+        _disposables = new();
+        var chatService1 = chatService;
 
-        public ITwitchChannel? Channel { get; set; }
+        var messageSent = chatService1.ChatMessageSent.Where(message => message.Channel == Channel?.Login)
+                                      .Select(messageProcessingService.ProcessSentMessage);
 
-        public ReactiveCommand<string, Unit> SendMessageCommand { get; }
+        chatService1.ChatMessageReceived.Where(message => message.Channel == Channel?.Login)
+                    .Select(messageProcessingService.ProcessReceivedMessage).Merge(messageSent)
+                    .ToObservableChangeSet(model => model.Id).ObserveOn(RxApp.MainThreadScheduler).Bind(out ChatMessages)
+                    .Subscribe().DisposeWith(_disposables);
 
-        [Reactive]
-        public string MessageText { get; set; }
-        public readonly ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages;
-
-
-        private readonly CompositeDisposable _disposables;
-        private readonly TwitchChatService _chatService;
-
-        public ChatViewModel(TwitchChatService chatService, MessageProcessingService messageProcessingService)
+        MessageText = string.Empty;
+        SendMessageCommand = ReactiveCommand.Create<string>(s =>
         {
-            _disposables = new CompositeDisposable();
-            _chatService = chatService;
-
-            var messageSent= _chatService.ChatMessageSent
-                                         .Where(message => message.Channel == Channel?.Login)
-                                         .Select(messageProcessingService.ProcessSentMessage);
-
-            _chatService.ChatMessageReceived
-                        .Where(message => message.Channel == Channel?.Login)
-                        .Select(messageProcessingService.ProcessReceivedMessage)
-                        .Merge(messageSent)
-                        .ToObservableChangeSet(model => model.Id)
-                        .ObserveOn(RxApp.MainThreadScheduler)
-                        .Bind(out ChatMessages)
-                        .Subscribe()
-                        .DisposeWith(_disposables);
-
+            chatService1.SendMessage(Channel!, s);
             MessageText = string.Empty;
-            SendMessageCommand = ReactiveCommand.Create<string>(s =>
-            {
-                _chatService.SendMessage(Channel!, s);
-                MessageText = string.Empty;
-            });
+        });
 
-            SendMessageCommand.DisposeWith(_disposables);
-        }
+        SendMessageCommand.DisposeWith(_disposables);
+    }
 
-        public void Dispose() => _disposables.Dispose();
+    public void Dispose()
+    {
+        _disposables.Dispose();
     }
 }

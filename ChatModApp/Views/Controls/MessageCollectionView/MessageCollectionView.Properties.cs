@@ -5,7 +5,22 @@ namespace ChatModApp.Views.Controls.MessageCollectionView;
 public sealed partial class MessageCollectionView
 {
     public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
-        "ItemsSource", typeof(object), typeof(MessageCollectionView), new PropertyMetadata(default));
+        "ItemsSource",
+        typeof(object),
+        typeof(MessageCollectionView),
+        new(default));
+
+    public static readonly DependencyProperty IsStickyProperty = DependencyProperty.Register(
+        "IsSticky",
+        typeof(bool),
+        typeof(MessageCollectionView),
+        new(true));
+
+    public static readonly DependencyProperty ScrollingStateProperty = DependencyProperty.Register(
+        "ScrollingState",
+        typeof(ScrollingStateFlags),
+        typeof(MessageCollectionView),
+        new(ScrollingStateFlags.Auto));
 
     public object ItemsSource
     {
@@ -13,17 +28,11 @@ public sealed partial class MessageCollectionView
         set => SetValue(ItemsSourceProperty, value);
     }
 
-    public static readonly DependencyProperty IsStickyProperty = DependencyProperty.Register(
-        "IsSticky", typeof(bool), typeof(MessageCollectionView), new PropertyMetadata(true));
-
     public bool IsSticky
     {
         get => (bool)GetValue(IsStickyProperty);
         private set => SetValue(IsStickyProperty, value);
     }
-
-    public static readonly DependencyProperty ScrollingStateProperty = DependencyProperty.Register(
-        "ScrollingState", typeof(ScrollingStateFlags), typeof(MessageCollectionView), new PropertyMetadata(ScrollingStateFlags.Auto));
 
     public ScrollingStateFlags ScrollingState
     {

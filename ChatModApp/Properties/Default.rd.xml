@@ -31,6 +31,6 @@
 
     <Type Name="Microsoft.Extensions.Http.LoggingHttpMessageHandlerBuilderFilter" Activate="Required Public" />
     <Type Name="Microsoft.Extensions.Http.HttpClientFactoryOptions" Activate="Required Public" />
-    <Type Name="Windows.Foundation.TypedEventHandler`2" MarshalObject="Required All"/>
+    <Type Name="Windows.Foundation.TypedEventHandler`2" MarshalObject="Required All" />
   </Application>
 </Directives>

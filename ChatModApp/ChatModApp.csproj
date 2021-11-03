@@ -112,7 +112,6 @@
     <Compile Include="Views\Controls\MessageCollectionView\MessageCollectionDictionary.xaml.cs" />
     <Compile Include="Tools\Grouping.cs" />
     <Compile Include="Services\TwitchApiService.cs" />
-    <Compile Include="Tools\AkavacheSuspensionDriver.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>

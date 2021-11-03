@@ -1,10 +1,9 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ChatModApp
+namespace ChatModApp;
+
+[DataContract]
+internal class AppState
 {
-    [DataContract]
-    class AppState
-    {
-        public string TwitchAccessToken { get; set; }
-    }
+    public string TwitchAccessToken { get; set; }
 }

@@ -6,6 +6,6 @@
     <ResourceDictionary.MergedDictionaries>
         <messageCollectionView:MessageCollectionDictionary />
 
-        <ResourceDictionary Source="/Views/Controls/MessageView/MessageView.xaml"/>
+        <ResourceDictionary Source="/Views/Controls/MessageView/MessageView.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

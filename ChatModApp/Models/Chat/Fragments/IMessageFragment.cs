@@ -1,6 +1,3 @@
-﻿namespace ChatModApp.Models.Chat.Fragments
-{
-    public interface IMessageFragment
-    {
-    }
-}
+﻿namespace ChatModApp.Models.Chat.Fragments;
+
+public interface IMessageFragment { }

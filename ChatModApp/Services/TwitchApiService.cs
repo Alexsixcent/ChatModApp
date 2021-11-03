@@ -10,38 +10,35 @@ using TwitchLib.Api.Helix;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Api.V5;
 
-namespace ChatModApp.Services
+namespace ChatModApp.Services;
+
+public class TwitchApiService
 {
-    public class TwitchApiService
+    public IObservable<User> UserConnected { get; }
+
+    public Helix Helix => _api.Helix;
+    public V5 V5 => _api.V5;
+
+    private readonly TwitchAPI _api;
+
+    public TwitchApiService(ILoggerFactory apiLoggerFactory, AuthenticationService authService)
     {
-        public IObservable<User> UserConnected { get; }
+        _api = new(apiLoggerFactory);
 
-        public Helix Helix => _api.Helix;
-        public V5 V5 => _api.V5;
+        UserConnected = authService.AccessTokenChanged.Select(Connect).SelectMany(GetCurrentUser);
+    }
 
-        private readonly TwitchAPI _api;
+    private Unit Connect(string accessToken)
+    {
+        _api.Settings.ClientId = AuthenticationService.ClientId;
+        _api.Settings.AccessToken = accessToken;
 
-        public TwitchApiService(ILoggerFactory apiLoggerFactory, AuthenticationService authService)
-        {
-            _api = new TwitchAPI(apiLoggerFactory);
+        return Unit.Default;
+    }
 
-            UserConnected = authService.AccessTokenChanged
-                                       .Select(Connect)
-                                       .SelectMany(GetCurrentUser);
-        }
-
-        private Unit Connect(string accessToken)
-        {
-            _api.Settings.ClientId = AuthenticationService.ClientId;
-            _api.Settings.AccessToken = accessToken;
-
-            return Unit.Default;
-        }
-
-        private async Task<User> GetCurrentUser(Unit _, CancellationToken cancellation)
-        {
-            var res = await _api.Helix.Users.GetUsersAsync();
-            return res.Users.Single();
-        }
+    private async Task<User> GetCurrentUser(Unit _, CancellationToken cancellation)
+    {
+        var res = await _api.Helix.Users.GetUsersAsync();
+        return res.Users.Single();
     }
 }
