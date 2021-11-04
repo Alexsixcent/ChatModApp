@@ -242,13 +242,16 @@
       <Version>5.0.0-preview.3</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI">
-      <Version>15.1.1</Version>
+      <Version>16.3.10</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Events">
       <Version>15.1.1</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Fody">
-      <Version>16.3.8</Version>
+      <Version>16.3.10</Version>
+    </PackageReference>
+    <PackageReference Include="ReactiveUI.Uwp">
+      <Version>16.3.10</Version>
     </PackageReference>
     <PackageReference Include="Refit">
       <Version>6.1.15</Version>
@@ -257,7 +260,7 @@
       <Version>6.1.15</Version>
     </PackageReference>
     <PackageReference Include="Splat">
-      <Version>13.1.30</Version>
+      <Version>13.1.42</Version>
     </PackageReference>
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator">
       <Version>1.1.33</Version>
@@ -265,7 +268,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Splat.DryIoc">
-      <Version>13.1.30</Version>
+      <Version>13.1.42</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">
       <Version>3.3.1-preview-65841cb1054530e5d51ed5935d6805da25a97c50</Version>
