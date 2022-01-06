@@ -12,6 +12,6 @@
 
     <Grid>
         <TextBlock Text="MainView"/>
-        <reactiveUi:RoutedViewHost Name="RoutedViewHost"/>
+        <reactiveUi:RoutedViewHost x:Name="RoutedViewHost"/>
     </Grid>
 </views:MainViewBase>

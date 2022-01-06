@@ -12,7 +12,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
-        <muxc:TabView Name="TabViewControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+        <muxc:TabView x:Name="TabViewControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
             <muxc:TabView.TabItemTemplate>
                 <DataTemplate x:DataType="viewModels:ChatTabItemViewModel">
                     <muxc:TabViewItem Header="{x:Bind Title, Mode=OneWay}">
