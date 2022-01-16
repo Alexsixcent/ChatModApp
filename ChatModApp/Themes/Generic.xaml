@@ -7,5 +7,6 @@
         <messageCollectionView:MessageCollectionDictionary />
 
         <ResourceDictionary Source="/Views/Controls/MessageView/MessageView.xaml" />
+        <ResourceDictionary Source="/Views/Controls/ChatEditBox/ChatEditBox.xaml" />
     </ResourceDictionary.MergedDictionaries>
 </ResourceDictionary>

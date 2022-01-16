@@ -109,6 +109,19 @@
     <Compile Include="Services\ApiClients\IAuthApi.cs" />
     <Compile Include="Services\GlobalStateService.cs" />
     <Compile Include="Services\MessageProcessingService.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatEditBox.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatEditBox.Properties.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatEditBox.Document.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatEditBox.Events.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatEditBox.Helpers.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatEditBox.Suggestion.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatEditQuery.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatSuggestToken.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatEditTokenPointerOverEventArgs.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\ChatEditTokenSelectedEventArgs.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\SuggestionChosenEventArgs.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\SuggestionPopupPlacementMode.cs" />
+    <Compile Include="Views\Controls\ChatEditBox\SuggestionRequestedEventArgs.cs" />
     <Compile Include="Views\Controls\MessageCollectionView\MessageCollectionDictionary.xaml.cs" />
     <Compile Include="Tools\Grouping.cs" />
     <Compile Include="Services\TwitchApiService.cs" />
@@ -176,6 +189,10 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Controls\ChatEditBox\ChatEditBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Controls\MessageCollectionView\MessageCollectionView.xaml">
       <SubType>Designer</SubType>
