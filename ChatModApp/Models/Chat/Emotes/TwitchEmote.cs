@@ -1,31 +1,34 @@
 ﻿using System;
+using TwitchLib.Api.Helix.Models.Chat.Emotes;
 
-namespace ChatModApp.Models.Chat.Emotes
+namespace ChatModApp.Models.Chat.Emotes;
+
+public class TwitchEmote : IEmote
 {
-    public class TwitchEmote : IEmote
+    public TwitchEmote(string id, string code, string uri)
     {
-        public TwitchEmote(string id, string code)
-        {
-            Id = id;
-            Code = code;
-        }
-
-        public string Code { get; }
-        string Id { get; }
-        public Uri Uri => new($"http://static-cdn.jtvnw.net/emoticons/v1/{Id}/1.0");
+        Id = id;
+        Code = code;
+        Uri = new(uri);
     }
 
-    public class TwitchSubEmote : TwitchEmote
-    {
-        public TwitchSubEmote(string id, string code) : base(id, code)
-        {
-        }
-    }
+    public TwitchEmote(string id, string code)
+        : this(id, code, $"https://static-cdn.jtvnw.net/emoticons/v2/{id}/default/dark/1.0")
+    { }
 
-    public class TwitchGlobalEmote : TwitchEmote
-    {
-        public TwitchGlobalEmote(string id, string code) : base(id, code)
-        {
-        }
-    }
+    public TwitchEmote(Emote emote)
+        : this(emote.Id, emote.Name, emote.Images.Url1X)
+    { }
+
+    public TwitchEmote(TwitchLib.Client.Models.Emote emote)
+        : this(emote.Id, emote.Name)
+    { }
+
+    public string Id { get; }
+    public string Code { get; }
+    public Uri Uri { get; }
+
+
+    public static implicit operator TwitchEmote(Emote e) => new(e);
+    public static implicit operator TwitchEmote(TwitchLib.Client.Models.Emote e) => new(e);
 }

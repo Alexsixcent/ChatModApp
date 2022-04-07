@@ -1,11 +1,10 @@
 ﻿using System;
 
-namespace ChatModApp.Models.Chat
+namespace ChatModApp.Models.Chat;
+
+public interface IChatBadge
 {
-    public interface IChatBadge
-    {
-        Uri Small { get; }
-        Uri Medium { get; }
-        Uri Large { get; }
-    }
+    Uri Small { get; }
+    Uri Medium { get; }
+    Uri Large { get; }
 }

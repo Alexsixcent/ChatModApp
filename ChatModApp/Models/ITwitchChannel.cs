@@ -1,8 +1,7 @@
-﻿namespace ChatModApp.Models
+﻿namespace ChatModApp.Models;
+
+public interface ITwitchChannel
 {
-    public interface ITwitchChannel
-    {
-        string DisplayName { get; }
-        string Login { get; }
-    }
+    string DisplayName { get; }
+    string Login { get; }
 }

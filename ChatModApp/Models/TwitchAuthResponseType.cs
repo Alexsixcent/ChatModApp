@@ -1,10 +1,9 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ChatModApp.Models
+namespace ChatModApp.Models;
+
+public enum TwitchAuthResponseType
 {
-    public enum TwitchAuthResponseType
-    {
-        [EnumMember(Value = "token")]
-        Token
-    }
+    [EnumMember(Value = "token")]
+    Token
 }

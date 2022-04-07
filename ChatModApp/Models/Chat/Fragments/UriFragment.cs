@@ -1,21 +1,20 @@
 ﻿using System;
 
-namespace ChatModApp.Models.Chat.Fragments
-{
-    public class UriFragment : IMessageFragment
-    {
-        public string Text { get; }
-        public Uri Uri { get; }
+namespace ChatModApp.Models.Chat.Fragments;
 
-        public UriFragment(Uri uri)
-        {
-            Uri = uri;
-            Text = uri.OriginalString;
-        }
-        public UriFragment(Uri uri, string text)
-        {
-            Uri = uri;
-            Text = text;
-        }
+public class UriFragment : IMessageFragment
+{
+    public string Text { get; }
+    public Uri Uri { get; }
+
+    public UriFragment(Uri uri)
+    {
+        Uri = uri;
+        Text = uri.OriginalString;
+    }
+    public UriFragment(Uri uri, string text)
+    {
+        Uri = uri;
+        Text = text;
     }
 }
