@@ -18,7 +18,7 @@ public class MessageProcessingService
     private readonly EmotesService _emotesService;
     private readonly TwitchChatService _chatService;
 
-    public MessageProcessingService(GlobalStateService globalStateService, 
+    public MessageProcessingService(GlobalStateService globalStateService,
                                     EmotesService emotesService,
                                     TwitchChatService chatService)
     {
@@ -47,7 +47,8 @@ public class MessageProcessingService
                    GetColorFromTwitchHex(message.ColorHex));
     }
 
-    private IEnumerable<IChatBadge> GetMessageBadges(string channel, IEnumerable<KeyValuePair<string, string>> badgePairs)
+    private IEnumerable<IChatBadge> GetMessageBadges(string channel,
+                                                     IEnumerable<KeyValuePair<string, string>> badgePairs)
     {
         var badges = new List<TwitchChatBadge>();
 
@@ -100,9 +101,12 @@ public class MessageProcessingService
         return fragments;
     }
 
-    private IEnumerable<IMessageFragment> ParseTextFragment(string msg, string channel, bool startSpace = true,
+    private IEnumerable<IMessageFragment> ParseTextFragment(string? msg, string channel, bool startSpace = true,
                                                             bool endSpace = true)
     {
+        if (msg is null)
+            return Array.Empty<IMessageFragment>();
+        
         var fragments = new List<IMessageFragment>();
 
         foreach (var frag in msg.Split(' ', StringSplitOptions.RemoveEmptyEntries))
