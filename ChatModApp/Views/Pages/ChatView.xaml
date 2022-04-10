@@ -46,9 +46,11 @@
 					 AcceptsReturn="True"
 					 Margin="5,5" />
 
-			<StackPanel Orientation="Horizontal">
-				<Button Name="ChatListButton"
-						Content="Viewers">
+			<StackPanel Orientation="Horizontal"
+						VerticalAlignment="Stretch"
+						HorizontalAlignment="Right">
+				<Button Margin="0,0,5,5">
+					<SymbolIcon Symbol="People" />
 					<Button.Resources>
 						<CollectionViewSource x:Name="GroupInfoCvs"
 											  IsSourceGrouped="True"
@@ -58,9 +60,13 @@
 						<Flyout x:Name="ChattersFlyout">
 							<StackPanel Orientation="Vertical">
 								<StackPanel Orientation="Horizontal">
-									<TextBox Header="Username search"
-											 PlaceholderText="Search" />
-									<Button Name="UserListRefreshButton">
+									<TextBox x:Name="UserNameSearch"
+											 PlaceholderText="Search user..."
+											 Margin="0,0,5,5" />
+									<Button Name="UserListRefreshButton"
+											Margin="10,0,0,5"
+											VerticalAlignment="Top"
+											HorizontalAlignment="Right">
 										<SymbolIcon Symbol="Refresh" />
 									</Button>
 								</StackPanel>
@@ -94,9 +100,7 @@
 					</Button.Flyout>
 				</Button>
 				<Button Name="SubmitButton"
-						Content="Chat"
-						VerticalAlignment="Stretch"
-						HorizontalAlignment="Right"
+						Content="Send"
 						Margin="0,0,5,5" />
 			</StackPanel>
 
