@@ -34,7 +34,9 @@ public sealed partial class ChatView
 
             this.Bind(ViewModel, vm => vm.MessageText, v => v.ChatBox.Text)
                 .DisposeWith(disposables);
-            
+            this.Bind(ViewModel, vm => vm.UserSearchText, v => v.UserNameSearch.Text)
+                .DisposeWith(disposables);
+
             var enterDown = ChatBox.Events().KeyUp
                                    .Where(args => args.Key == VirtualKey.Enter &&
                                                   !WinCore.CoreWindow.GetForCurrentThread()

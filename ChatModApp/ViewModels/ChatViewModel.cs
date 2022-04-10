@@ -26,6 +26,7 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     public ReactiveCommand<Unit, Unit> ChattersLoadCommand { get; }
 
     [Reactive] public string MessageText { get; set; }
+    [Reactive] public string UserSearchText { get; set; }
 
     public readonly ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages;
     public readonly ReadOnlyObservableCollection<IGrouping<UserType, string>> UsersList;
@@ -40,6 +41,8 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     {
         _disposables = new();
         _chatters = new();
+        MessageText = string.Empty;
+        UserSearchText = string.Empty;
         _chatService = chatService;
 
         var messageSent = _chatService.ChatMessageSent
@@ -55,15 +58,16 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
                     .Bind(out ChatMessages)
                     .Subscribe()
                     .DisposeWith(_disposables);
-
+        
         _chatters.Connect()
+                 .AutoRefreshOnObservable(_ => this.WhenAnyValue(vm => vm.UserSearchText))
+                 .Filter(c => c.Username.Contains(UserSearchText))
                  .GroupByElement(c => c.UserType, c => c.Username)
                  .ObserveOn(RxApp.MainThreadScheduler)
                  .Bind(out UsersList)
                  .Subscribe()
                  .DisposeWith(_disposables);
 
-        MessageText = string.Empty;
         SendMessageCommand = ReactiveCommand.Create<string>(message =>
         {
             _chatService.SendMessage(Channel ?? throw new NullReferenceException("Channel can't be null"), message);
