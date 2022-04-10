@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using Microsoft.Toolkit.Collections;
+using ReactiveUI;
 
 namespace ChatModApp.Tools;
 
@@ -24,10 +26,10 @@ public class Grouping<TObject, TKey, TGroupKey> : IGroup<TObject, TKey, TGroupKe
 
 // From: https://stackoverflow.com/a/52928955
 // custom IGrouping implementation which is required by ListView
-public class GroupingListView<TObject, TKey, TElement> : ObservableCollectionExtended<TElement>, IGrouping<TKey, TElement>, IReadOnlyObservableGroup, IDisposable
+public class ListViewGrouping<TObject, TKey, TElement> : ObservableCollectionExtended<TElement>, IGrouping<TKey, TElement>, IReadOnlyObservableGroup, IDisposable
 {
     private readonly IDisposable _subscription;
-    public GroupingListView(IGroup<TObject, TKey> group, Func<TObject, TElement> elementSelector) 
+    public ListViewGrouping(IGroup<TObject, TKey> group, Func<TObject, TElement> elementSelector) 
     {
         if (group == null)
             throw new ArgumentNullException(nameof(group));
@@ -36,6 +38,7 @@ public class GroupingListView<TObject, TKey, TElement> : ObservableCollectionExt
         _subscription = group.List
                              .Connect()
                              .Transform(elementSelector)
+                             .ObserveOn(RxApp.MainThreadScheduler)
                              .Bind(this)
                              .Subscribe();
     }
@@ -44,8 +47,5 @@ public class GroupingListView<TObject, TKey, TElement> : ObservableCollectionExt
 
     object IReadOnlyObservableGroup.Key => Key;
 
-    public void Dispose()
-    {
-        _subscription.Dispose();
-    }
+    public void Dispose() => _subscription.Dispose();
 }
