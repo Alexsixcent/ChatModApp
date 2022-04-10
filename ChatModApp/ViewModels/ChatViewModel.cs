@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ChatModApp.Models;
 using ChatModApp.Services;
+using ChatModApp.Tools.Extensions;
 using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using TwitchLib.Api.Core.Enums;
+using TwitchLib.Api.Core.Models.Undocumented.Chatters;
 
 namespace ChatModApp.ViewModels;
 
@@ -19,24 +23,28 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     public ITwitchChannel? Channel { get; set; }
 
     public ReactiveCommand<string, Unit> SendMessageCommand { get; }
+    public ReactiveCommand<Unit, Unit> ChattersLoadCommand { get; }
 
-    [Reactive]
-    public string MessageText { get; set; }
+    [Reactive] public string MessageText { get; set; }
 
     public readonly ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages;
+    public readonly ReadOnlyObservableCollection<IGrouping<UserType, string>> UsersList;
 
 
     private readonly CompositeDisposable _disposables;
     private readonly TwitchChatService _chatService;
+    private readonly SourceList<ChatterFormatted> _chatters;
+
 
     public ChatViewModel(TwitchChatService chatService, MessageProcessingService messageProcessingService)
     {
         _disposables = new();
+        _chatters = new();
         _chatService = chatService;
 
-        var messageSent= _chatService.ChatMessageSent
-                                     .Where(message => message.Channel == Channel?.Login)
-                                     .Select(messageProcessingService.ProcessSentMessage);
+        var messageSent = _chatService.ChatMessageSent
+                                      .Where(message => message.Channel == Channel?.Login)
+                                      .Select(messageProcessingService.ProcessSentMessage);
 
         _chatService.ChatMessageReceived
                     .Where(message => message.Channel == Channel?.Login)
@@ -48,14 +56,32 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
                     .Subscribe()
                     .DisposeWith(_disposables);
 
-        MessageText = string.Empty;
-        SendMessageCommand = ReactiveCommand.Create<string>(s =>
-        {
-            _chatService.SendMessage(Channel!, s);
-            MessageText = string.Empty;
-        });
+        _chatters.Connect()
+                 .GroupByElement(c => c.UserType, c => c.Username)
+                 .ObserveOn(RxApp.MainThreadScheduler)
+                 .Bind(out UsersList)
+                 .Subscribe()
+                 .DisposeWith(_disposables);
 
-        SendMessageCommand.DisposeWith(_disposables);
+        MessageText = string.Empty;
+        SendMessageCommand = ReactiveCommand.Create<string>(message =>
+        {
+            _chatService.SendMessage(Channel ?? throw new NullReferenceException("Channel can't be null"), message);
+            MessageText = string.Empty;
+        }).DisposeWith(_disposables);
+
+        ChattersLoadCommand = ReactiveCommand.CreateFromTask(async () =>
+        {
+            var list =
+                await _chatService.GetChatUserList(Channel ??
+                                                   throw new NullReferenceException("Channel can't be null"));
+
+            _chatters.Edit(e =>
+            {
+                e.Clear();
+                e.AddRange(list);
+            });
+        }).DisposeWith(_disposables);
     }
 
     public void Dispose() => _disposables.Dispose();

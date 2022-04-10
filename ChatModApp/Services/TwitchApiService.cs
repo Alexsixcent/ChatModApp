@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using TwitchLib.Api;
+using TwitchLib.Api.Core.Undocumented;
 using TwitchLib.Api.Helix;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
@@ -16,6 +17,7 @@ public class TwitchApiService
     public IObservable<User> UserConnected { get; }
 
     public Helix Helix => _api.Helix;
+    public Undocumented Undocumented => _api.Undocumented;
 
     private readonly TwitchAPI _api;
 

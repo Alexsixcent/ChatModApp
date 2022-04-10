@@ -1,4 +1,6 @@
-﻿using System.Reactive.Disposables;
+﻿using System;
+using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Windows.System;
 using Windows.UI.Xaml;
@@ -24,12 +26,15 @@ public sealed partial class ChatView
 
         this.WhenActivated(disposables =>
         {
+            GroupInfoCvs.Source = ViewModel?.UsersList;
+            UserListView.ItemsSource = GroupInfoCvs.View;
+            
             this.OneWayBind(ViewModel, vm => vm.ChatMessages, v => v.ChatList.ItemsSource)
                 .DisposeWith(disposables);
 
             this.Bind(ViewModel, vm => vm.MessageText, v => v.ChatBox.Text)
                 .DisposeWith(disposables);
-
+            
             var enterDown = ChatBox.Events().KeyUp
                                    .Where(args => args.Key == VirtualKey.Enter &&
                                                   !WinCore.CoreWindow.GetForCurrentThread()
@@ -42,6 +47,17 @@ public sealed partial class ChatView
                         .Merge(enterDown)
                         .InvokeCommand(ViewModel, vm => vm.SendMessageCommand)
                         .DisposeWith(disposables);
+
+            ChattersFlyout.Events().Opening
+                          .Sample(TimeSpan.FromSeconds(30))
+                          .Select(_ => Unit.Default)
+                          .InvokeCommand(ViewModel, vm => vm.ChattersLoadCommand)
+                          .DisposeWith(disposables);
+
+            UserListRefreshButton.Events().Click
+                                 .Select(_ => Unit.Default)
+                                 .InvokeCommand(ViewModel, vm => vm.ChattersLoadCommand)
+                                 .DisposeWith(disposables);
         });
     }
 

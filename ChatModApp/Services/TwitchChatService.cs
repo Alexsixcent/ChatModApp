@@ -10,6 +10,7 @@ using ChatModApp.Models.Chat;
 using DynamicData;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
+using TwitchLib.Api.Core.Models.Undocumented.Chatters;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -87,6 +88,11 @@ public class TwitchChatService : IDisposable
     }
 
     public void SendMessage(ITwitchChannel channel, string message) => _client.SendMessage(channel.Login, message);
+
+    public async Task<IEnumerable<ChatterFormatted>> GetChatUserList(ITwitchChannel channel)
+    {
+        return await _apiService.Undocumented.GetChattersAsync(channel.Login);
+    }
 
     public void Dispose() => _disposables.Dispose();
 
