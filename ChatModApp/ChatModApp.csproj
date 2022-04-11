@@ -201,19 +201,19 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="akavache">
-      <Version>7.3.1</Version>
+      <Version>8.1.1</Version>
     </PackageReference>
     <PackageReference Include="DynamicData">
-      <Version>7.4.3</Version>
+      <Version>7.6.5</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection">
-      <Version>6.0.0-rc.2.21480.5</Version>
+      <Version>6.0.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting">
-      <Version>6.0.0-rc.2.21480.5</Version>
+      <Version>6.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging">
-      <Version>6.0.0-rc.2.21480.5</Version>
+      <Version>6.0.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.13</Version>
@@ -222,34 +222,34 @@
       <Version>7.1.2</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.UI.Xaml">
-      <Version>2.7.0</Version>
+      <Version>2.8.0-prerelease.220118001</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>5.0.0-preview.3</Version>
+      <Version>5.0.0-rc2</Version>
     </PackageReference>
     <PackageReference Include="NLog.Extensions.Logging">
-      <Version>5.0.0-preview.3</Version>
+      <Version>5.0.0-rc2</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI">
-      <Version>16.3.10</Version>
+      <Version>18.0.7</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Events">
       <Version>15.1.1</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Fody">
-      <Version>16.3.10</Version>
+      <Version>18.0.7</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI.Uwp">
-      <Version>16.3.10</Version>
+      <Version>18.0.7</Version>
     </PackageReference>
     <PackageReference Include="Refit">
-      <Version>6.1.15</Version>
+      <Version>6.3.2</Version>
     </PackageReference>
     <PackageReference Include="Refit.HttpClientFactory">
-      <Version>6.1.15</Version>
+      <Version>6.3.2</Version>
     </PackageReference>
     <PackageReference Include="Splat">
-      <Version>13.1.42</Version>
+      <Version>14.2.1</Version>
     </PackageReference>
     <PackageReference Include="Splat.DependencyInjection.SourceGenerator">
       <Version>1.1.33</Version>
@@ -257,10 +257,10 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Splat.DryIoc">
-      <Version>13.1.42</Version>
+      <Version>14.2.1</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Api">
-      <Version>3.5.2-preview-aef709005e40023500089c062bc6696baa9998d5</Version>
+      <Version>3.5.2</Version>
     </PackageReference>
     <PackageReference Include="TwitchLib.Client">
       <Version>3.2.6-preview-5e869129649a88c4cb8d7fb824f17f9397d1668b</Version>
