@@ -78,7 +78,8 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
         {
             var list =
                 await _chatService.GetChatUserList(Channel ??
-                                                   throw new NullReferenceException("Channel can't be null"));
+                                                   throw new NullReferenceException("Channel can't be null"))
+                                  .ConfigureAwait(false);
 
             _chatters.Edit(e =>
             {

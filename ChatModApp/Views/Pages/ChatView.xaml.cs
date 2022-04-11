@@ -56,10 +56,8 @@ public sealed partial class ChatView
                           .InvokeCommand(ViewModel, vm => vm.ChattersLoadCommand)
                           .DisposeWith(disposables);
 
-            UserListRefreshButton.Events().Click
-                                 .Select(_ => Unit.Default)
-                                 .InvokeCommand(ViewModel, vm => vm.ChattersLoadCommand)
-                                 .DisposeWith(disposables);
+            this.BindCommand(ViewModel, vm => vm.ChattersLoadCommand, v => v.UserListRefreshButton)
+                .DisposeWith(disposables);
         });
     }
 

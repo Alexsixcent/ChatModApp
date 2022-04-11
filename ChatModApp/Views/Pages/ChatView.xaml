@@ -90,8 +90,8 @@
 										</GroupStyle>
 									</ListView.GroupStyle>
 									<ListView.ItemTemplate>
-										<DataTemplate>
-											<TextBlock Text="{Binding}" />
+										<DataTemplate x:DataType="system:String">
+											<TextBlock Text="{x:Bind}" />
 										</DataTemplate>
 									</ListView.ItemTemplate>
 								</ListView>
