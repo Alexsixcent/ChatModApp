@@ -1,7 +1,7 @@
-﻿using ChatModApp.Models;
+﻿using ChatModApp.Shared.Models;
 using Refit;
 
-namespace ChatModApp.Services.ApiClients;
+namespace ChatModApp.Shared.Services.ApiClients;
 
 public interface IFfzApi
 {

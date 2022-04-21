@@ -4,7 +4,7 @@ using DynamicData.Binding;
 using Microsoft.Toolkit.Collections;
 using ReactiveUI;
 
-namespace ChatModApp.Tools;
+namespace ChatModApp.Shared.Tools;
 
 public class Grouping<TObject, TKey, TGroupKey> : IGroup<TObject, TKey, TGroupKey>, IDisposable
     where TKey : notnull

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace ChatModApp.Models;
+namespace ChatModApp.Shared.Models;
 
 public interface IChatTabItem : INotifyPropertyChanged
 {

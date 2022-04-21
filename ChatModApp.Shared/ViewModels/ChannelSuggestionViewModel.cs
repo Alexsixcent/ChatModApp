@@ -1,4 +1,4 @@
-﻿namespace ChatModApp.ViewModels;
+﻿namespace ChatModApp.Shared.ViewModels;
 
 public class ChannelSuggestionViewModel
 {

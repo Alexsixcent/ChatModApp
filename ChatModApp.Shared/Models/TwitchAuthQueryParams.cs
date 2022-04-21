@@ -1,6 +1,6 @@
 ﻿using Refit;
 
-namespace ChatModApp.Models;
+namespace ChatModApp.Shared.Models;
 
 public class TwitchAuthQueryParams
 {

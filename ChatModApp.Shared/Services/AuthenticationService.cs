@@ -1,9 +1,9 @@
 ﻿using System.Reactive.Linq;
 using System.Web;
-using ChatModApp.Models;
-using Tools.Extensions;
+using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Tools.Extensions;
 
-namespace ChatModApp.Services;
+namespace ChatModApp.Shared.Services;
 
 public class AuthenticationService
 {

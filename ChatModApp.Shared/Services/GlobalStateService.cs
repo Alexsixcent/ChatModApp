@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Net;
 
-namespace ChatModApp.Services;
+namespace ChatModApp.Shared.Services;
 
 public class GlobalStateService
 {

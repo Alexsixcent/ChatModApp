@@ -1,9 +1,9 @@
 ﻿using System.Reactive;
-using ChatModApp.Models;
-using ChatModApp.Services;
+using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Services;
 using ReactiveUI;
 
-namespace ChatModApp.ViewModels;
+namespace ChatModApp.Shared.ViewModels;
 
 public class WebNavigatedAction
 {

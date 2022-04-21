@@ -5,9 +5,9 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using ChatModApp.Models.Chat.Fragments;
-using ChatModApp.Tools.Extensions;
-using ChatModApp.ViewModels;
+using ChatModApp.Extensions;
+using ChatModApp.Shared.Models.Chat.Fragments;
+using ChatModApp.Shared.ViewModels;
 using ReactiveUI;
 
 namespace ChatModApp.Views.Controls;

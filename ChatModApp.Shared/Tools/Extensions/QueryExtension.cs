@@ -5,7 +5,7 @@ using System.Text;
 using System.Web;
 using Refit;
 
-namespace Tools.Extensions;
+namespace ChatModApp.Shared.Tools.Extensions;
 
 public static class QueryExtension
 {

@@ -1,4 +1,4 @@
-﻿namespace Tools.Extensions;
+﻿namespace ChatModApp.Shared.Tools.Extensions;
 
 internal static class UriExtension
 {

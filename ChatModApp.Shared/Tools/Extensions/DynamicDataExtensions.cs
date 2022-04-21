@@ -1,6 +1,6 @@
 using DynamicData;
 
-namespace ChatModApp.Tools.Extensions;
+namespace ChatModApp.Shared.Tools.Extensions;
 
 public static class DynamicDataExtensions
 {

@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using ChatModApp.ViewModels;
+using ChatModApp.Shared.ViewModels;
 using Microsoft.UI.Xaml.Controls;
 using ReactiveUI;
 

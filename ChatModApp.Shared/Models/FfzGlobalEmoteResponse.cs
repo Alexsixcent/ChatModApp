@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using ChatModApp.Models.Chat.Emotes;
+using ChatModApp.Shared.Models.Chat.Emotes;
 
-namespace ChatModApp.Models;
+namespace ChatModApp.Shared.Models;
 
 public class FfzGlobalEmoteResponse
 {

@@ -1,13 +1,13 @@
 ﻿using System.Reactive;
 using System.Reactive.Linq;
-using ChatModApp.Services;
+using ChatModApp.Shared.Services;
 using DryIoc;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace ChatModApp.ViewModels;
+namespace ChatModApp.Shared.ViewModels;
 
 public class ChatTabViewModel : ReactiveObject, IRoutableViewModel
 {

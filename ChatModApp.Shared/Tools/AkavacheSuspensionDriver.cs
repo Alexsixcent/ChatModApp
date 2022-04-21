@@ -2,7 +2,7 @@
 using Akavache;
 using ReactiveUI;
 
-namespace ChatModApp.Tools;
+namespace ChatModApp.Shared.Tools;
 
 class AkavacheSuspensionDriver<TAppState> : ISuspensionDriver where TAppState : class
 {

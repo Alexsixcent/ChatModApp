@@ -1,8 +1,8 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using ChatModApp.Models;
-using ChatModApp.Models.Chat;
+using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Models.Chat;
 using DynamicData;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
@@ -14,7 +14,7 @@ using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
 using TwitchLib.Communication.Models;
 
-namespace ChatModApp.Services;
+namespace ChatModApp.Shared.Services;
 
 public class TwitchChatService : IDisposable
 {

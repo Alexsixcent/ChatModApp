@@ -2,14 +2,14 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using ChatModApp.Models;
-using ChatModApp.Services;
+using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Services;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace ChatModApp.ViewModels;
+namespace ChatModApp.Shared.ViewModels;
 
 public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableViewModel
 {

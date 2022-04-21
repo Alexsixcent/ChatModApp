@@ -2,16 +2,16 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using ChatModApp.Models;
-using ChatModApp.Models.Chat.Emotes;
-using ChatModApp.Services.ApiClients;
-using ChatModApp.Tools;
+using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Models.Chat.Emotes;
+using ChatModApp.Shared.Services.ApiClients;
+using ChatModApp.Shared.Tools;
 using DynamicData;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
-using EmoteKeyValue = System.Collections.Generic.KeyValuePair<ChatModApp.Models.Chat.Emotes.EmoteKey,
-    ChatModApp.Models.Chat.Emotes.IEmote>;
+using EmoteKeyValue = System.Collections.Generic.KeyValuePair<ChatModApp.Shared.Models.Chat.Emotes.EmoteKey,
+    ChatModApp.Shared.Models.Chat.Emotes.IEmote>;
 
-namespace ChatModApp.Services;
+namespace ChatModApp.Shared.Services;
 
 public class EmotesService : IDisposable
 {

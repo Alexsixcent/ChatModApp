@@ -1,9 +1,9 @@
 ﻿using System.Drawing;
-using ChatModApp.Models.Chat;
-using ChatModApp.Models.Chat.Fragments;
+using ChatModApp.Shared.Models.Chat;
+using ChatModApp.Shared.Models.Chat.Fragments;
 using ReactiveUI;
 
-namespace ChatModApp.ViewModels;
+namespace ChatModApp.Shared.ViewModels;
 
 public class ChatMessageViewModel : ReactiveObject
 {

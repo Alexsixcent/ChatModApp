@@ -1,13 +1,13 @@
 ﻿using System.Drawing;
 using System.Globalization;
-using ChatModApp.Models.Chat;
-using ChatModApp.Models.Chat.Emotes;
-using ChatModApp.Models.Chat.Fragments;
-using ChatModApp.ViewModels;
-using Tools.Extensions;
+using ChatModApp.Shared.Models.Chat;
+using ChatModApp.Shared.Models.Chat.Emotes;
+using ChatModApp.Shared.Models.Chat.Fragments;
+using ChatModApp.Shared.Tools.Extensions;
+using ChatModApp.Shared.ViewModels;
 using TwitchLib.Client.Models;
 
-namespace ChatModApp.Services;
+namespace ChatModApp.Shared.Services;
 
 public class MessageProcessingService
 {

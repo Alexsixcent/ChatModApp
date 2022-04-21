@@ -1,7 +1,7 @@
 ﻿using UiColor = Windows.UI.Color;
 using SysColor = System.Drawing.Color;
 
-namespace ChatModApp.Tools.Extensions;
+namespace ChatModApp.Extensions;
 
 public static class ColorExtensions
 {

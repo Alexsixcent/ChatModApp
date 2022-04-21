@@ -5,8 +5,8 @@ using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using ChatModApp.Services;
-using ChatModApp.Tools;
+using ChatModApp.Shared.Services;
+using ChatModApp.Shared.Tools;
 using ChatModApp.Views.Pages;
 using Splat;
 

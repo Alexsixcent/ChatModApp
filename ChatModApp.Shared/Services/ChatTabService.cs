@@ -1,7 +1,7 @@
-﻿using ChatModApp.Models;
+﻿using ChatModApp.Shared.Models;
 using DynamicData;
 
-namespace ChatModApp.Services;
+namespace ChatModApp.Shared.Services;
 
 public class ChatTabService
 {

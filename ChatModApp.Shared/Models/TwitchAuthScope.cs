@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ChatModApp.Models;
+namespace ChatModApp.Shared.Models;
 
 public enum TwitchAuthScope
 {

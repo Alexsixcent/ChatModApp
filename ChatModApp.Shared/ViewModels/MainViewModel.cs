@@ -1,6 +1,6 @@
 ﻿using ReactiveUI;
 
-namespace ChatModApp.ViewModels;
+namespace ChatModApp.Shared.ViewModels;
 
 public class MainViewModel : ReactiveObject, IScreen
 {

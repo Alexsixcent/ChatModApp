@@ -2,7 +2,7 @@
 using DryIoc;
 using ReactiveUI;
 
-namespace ChatModApp.Tools.Extensions;
+namespace ChatModApp.Shared.Tools.Extensions;
 
 public static class DependencyResolverExtensions
 {

@@ -1,7 +1,7 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Windows.UI.Xaml.Controls;
-using ChatModApp.ViewModels;
+using ChatModApp.Shared.ViewModels;
 using ReactiveUI;
 
 namespace ChatModApp.Views.Pages;

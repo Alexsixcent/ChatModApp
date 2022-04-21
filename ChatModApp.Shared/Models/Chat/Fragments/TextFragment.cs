@@ -1,4 +1,4 @@
-﻿namespace ChatModApp.Models.Chat.Fragments;
+﻿namespace ChatModApp.Shared.Models.Chat.Fragments;
 
 public class TextFragment:IMessageFragment
 {

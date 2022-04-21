@@ -1,4 +1,4 @@
-﻿namespace ChatModApp.Models.Chat;
+﻿namespace ChatModApp.Shared.Models.Chat;
 
 public interface IChatBadge
 {

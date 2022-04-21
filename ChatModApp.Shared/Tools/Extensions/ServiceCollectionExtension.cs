@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Tools.Extensions;
+namespace ChatModApp.Shared.Tools.Extensions;
 
 public static class ServiceCollectionExtension
 {

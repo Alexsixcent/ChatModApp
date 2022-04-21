@@ -2,16 +2,16 @@
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using ChatModApp.Models;
-using ChatModApp.Services;
-using ChatModApp.Tools.Extensions;
+using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Services;
+using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using TwitchLib.Api.Core.Enums;
 using TwitchLib.Api.Core.Models.Undocumented.Chatters;
 
-namespace ChatModApp.ViewModels;
+namespace ChatModApp.Shared.ViewModels;
 
 public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
 {

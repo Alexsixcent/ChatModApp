@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace ChatModApp.Tools;
+namespace ChatModApp.Shared.Tools;
 
 [DataContract]
 class AppState

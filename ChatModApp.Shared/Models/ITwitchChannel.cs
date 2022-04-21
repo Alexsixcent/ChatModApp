@@ -1,4 +1,4 @@
-﻿namespace ChatModApp.Models;
+﻿namespace ChatModApp.Shared.Models;
 
 public interface ITwitchChannel
 {

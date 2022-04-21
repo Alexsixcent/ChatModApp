@@ -1,6 +1,6 @@
-﻿using ChatModApp.Models.Chat.Emotes;
+﻿using ChatModApp.Shared.Models.Chat.Emotes;
 
-namespace ChatModApp.Models.Chat.Fragments;
+namespace ChatModApp.Shared.Models.Chat.Fragments;
 
 public class EmoteFragment : IMessageFragment
 {

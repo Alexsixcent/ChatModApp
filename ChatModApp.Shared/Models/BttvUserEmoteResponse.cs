@@ -1,7 +1,7 @@
-﻿using ChatModApp.Models.Chat.Emotes;
+﻿using ChatModApp.Shared.Models.Chat.Emotes;
 using Refit;
 
-namespace ChatModApp.Models;
+namespace ChatModApp.Shared.Models;
 
 public class BttvUserEmoteResponse
 {

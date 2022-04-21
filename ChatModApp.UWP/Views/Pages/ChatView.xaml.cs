@@ -6,7 +6,7 @@ using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
-using ChatModApp.ViewModels;
+using ChatModApp.Shared.ViewModels;
 using ReactiveUI;
 using WinCore = Windows.UI.Core;
 

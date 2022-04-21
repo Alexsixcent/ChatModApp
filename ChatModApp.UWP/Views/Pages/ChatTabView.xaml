@@ -5,9 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    xmlns:viewModels="using:ChatModApp.ViewModels"
     xmlns:reactiveUi="using:ReactiveUI"
     xmlns:pages="using:ChatModApp.Views.Pages"
+    xmlns:viewModels="using:ChatModApp.Shared.ViewModels"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 

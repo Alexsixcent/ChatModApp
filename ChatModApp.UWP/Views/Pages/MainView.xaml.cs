@@ -1,5 +1,5 @@
 ﻿using System.Reactive.Disposables;
-using ChatModApp.ViewModels;
+using ChatModApp.Shared.ViewModels;
 using ReactiveUI;
 using Splat;
 

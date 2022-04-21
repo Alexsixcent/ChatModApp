@@ -1,9 +1,9 @@
 ﻿using System.Reactive.Disposables;
-using ChatModApp.Models;
+using ChatModApp.Shared.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
-namespace ChatModApp.ViewModels;
+namespace ChatModApp.Shared.ViewModels;
 
 public class ChatTabItemViewModel : ReactiveObject, IChatTabItem, IScreen, IDisposable
 {

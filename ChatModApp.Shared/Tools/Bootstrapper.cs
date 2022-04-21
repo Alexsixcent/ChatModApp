@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using ChatModApp.Services;
-using ChatModApp.Services.ApiClients;
-using ChatModApp.Tools.Extensions;
-using ChatModApp.ViewModels;
+using ChatModApp.Shared.Services;
+using ChatModApp.Shared.Services.ApiClients;
+using ChatModApp.Shared.Tools.Extensions;
+using ChatModApp.Shared.ViewModels;
 using DryIoc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,7 +16,7 @@ using Splat;
 using Splat.DryIoc;
 using LogLevel = NLog.LogLevel;
 
-namespace ChatModApp.Tools;
+namespace ChatModApp.Shared.Tools;
 
 public static class Bootstrapper
 {

@@ -1,6 +1,6 @@
 ﻿using TwitchLib.Api.Helix.Models.Chat.Emotes;
 
-namespace ChatModApp.Models.Chat.Emotes;
+namespace ChatModApp.Shared.Models.Chat.Emotes;
 
 public class TwitchEmote : IEmote
 {

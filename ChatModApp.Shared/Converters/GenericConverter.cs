@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using ReactiveUI;
 
-namespace ChatModApp.Converters;
+namespace ChatModApp.Shared.Converters;
 
 public abstract class GenericConverter<TSource, TResult> : IBindingTypeConverter
 {

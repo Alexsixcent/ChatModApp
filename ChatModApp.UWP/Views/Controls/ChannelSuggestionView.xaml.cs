@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Disposables;
 using Windows.UI.Xaml.Media.Imaging;
-using ChatModApp.ViewModels;
+using ChatModApp.Shared.ViewModels;
 using ReactiveUI;
 
 namespace ChatModApp.Views.Controls;

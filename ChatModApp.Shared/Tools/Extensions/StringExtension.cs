@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Tools.Extensions;
+namespace ChatModApp.Shared.Tools.Extensions;
 
 public static class StringExtension
 {

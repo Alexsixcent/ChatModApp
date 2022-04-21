@@ -6,7 +6,7 @@ using TwitchLib.Api.Core.Undocumented;
 using TwitchLib.Api.Helix;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
-namespace ChatModApp.Services;
+namespace ChatModApp.Shared.Services;
 
 public class TwitchApiService
 {

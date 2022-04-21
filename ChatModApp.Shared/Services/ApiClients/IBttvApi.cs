@@ -1,8 +1,8 @@
-﻿using ChatModApp.Models;
-using ChatModApp.Models.Chat.Emotes;
+﻿using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Models.Chat.Emotes;
 using Refit;
 
-namespace ChatModApp.Services.ApiClients;
+namespace ChatModApp.Shared.Services.ApiClients;
 
 public interface IBttvApi
 {
