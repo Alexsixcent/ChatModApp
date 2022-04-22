@@ -11,7 +11,7 @@ namespace ChatModApp.Views
         {
             this.WhenActivated(disposable =>
             {
-                this.OneWayBind<MainViewModel, MainWindow, RoutingState, RoutingState?>(ViewModel, vm => vm.Router, v => v.RoutedViewHost.Router)
+                this.OneWayBind(ViewModel, vm => vm.Router, v => v.RoutedViewHost.Router)
                     .DisposeWith(disposable);
             });
             

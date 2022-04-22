@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+			 xmlns:viewModels="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
+			 xmlns:reactiveUi="http://reactiveui.net"
+			 mc:Ignorable="d"
+			 d:DesignWidth="800"
+			 d:DesignHeight="450"
+			 x:Class="ChatModApp.Views.ChatTabView"
+			 x:DataType="viewModels:ChatTabViewModel">
+	<controls:TabView x:Name="TabViewControl" x:DataType="viewModels:ChatTabViewModel"
+					  TabItems="{CompiledBinding ChatTabs}"
+					  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+		<controls:TabView.TabItemTemplate>
+			<DataTemplate x:DataType="viewModels:ChatTabItemViewModel">
+				<controls:TabViewItem Header="{CompiledBinding Title, Mode=OneWay}">
+					<reactiveUi:RoutedViewHost Router="{CompiledBinding Router, Mode=OneTime}"/> 
+				</controls:TabViewItem>
+			</DataTemplate>
+		</controls:TabView.TabItemTemplate>
+	</controls:TabView>
+</UserControl>

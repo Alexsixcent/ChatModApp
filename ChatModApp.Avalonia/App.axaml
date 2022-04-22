@@ -1,7 +1,8 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			 x:Class="ChatModApp.App">
+             xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+             x:Class="ChatModApp.App">
     <Application.Styles>
-        <FluentTheme Mode="Dark"/>
+        <styling:FluentAvaloniaTheme RequestedTheme="Dark"/>
     </Application.Styles>
 </Application>

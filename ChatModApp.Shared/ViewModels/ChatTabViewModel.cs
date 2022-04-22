@@ -16,12 +16,10 @@ public class ChatTabViewModel : ReactiveObject, IRoutableViewModel
 
     public ReactiveCommand<Unit, Unit> AddTabCommand { get; }
     public ReactiveCommand<ChatTabItemViewModel, Unit> CloseTabCommand { get; }
-        
-    [Reactive]
-    public int OpenedTabIndex { get; private set; }
 
-    public readonly ObservableCollectionExtended<ChatTabItemViewModel> ChatTabs;
-        
+    [Reactive] public int OpenedTabIndex { get; private set; }
+    public ObservableCollectionExtended<ChatTabItemViewModel> ChatTabs { get; set; }
+
     private readonly ChatTabService _tabService;
     private readonly IContainer _container;
 
@@ -43,7 +41,7 @@ public class ChatTabViewModel : ReactiveObject, IRoutableViewModel
 
     private void AddTab()
     {
-        var newTab= _container.Resolve<ChatTabItemViewModel>();
+        var newTab = _container.Resolve<ChatTabItemViewModel>();
         newTab.Title = "New tab";
 
         _tabService.AddTab(newTab);
