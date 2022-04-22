@@ -57,7 +57,7 @@ public class AuthenticationService
 
     public bool AuthFromCallbackUri(Uri callbackUri)
     {
-        if (!callbackUri.AbsoluteUri.Contains(RedirectUri))
+        if (!callbackUri.AbsoluteUri.StartsWith(RedirectUri))
             return false;
 
         var accessToken = HttpUtility.ParseQueryString(callbackUri.Fragment.Substring(1))["access_token"];

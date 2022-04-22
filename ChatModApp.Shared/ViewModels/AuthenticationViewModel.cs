@@ -1,4 +1,5 @@
 ﻿using System.Reactive;
+using System.Reactive.Disposables;
 using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Services;
 using ReactiveUI;
@@ -17,27 +18,32 @@ public class WebNavigatedAction
     public Action Cancel { get; }
 }
 
-public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel
+public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel
 {
     public IScreen? HostScreen { get; set; }
     public string UrlPathSegment => "auth";
 
-    public Uri AuthUri { get; }
+    public Uri AuthUri { get; private set; }
     public readonly ReactiveCommand<WebNavigatedAction, Unit> AuthCompleteCommand;
 
 
     private readonly AuthenticationService _authService;
     private readonly ChatTabViewModel _chatTabs;
-    private readonly TwitchAuthQueryParams _queryParams;
+    private TwitchAuthQueryParams _queryParams;
 
 
     public AuthenticationViewModel(AuthenticationService authService, ChatTabViewModel chatTabs)
     {
         _authService = authService;
         _chatTabs = chatTabs;
+        Activator = new();
         AuthCompleteCommand = ReactiveCommand.Create<WebNavigatedAction>(AuthComplete);
-
-        (AuthUri, _queryParams) = authService.GenerateAuthUri();
+        
+        this.WhenActivated(() =>
+        {
+            (AuthUri, _queryParams) = authService.GenerateAuthUri();
+            return new CompositeDisposable();
+        });
     }
 
 
@@ -50,4 +56,6 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel
         _chatTabs.HostScreen = HostScreen;
         HostScreen.Router.NavigateAndReset.Execute(_chatTabs).Subscribe();
     }
+
+    public ViewModelActivator Activator { get; }
 }
