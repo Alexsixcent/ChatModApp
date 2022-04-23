@@ -4,15 +4,15 @@ using ReactiveUI;
 
 namespace ChatModApp.Shared.Tools;
 
-class AkavacheSuspensionDriver<TAppState> : ISuspensionDriver where TAppState : class
+public class AkavacheSuspensionDriver<TAppState> : ISuspensionDriver where TAppState : class
 {
     private const string AppStateKey = "appState";
 
     public AkavacheSuspensionDriver() => BlobCache.ApplicationName = "ChatModApp";
 
-    public IObservable<object> LoadState() => BlobCache.UserAccount.GetObject<TAppState>(AppStateKey);
+    public IObservable<object> LoadState() => BlobCache.Secure.GetObject<TAppState>(AppStateKey)!;
 
     public IObservable<Unit> SaveState(object state) =>
-        BlobCache.UserAccount.InsertObject(AppStateKey, (TAppState) state);
-    public IObservable<Unit> InvalidateState() => BlobCache.UserAccount.InvalidateObject<TAppState>(AppStateKey);
+        BlobCache.Secure.InsertObject(AppStateKey, (TAppState) state);
+    public IObservable<Unit> InvalidateState() => BlobCache.Secure.InvalidateObject<TAppState>(AppStateKey);
 }

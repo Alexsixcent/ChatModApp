@@ -1,15 +1,21 @@
 ﻿using System.Reactive.Linq;
 using System.Web;
 using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Tools;
 using ChatModApp.Shared.Tools.Extensions;
 
 namespace ChatModApp.Shared.Services;
 
 public class AuthenticationService
 {
+    private readonly AppState _state;
     public const string ClientId = "110gs3dzgr2bj3ask88vqi7mnczk02";
 
-    public string TwitchAccessToken { get; private set; }
+    public string? TwitchAccessToken
+    {
+        get => _state.TwitchAccessToken; 
+        private set=> _state.TwitchAccessToken = value; 
+    }
 
     public bool IsAuthenticated => !string.IsNullOrWhiteSpace(TwitchAccessToken);
     public IObservable<string> AccessTokenChanged { get; }
@@ -19,9 +25,9 @@ public class AuthenticationService
     private const string RedirectUri = "http://localhost:3000/callback";
     private event EventHandler<string>? AccessTokenChangedEvent;
 
-    public AuthenticationService()
+    public AuthenticationService(AppState state)
     {
-        TwitchAccessToken = string.Empty;
+        _state = state;
         Scopes = new List<TwitchAuthScope>
         {
             TwitchAuthScope.ChatRead,
@@ -53,6 +59,19 @@ public class AuthenticationService
         };
         return (new Uri("https://id.twitch.tv/oauth2/authorize").AddQueries(queryParams),
                 queryParams);
+    }
+
+    public async Task<bool> TryAuthFromStorage()
+    {
+        if (string.IsNullOrWhiteSpace(_state.TwitchAccessToken))
+            return false;
+
+        var res = await TwitchApiService.ValidateAccessToken(_state.TwitchAccessToken);
+        if (res is not null)
+            return true;
+
+        _state.TwitchAccessToken = null;
+        return false;
     }
 
     public bool AuthFromCallbackUri(Uri callbackUri)

@@ -78,6 +78,9 @@ public static class Bootstrapper
         resolver.InitializeSplat();
         resolver.InitializeReactiveUI();
 
+        var state = RxApp.SuspensionHost.GetAppState<AppState>();
+        container.RegisterInstance(state);
+
         //#TODO: Streamline client registration process, RestEase migration ?
         container.RegisterInstance(services.GetRequiredService<IBttvApi>());
         container.RegisterInstance(services.GetRequiredService<IFfzApi>());

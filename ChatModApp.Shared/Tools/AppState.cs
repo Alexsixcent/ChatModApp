@@ -3,7 +3,8 @@
 namespace ChatModApp.Shared.Tools;
 
 [DataContract]
-class AppState
+public class AppState
 {
-    public string TwitchAccessToken { get; set; }
+    [DataMember]
+    public string? TwitchAccessToken { get; set; }
 }
