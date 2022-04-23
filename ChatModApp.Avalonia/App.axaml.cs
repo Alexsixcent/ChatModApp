@@ -26,6 +26,9 @@ namespace ChatModApp
             
             Bootstrapper.Init(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Name!));
 
+            //Important since UseDryIocDependencyResolver in ConfigureService resets the scheduler to default
+            RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new MainWindow
