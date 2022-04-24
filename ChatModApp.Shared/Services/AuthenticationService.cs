@@ -68,7 +68,10 @@ public class AuthenticationService
 
         var res = await TwitchApiService.ValidateAccessToken(_state.TwitchAccessToken);
         if (res is not null)
+        {
+            AccessTokenChangedEvent?.Invoke(this, TwitchAccessToken!);
             return true;
+        }
 
         _state.TwitchAccessToken = null;
         return false;
