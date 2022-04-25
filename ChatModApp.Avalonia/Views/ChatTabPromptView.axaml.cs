@@ -14,15 +14,22 @@ public partial class ChatTabPromptView : ReactiveUserControl<ChatTabPromptViewMo
     {
         this.WhenActivated(disposable =>
         {
+            this.Bind(ViewModel, vm => vm.Channel, v => v.ChannelCompleteBox.SearchText)
+                .DisposeWith(disposable);
+
             Observable.FromEventPattern(ChannelCompleteBox, nameof(ChannelCompleteBox.DropDownClosed))
                       .Select(_ => ChannelCompleteBox.Text)
-                      .Where(t => !string.IsNullOrWhiteSpace(t))
+                      .Where(t => !string.IsNullOrWhiteSpace(t) && ChannelCompleteBox.SelectedItem is not null)
                       .Select(t => ChannelCompleteBox.Items
                                                      .Cast<ChannelSuggestionViewModel>()
                                                      .FirstOrDefault(model =>
                                                                          model.DisplayName
-                                                                              .Equals(t, StringComparison.InvariantCultureIgnoreCase)))
+                                                                              .Equals(t,
+                                                                                  StringComparison
+                                                                                      .InvariantCultureIgnoreCase)))
                       .WhereNotNull()
+                      .Throttle(TimeSpan.FromSeconds(1))
+                      .ObserveOn(RxApp.MainThreadScheduler)
                       .InvokeCommand(ViewModel, vm => vm.SelectionCommand)
                       .DisposeWith(disposable);
         });

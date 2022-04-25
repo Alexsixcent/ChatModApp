@@ -15,7 +15,6 @@
 						 FilterMode="None"
 						 MaxDropDownHeight="600"
 						 Items="{CompiledBinding ChannelSuggestions, Mode=OneWay}"
-						 SearchText="{CompiledBinding Channel, Mode=OneWayToSource}"
 						 Watermark="Channel">
 			<AutoCompleteBox.ItemTemplate>
 				<DataTemplate x:DataType="viewModels:ChannelSuggestionViewModel">
