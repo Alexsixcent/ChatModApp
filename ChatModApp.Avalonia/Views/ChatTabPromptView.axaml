@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:viewModels="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
+			 mc:Ignorable="d"
+			 d:DesignWidth="800"
+			 d:DesignHeight="450"
+			 x:Class="ChatModApp.Views.ChatTabPromptView"
+			 x:DataType="viewModels:ChatTabPromptViewModel">
+	<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+				Margin="20">
+		<TextBlock Text="Enter the channel name"/>
+		<AutoCompleteBox x:Name="ChannelCompleteBox"
+						 FilterMode="None"
+						 MaxDropDownHeight="600"
+						 Items="{CompiledBinding ChannelSuggestions, Mode=OneWay}"
+						 SearchText="{CompiledBinding Channel, Mode=OneWayToSource}"
+						 Watermark="Channel">
+			<AutoCompleteBox.ItemTemplate>
+				<DataTemplate x:DataType="viewModels:ChannelSuggestionViewModel">
+					<Grid ColumnDefinitions="*,*,*">
+						<TextBlock Grid.Column="1"
+								   HorizontalAlignment="Center"
+								   VerticalAlignment="Center"
+								   FontWeight="Bold"
+								   FontSize="20"
+								   Text="{CompiledBinding DisplayName}" />
+						<TextBlock Grid.Column="2"
+								   Text="Live"
+								   VerticalAlignment="Center"
+								   HorizontalAlignment="Right"
+								   Foreground="Red"
+								   FontSize="20"
+								   FontWeight="SemiBold"
+								   Margin="10,0"
+								   IsVisible="{CompiledBinding IsLive}" />
+					</Grid>
+				</DataTemplate>
+			</AutoCompleteBox.ItemTemplate>
+		</AutoCompleteBox>
+	</StackPanel>
+</UserControl>
