@@ -13,11 +13,9 @@ using Splat;
 
 namespace ChatModApp
 {
-    public partial class App : Application
+    public class App : Application
     {
-        public override void Initialize() => AvaloniaXamlLoader.Load(this);
-
-        public override void OnFrameworkInitializationCompleted()
+        public override void Initialize()
         {
             var suspend = new AutoSuspendHelper(ApplicationLifetime!);
             RxApp.SuspensionHost.CreateNewAppState = () => new AppState();
@@ -28,7 +26,12 @@ namespace ChatModApp
 
             //Important since UseDryIocDependencyResolver in ConfigureService resets the scheduler to default
             RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+            
+            AvaloniaXamlLoader.Load(this);
+        }
 
+        public override void OnFrameworkInitializationCompleted()
+        {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 desktop.MainWindow = new MainWindow
