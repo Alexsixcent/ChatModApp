@@ -1,4 +1,5 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using ChatModApp.Shared.Models;
@@ -30,6 +31,7 @@ public class TwitchChatService : IDisposable
 
     private readonly CompositeDisposable _disposables;
 
+    [SuppressMessage("ReSharper", "ContextualLoggerProblem")]
     public TwitchChatService(TwitchApiService apiService,
                              AuthenticationService authService,
                              ChatTabService tabService,
@@ -73,14 +75,13 @@ public class TwitchChatService : IDisposable
         ChatBadges = ChannelsJoined.TransformAsync(GetChannelChatBadges)
                                    .TransformMany(badges => badges)
                                    .Or(globalBadges)
-                                   .AsObservableList();
+                                   .AsObservableList()
+                                   .DisposeWith(_disposables);
         ChannelsJoined
             .OnItemAdded(channel => _client.JoinChannel(channel.Login))
             .OnItemRemoved(channel => _client.LeaveChannel(channel.Login))
             .Subscribe()
             .DisposeWith(_disposables);
-
-        ChatBadges.DisposeWith(_disposables);
     }
 
     public void SendMessage(ITwitchChannel channel, string message) => _client.SendMessage(channel.Login, message);

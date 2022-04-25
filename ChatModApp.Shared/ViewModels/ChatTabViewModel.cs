@@ -1,4 +1,5 @@
 ﻿using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ChatModApp.Shared.Services;
 using DryIoc;
@@ -9,7 +10,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace ChatModApp.Shared.ViewModels;
 
-public class ChatTabViewModel : ReactiveObject, IRoutableViewModel
+public class ChatTabViewModel : ReactiveObject, IRoutableViewModel, IDisposable
 {
     public string UrlPathSegment => "chatTabs";
     public IScreen? HostScreen { get; set; }
@@ -20,6 +21,7 @@ public class ChatTabViewModel : ReactiveObject, IRoutableViewModel
     [Reactive] public int OpenedTabIndex { get; private set; }
     public ObservableCollectionExtended<ChatTabItemViewModel> ChatTabs { get; set; }
 
+    private readonly CompositeDisposable _disposable;
     private readonly ChatTabService _tabService;
     private readonly IContainer _container;
 
@@ -27,17 +29,21 @@ public class ChatTabViewModel : ReactiveObject, IRoutableViewModel
     {
         _tabService = tabService;
         _container = container;
+        _disposable = new();
         ChatTabs = new();
 
-        AddTabCommand = ReactiveCommand.Create(AddTab);
-        CloseTabCommand = ReactiveCommand.Create<ChatTabItemViewModel>(RemoveTab);
+        AddTabCommand = ReactiveCommand.Create(AddTab).DisposeWith(_disposable);
+        CloseTabCommand = ReactiveCommand.Create<ChatTabItemViewModel>(RemoveTab).DisposeWith(_disposable);
 
         _tabService.Tabs
                    .Cast(item => (ChatTabItemViewModel)item)
                    .ObserveOn(RxApp.MainThreadScheduler)
                    .Bind(ChatTabs)
-                   .Subscribe();
+                   .Subscribe()
+                   .DisposeWith(_disposable);
     }
+
+    public void Dispose() => _disposable.Dispose();
 
     private void AddTab()
     {
