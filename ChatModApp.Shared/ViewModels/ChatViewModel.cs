@@ -26,13 +26,15 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     [Reactive] public string MessageText { get; set; }
     [Reactive] public string UserSearchText { get; set; }
 
-    public readonly ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages;
-    public readonly ReadOnlyObservableCollection<IGrouping<UserType, string>> UsersList;
+    public ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages => _chatMessages;
+    public ReadOnlyObservableCollection<IGrouping<UserType, string>> UsersList => _usersList;
 
 
     private readonly CompositeDisposable _disposables;
     private readonly TwitchChatService _chatService;
     private readonly SourceList<ChatterFormatted> _chatters;
+    private readonly ReadOnlyObservableCollection<ChatMessageViewModel> _chatMessages;
+    private readonly ReadOnlyObservableCollection<IGrouping<UserType, string>> _usersList;
 
 
     public ChatViewModel(TwitchChatService chatService, MessageProcessingService messageProcessingService)
@@ -53,16 +55,16 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
                     .Merge(messageSent)
                     .ToObservableChangeSet(model => model.Id)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Bind(out ChatMessages)
+                    .Bind(out _chatMessages)
                     .Subscribe()
                     .DisposeWith(_disposables);
         
         _chatters.Connect()
                  .AutoRefreshOnObservable(_ => this.WhenAnyValue(vm => vm.UserSearchText))
-                 .Filter(c => c.Username.Contains(UserSearchText))
+                 .Filter(c => string.IsNullOrWhiteSpace(UserSearchText) || c.Username.Contains(UserSearchText))
                  .GroupByElement(c => c.UserType, c => c.Username)
                  .ObserveOn(RxApp.MainThreadScheduler)
-                 .Bind(out UsersList)
+                 .Bind(out _usersList)
                  .Subscribe()
                  .DisposeWith(_disposables);
 

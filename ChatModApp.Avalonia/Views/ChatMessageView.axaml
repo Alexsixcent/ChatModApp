@@ -1,0 +1,85 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
+			 xmlns:fgmts="clr-namespace:ChatModApp.Shared.Models.Chat.Fragments;assembly=ChatModApp.Shared"
+			 xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+			 xmlns:tools="clr-namespace:ChatModApp.Tools"
+			 mc:Ignorable="d"
+			 d:DesignWidth="800"
+			 d:DesignHeight="450"
+			 x:Class="ChatModApp.Views.ChatMessageView"
+			 x:DataType="vm:ChatMessageViewModel">
+
+	<!-- <UserControl.Resources> -->
+	<!-- 	<tools:ColorToBrushConverter x:Key="BrushConverter"/> -->
+	<!-- 	<RecyclePool x:Key="RecyclePool" /> -->
+	<!-- -->
+	<!-- 	<DataTemplate x:Key="TextFragment" -->
+	<!-- 				  x:DataType="fgmts:TextFragment"> -->
+	<!-- 		<TextBlock TextWrapping="Wrap" -->
+	<!-- 				   TextAlignment="Left" -->
+	<!-- 				   VerticalAlignment="Center" -->
+	<!-- 				   Text="{CompiledBinding Text, Mode=OneTime}" /> -->
+	<!-- 	</DataTemplate> -->
+	<!-- 	<DataTemplate x:Key="EmoteFragment" -->
+	<!-- 				  x:DataType="Bitmap"> -->
+	<!-- 		<Image Stretch="None" -->
+	<!-- 			   Margin="2,0" -->
+	<!-- 			   Source="{CompiledBinding Mode=OneTime}"> -->
+	<!-- 		</Image> -->
+	<!-- 	</DataTemplate> -->
+	<!-- 	<DataTemplate x:Key="UriFragment" -->
+	<!-- 				  x:DataType="fgmts:UriFragment"> -->
+	<!-- 		<controls:HyperlinkButton Content="{CompiledBinding Text, Mode=OneTime}" -->
+	<!-- 								  NavigateUri="{CompiledBinding Uri, Mode=OneTime}" -->
+	<!-- 								  Padding="5,5,5,6"/> -->
+	<!-- 	</DataTemplate> -->
+	<!-- 	<RecyclingElementFactory x:Key="ElementFactory" -->
+	<!-- 							 RecyclePool="{StaticResource RecyclePool}" -->
+	<!-- 							 SelectTemplateKey="OnSelectTemplateKey"> -->
+	<!-- 		<RecyclingElementFactory.Templates> -->
+	<!-- 			<StaticResource x:Key="TextFragment" -->
+	<!-- 							ResourceKey="TextFragment" /> -->
+	<!-- 			<StaticResource x:Key="EmoteFragment" -->
+	<!-- 							ResourceKey="EmoteFragment" /> -->
+	<!-- 			<StaticResource x:Key="UriFragment" -->
+	<!-- 							ResourceKey="UriFragment" /> -->
+	<!-- 		</RecyclingElementFactory.Templates> -->
+	<!-- 	</RecyclingElementFactory> -->
+	<!-- </UserControl.Resources> -->
+
+	<WrapPanel x:Name="MessagePanel" Orientation="Horizontal" HorizontalAlignment="Stretch">
+		<!-- <ItemsRepeater x:Name="BadgeRepeater" -->
+		<!-- 			   Margin="1,0"> -->
+		<!-- 	<ItemsRepeater.ItemTemplate> -->
+		<!-- 		<DataTemplate x:DataType="Bitmap"> -->
+		<!-- 			<Image Stretch="None" -->
+		<!-- 				   Margin="1,0" -->
+		<!-- 				   Source="{CompiledBinding}" /> -->
+		<!-- 		</DataTemplate> -->
+		<!-- 	</ItemsRepeater.ItemTemplate> -->
+		<!-- 	<ItemsRepeater.Layout> -->
+		<!-- 		<StackLayout Orientation="Horizontal" /> -->
+		<!-- 	</ItemsRepeater.Layout> -->
+		<!-- </ItemsRepeater> -->
+		<!-- <TextBlock TextWrapping="Wrap" -->
+		<!-- 		   TextAlignment="Left" -->
+		<!-- 		   VerticalAlignment="Center" -->
+		<!-- 		   Margin="1,0" -->
+		<!-- 		   FontWeight="Bold" -->
+		<!-- 		   FontSize="12" -->
+		<!-- 		   Text="{CompiledBinding Username, Mode=OneTime, StringFormat={}{0}: }" -->
+		<!-- 		   Foreground="{CompiledBinding UsernameColor, Converter={StaticResource BrushConverter}}"/> -->
+		<!-- -->
+		<!-- <ItemsRepeater x:Name="FragmentsRepeater" -->
+		<!-- 			   Margin="2,0" -->
+		<!-- 			   HorizontalAlignment="Stretch" -->
+		<!-- 			   ItemTemplate="{StaticResource ElementFactory}"> -->
+		<!-- 	<ItemsRepeater.Layout> -->
+		<!-- 		<WrapLayout Orientation="Horizontal"/> -->
+		<!-- 	</ItemsRepeater.Layout> -->
+		<!-- </ItemsRepeater> -->
+	</WrapPanel>
+</UserControl>
