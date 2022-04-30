@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
@@ -53,31 +51,6 @@ public partial class ChatMessageView : ReactiveUserControl<ChatMessageViewModel>
                           MessagePanel.Children.AddRange(controls);
                       })
                       .DisposeWith(disposable);
-
-
-            // Observable.FromAsync(token =>
-            //           {
-            //               var tasks = ViewModel?.Badges.Select(badge => CachedBitmapStore.Get(badge.Small, token));
-            //               return Task.WhenAll(tasks!);
-            //           })
-            //           .LoggedCatch(this, message: "Badge image download failed")
-            //           .ObserveOn(RxApp.MainThreadScheduler)
-            //           .Subscribe(b => BadgeRepeater.Items = b)
-            //           .DisposeWith(disposable);
-            //
-            // Observable.FromAsync(token =>
-            //           {
-            //               var tasks = ViewModel?.Message.Select<IMessageFragment, Task<object>>(async frag =>
-            //                   frag is EmoteFragment e
-            //                       ? await CachedBitmapStore.Get(e.Emote.Uri, token)
-            //                       : frag);
-            //
-            //               return Task.WhenAll(tasks!);
-            //           })
-            //           .LoggedCatch(this, message: "Chat message emote download failed")
-            //           .ObserveOn(RxApp.MainThreadScheduler)
-            //           .Subscribe(frags => FragmentsRepeater.Items = frags)
-            //           .DisposeWith(disposable);
         });
         InitializeComponent();
     }
@@ -110,17 +83,6 @@ public partial class ChatMessageView : ReactiveUserControl<ChatMessageViewModel>
                 Padding = new(5,5,5,6)
             },
             _ => throw new ArgumentOutOfRangeException(nameof(frag))
-        };
-    }
-
-    private void OnSelectTemplateKey(object? sender, SelectTemplateEventArgs e)
-    {
-        e.TemplateKey = e.DataContext switch
-        {
-            TextFragment => "TextFragment",
-            IImage => "EmoteFragment", //TODO: Replace with EmoteFragment type when we can bind to Uri directly
-            UriFragment => "UriFragment",
-            _ => "TextFragment"
         };
     }
 }
