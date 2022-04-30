@@ -8,7 +8,8 @@ namespace ChatModApp.Shared.ViewModels;
 public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
 {
     public RoutingState Router { get; }
-    
+    public ViewModelActivator Activator { get; }
+
     private readonly AuthenticationService _authService;
 
     public MainViewModel(AuthenticationService authService)
@@ -19,6 +20,8 @@ public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
 
         this.WhenActivated(async disposable =>
         {
+            await Locator.Current.GetService<GlobalStateService>()!.Initialize();
+            
             if (await authService.TryAuthFromStorage())
             {
                 var tab = Locator.Current.GetService<ChatTabViewModel>()!;
@@ -39,6 +42,4 @@ public class MainViewModel : ReactiveObject, IScreen, IActivatableViewModel
             }
         });
     }
-
-    public ViewModelActivator Activator { get; }
 }

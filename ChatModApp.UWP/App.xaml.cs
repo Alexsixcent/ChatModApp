@@ -5,11 +5,9 @@ using Windows.Storage;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using ChatModApp.Shared.Services;
 using ChatModApp.Shared.Tools;
 using ChatModApp.Views.Pages;
 using ReactiveUI;
-using Splat;
 
 namespace ChatModApp;
 
@@ -59,9 +57,6 @@ public sealed partial class App
             if (e.PreviousExecutionState != ApplicationExecutionState.Running &&
                 e.PreviousExecutionState != ApplicationExecutionState.Suspended)
             {
-                var stateService = Locator.Current.GetService<GlobalStateService>();
-                await stateService.Initialize();
-
                 //TODO: Load state from previously suspended application
             }
 
