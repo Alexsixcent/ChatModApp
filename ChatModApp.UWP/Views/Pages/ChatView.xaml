@@ -63,7 +63,7 @@
 									<TextBox x:Name="UserNameSearch"
 											 PlaceholderText="Search user..."
 											 Margin="0,0,5,5" />
-									<Button Name="UserListRefreshButton"
+									<Button x:Name="UserListRefreshButton"
 											Margin="10,0,0,5"
 											VerticalAlignment="Top"
 											HorizontalAlignment="Right">
