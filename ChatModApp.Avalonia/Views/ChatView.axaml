@@ -11,12 +11,14 @@
 			 x:Class="ChatModApp.Views.ChatView"
 			 x:DataType="viewModels:ChatViewModel">
 	<Grid RowDefinitions="8*,Auto">
-		<ListBox x:Name="MessageList" Items="{CompiledBinding ChatMessages, Mode=OneWay}">
+		<ListBox x:Name="MessageList"
+				 Items="{CompiledBinding ChatMessages, Mode=OneWay}">
 			<ListBox.ItemTemplate>
 				<DataTemplate x:DataType="viewModels:ChatMessageViewModel">
-					<reactiveUi:ViewModelViewHost ViewModel="{CompiledBinding Mode=OneWay}" 
-												  VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"
-												  IsTabStop="False"/>
+					<reactiveUi:ViewModelViewHost ViewModel="{CompiledBinding Mode=OneWay}"
+												  VerticalContentAlignment="Stretch"
+												  HorizontalContentAlignment="Stretch"
+												  IsTabStop="False" />
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
@@ -51,7 +53,8 @@
 									</Button>
 								</StackPanel>
 
-								<ScrollViewer HorizontalScrollBarVisibility="Disabled" Margin="5,0">
+								<ScrollViewer HorizontalScrollBarVisibility="Disabled"
+											  Margin="5,0">
 									<ItemsRepeater Items="{CompiledBinding UsersList}">
 										<ItemsRepeater.ItemTemplate>
 											<DataTemplate x:DataType="tk:IReadOnlyObservableGroup">
@@ -70,7 +73,7 @@
 													<ItemsRepeater Items="{Binding}">
 														<ItemsRepeater.ItemTemplate>
 															<DataTemplate x:DataType="system:String">
-																<TextBlock Text="{CompiledBinding .}"/>
+																<TextBlock Text="{CompiledBinding .}" />
 															</DataTemplate>
 														</ItemsRepeater.ItemTemplate>
 													</ItemsRepeater>

@@ -20,6 +20,15 @@ namespace ChatModApp.Views;
 
 public partial class ChatMessageView : ReactiveUserControl<ChatMessageViewModel>, IEnableLogger
 {
+    private static TextBlock UsernameColon => new()
+    {
+        Text = ": ",
+        TextWrapping = TextWrapping.NoWrap,
+        TextAlignment = TextAlignment.Left,
+        VerticalAlignment = VerticalAlignment.Center,
+        Margin = new(0, 0, 0, 1)
+    };
+
     public ChatMessageView()
     {
         this.WhenActivated(disposable =>
@@ -30,18 +39,21 @@ public partial class ChatMessageView : ReactiveUserControl<ChatMessageViewModel>
                           var badges = ViewModel?.Badges.Select(badge => GetImageFromUri(badge.Small, token));
                           var username = Task.FromResult((Control)new TextBlock
                           {
-                              Text = ViewModel?.Username + ": ",
-                              TextWrapping = TextWrapping.Wrap,
+                              Text = ViewModel?.Username,
+                              TextWrapping = TextWrapping.NoWrap,
                               TextAlignment = TextAlignment.Left,
                               VerticalAlignment = VerticalAlignment.Center,
-                              Margin = new(1,0),
+                              Margin = new(1, 0, 0, 0),
                               FontWeight = FontWeight.Bold,
-                              FontSize = 12,
                               Foreground =
                                   new ImmutableSolidColorBrush(ViewModel?.UsernameColor.ToUiColor() ?? Colors.White)
                           });
                           var frags = ViewModel?.Message.Select(frag => GetMsgFragControl(frag, token));
-                          return Task.WhenAll(badges.Append(username).Concat(frags));
+                          
+                          return Task.WhenAll(badges
+                                              .Append(username)
+                                              .Append(Task.FromResult((Control)UsernameColon))
+                                              .Concat(frags));
                       })
                       .LoggedCatch(this, message: "Failed to load message")
                       .ObserveOn(RxApp.MainThreadScheduler)
@@ -64,7 +76,9 @@ public partial class ChatMessageView : ReactiveUserControl<ChatMessageViewModel>
             Source = await CachedBitmapStore.Get(uri, cancellationToken)
         };
     }
-    private static async Task<Control> GetMsgFragControl(IMessageFragment frag, CancellationToken cancellationToken = default)
+
+    private static async Task<Control> GetMsgFragControl(IMessageFragment frag,
+                                                         CancellationToken cancellationToken = default)
     {
         return frag switch
         {
@@ -80,7 +94,7 @@ public partial class ChatMessageView : ReactiveUserControl<ChatMessageViewModel>
             {
                 Content = uriFragment.Text,
                 NavigateUri = uriFragment.Uri,
-                Padding = new(5,5,5,6)
+                Padding = new(5, 5, 5, 6)
             },
             _ => throw new ArgumentOutOfRangeException(nameof(frag))
         };
