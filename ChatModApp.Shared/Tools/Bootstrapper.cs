@@ -7,14 +7,13 @@ using DryIoc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using NLog.Config;
-using NLog.Extensions.Logging;
-using NLog.Targets;
 using ReactiveUI;
 using Refit;
+using Serilog;
+using Serilog.Events;
 using Splat;
 using Splat.DryIoc;
-using LogLevel = NLog.LogLevel;
+using Splat.Serilog;
 
 namespace ChatModApp.Shared.Tools;
 
@@ -22,36 +21,18 @@ public static class Bootstrapper
 {
     public static void Init(string logFolder)
     {
+        Log.Logger = new LoggerConfiguration()
+                     .MinimumLevel.Debug()
+                     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                     .MinimumLevel.Override("TwitchLib", LogEventLevel.Debug)
+                     .Enrich.FromLogContext()
+                     .WriteTo.Console()
+                     .WriteTo.Debug()
+                     .WriteTo.File(Path.Combine(logFolder, "globalLogs.log"))
+                     .CreateLogger();
+        
         var host = Host
                    .CreateDefaultBuilder()
-                   .ConfigureLogging(builder =>
-                   {
-                       builder.ClearProviders();
-                       builder.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-
-                       var config = new LoggingConfiguration();
-
-                       var logConsole = new ConsoleTarget
-                       {
-                           AutoFlush = true,
-                           DetectConsoleAvailable = false
-                       };
-
-                       var logFile = new FileTarget
-                       {
-                           FileName = Path.Combine(logFolder, "globalLogs.log"),
-                           KeepFileOpen = true,
-                           AutoFlush = true,
-                           ConcurrentWrites = false,
-                           DeleteOldFileOnStartup = true
-                       };
-
-                       config.AddRule(LogLevel.Trace, LogLevel.Fatal, logConsole);
-                       config.AddRule(LogLevel.Trace, LogLevel.Fatal, logFile);
-
-                       builder.AddNLog(config);
-                       builder.AddConsole();
-                   })
                    .ConfigureServices(services =>
                    {
                        services
@@ -62,10 +43,12 @@ public static class Bootstrapper
                            .AddRefitClient<IFfzApi>()
                            .ConfigureHttpClient(c => c.BaseAddress = new("https://api.frankerfacez.com/v1"));
                    })
+                   .UseSerilog()
                    .UseEnvironment(Environments.Development)
                    .Build();
 
         ConfigureServices(host.Services);
+        
     }
 
     private static void ConfigureServices(IServiceProvider services)
@@ -75,6 +58,7 @@ public static class Bootstrapper
 
         var resolver = Locator.CurrentMutable;
 
+        resolver.UseSerilogFullLogger();
         resolver.InitializeSplat();
         resolver.InitializeReactiveUI();
 
@@ -93,7 +77,7 @@ public static class Bootstrapper
 
         container.Register(typeof(ILogger<>), made: Made.Of(req => loggerFactoryMethod.MakeGenericMethod(req.ServiceType.GenericTypeArguments.First())));
 
-        container.RegisterViewsForViewModels(Assembly.GetEntryAssembly() ?? throw new Exception("Couldn't find entry application assembly where views are defined"), "ChatModApp.Views");
+        container.RegisterViewsForViewModels(Assembly.GetEntryAssembly() ?? throw new PlatformNotSupportedException("Couldn't find entry application assembly where views are defined"), "ChatModApp.Views");
 
 
         container.Register<AuthenticationViewModel>(Reuse.Singleton);

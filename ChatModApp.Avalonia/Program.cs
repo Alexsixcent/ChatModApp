@@ -1,6 +1,8 @@
 ﻿using System;
 using Avalonia;
+using Avalonia.Logging;
 using Avalonia.ReactiveUI;
+using ChatModApp.Tools;
 
 namespace ChatModApp
 {
@@ -15,9 +17,11 @@ namespace ChatModApp
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
-                         .UsePlatformDetect()
-                         .LogToTrace()
-                         .UseReactiveUI();
+        {
+            return AppBuilder.Configure<App>()
+                             .UsePlatformDetect()
+                             .LogToSerilog(LogEventLevel.Debug, LogArea.Control, LogArea.Layout, LogArea.Binding, LogArea.Property, LogArea.Visual)
+                             .UseReactiveUI();
+        }
     }
 }
