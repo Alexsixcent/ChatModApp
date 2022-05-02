@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia.ReactiveUI;
+using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Shared.ViewModels;
 using ReactiveUI;
 
@@ -28,7 +29,7 @@ public partial class ChatTabPromptView : ReactiveUserControl<ChatTabPromptViewMo
                                                                                   StringComparison
                                                                                       .InvariantCultureIgnoreCase)))
                       .WhereNotNull()
-                      .Throttle(TimeSpan.FromSeconds(1))
+                      .SampleFirst(TimeSpan.FromSeconds(1))
                       .ObserveOn(RxApp.MainThreadScheduler)
                       .InvokeCommand(ViewModel, vm => vm.SelectionCommand)
                       .DisposeWith(disposable);
