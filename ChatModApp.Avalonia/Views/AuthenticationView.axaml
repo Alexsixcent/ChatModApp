@@ -4,8 +4,6 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:webViewControl="clr-namespace:WebViewControl;assembly=WebViewControl.Avalonia"
 			 mc:Ignorable="d"
-			 d:DesignWidth="800"
-			 d:DesignHeight="450"
 			 x:Class="ChatModApp.Views.AuthenticationView">
 	<Grid RowDefinitions="Auto,*">
 		<TextBlock Text="Please authenticate on Twitch to continue"/>

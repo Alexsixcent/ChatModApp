@@ -17,6 +17,7 @@ namespace ChatModApp
     {
         public override void Initialize()
         {
+            Name = "ChatModApp";
             var suspend = new AutoSuspendHelper(ApplicationLifetime!);
             RxApp.SuspensionHost.CreateNewAppState = () => new AppState();
             RxApp.SuspensionHost.SetupDefaultSuspendResume(new AkavacheSuspensionDriver<AppState>());

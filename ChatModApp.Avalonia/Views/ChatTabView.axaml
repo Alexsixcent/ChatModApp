@@ -6,8 +6,6 @@
 			 xmlns:viewModels="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
 			 xmlns:reactiveUi="http://reactiveui.net"
 			 mc:Ignorable="d"
-			 d:DesignWidth="800"
-			 d:DesignHeight="450"
 			 x:Class="ChatModApp.Views.ChatTabView"
 			 x:DataType="viewModels:ChatTabViewModel">
 	<controls:TabView x:Name="TabViewControl" x:DataType="viewModels:ChatTabViewModel"
