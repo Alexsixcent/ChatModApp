@@ -11,6 +11,7 @@ using ReactiveUI;
 using Refit;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Compact;
 using Splat;
 using Splat.DryIoc;
 using Splat.Serilog;
@@ -28,7 +29,7 @@ public static class Bootstrapper
                      .Enrich.FromLogContext()
                      .WriteTo.Console()
                      .WriteTo.Debug()
-                     .WriteTo.File(Path.Combine(logFolder, "globalLogs.log"))
+                     .WriteTo.File(new CompactJsonFormatter(), Path.Combine(logFolder, "globalLogs.log"))
                      .CreateLogger();
         
         var host = Host
