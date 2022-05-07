@@ -45,11 +45,6 @@ public class CachedImage : TemplatedControl, IBitmapSource
 
     static CachedImage()
     {
-        ImageSourceProperty.Changed
-                           .Where(args => args.IsEffectiveValueChange && !args.IsSameValue())
-                           .Select(args => ((Image)args.Sender, args.NewValue.Value))
-                           .Subscribe(tuple => tuple.Item1.Source = tuple.Value);
-
         SourceProperty.Changed
                       .ObserveOn(Scheduler.Default)
                       .Where(args => args.IsEffectiveValueChange && !args.IsSameValue())
@@ -69,9 +64,6 @@ public class CachedImage : TemplatedControl, IBitmapSource
 
     public void SetImageSource(IBitmap? bitmap)
     {
-        if (bitmap is null) return;
-        if (_image is null) return;
-
-        _image.Source = bitmap;
+        ImageSource = bitmap;
     }
 }
