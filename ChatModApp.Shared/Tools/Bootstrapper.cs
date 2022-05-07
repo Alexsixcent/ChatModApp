@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Reactive;
+using System.Reflection;
 using ChatModApp.Shared.Services;
 using ChatModApp.Shared.Services.ApiClients;
 using ChatModApp.Shared.Tools.Extensions;
@@ -49,7 +50,8 @@ public static class Bootstrapper
                    .Build();
 
         ConfigureServices(host.Services);
-        
+        RxApp.DefaultExceptionHandler =
+            Observer.Create<Exception>(ex => Log.Fatal(ex, "Unhandled exception occurred in observable"));
     }
 
     private static void ConfigureServices(IServiceProvider services)
