@@ -29,11 +29,12 @@
 
 		<StackPanel Grid.Row="1"
 					Orientation="Vertical">
-			<TextBox Text="{CompiledBinding MessageText, Mode=TwoWay}"
+			<TextBox x:Name="ChatBox"
+					 Text="{CompiledBinding MessageText, Mode=TwoWay}"
 					 Watermark="Send a message"
 					 HorizontalAlignment="Stretch"
 					 TextWrapping="Wrap"
-					 AcceptsReturn="True"
+					 AcceptsReturn="False"
 					 Margin="5" />
 
 			<StackPanel Orientation="Horizontal"

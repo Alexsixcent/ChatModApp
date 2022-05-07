@@ -1,9 +1,12 @@
 using System;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.ReactiveUI;
 using ChatModApp.Shared.ViewModels;
 using ReactiveUI;
+using Splat;
 
 namespace ChatModApp.Views;
 
@@ -14,7 +17,7 @@ public enum StatusType
     AutoScrollingToBottomButSuppressed
 }
 
-public partial class ChatView : ReactiveUserControl<ChatViewModel>
+public partial class ChatView : ReactiveUserControl<ChatViewModel>, IEnableLogger
 {
     private StatusType _scrollStatus = StatusType.AutoScrollingToBottom;
 
@@ -32,6 +35,17 @@ public partial class ChatView : ReactiveUserControl<ChatViewModel>
                     if (scrollable is ScrollViewer sw) sw.ScrollChanged += OnScrollChanged;
                 })
                 .DisposeWith(disposable);
+            
+            var keyUp = Observable.FromEventPattern<KeyEventArgs>(ChatBox, nameof(ChatBox.KeyUp))
+                                  .Select(pattern => pattern.EventArgs);
+            var keyDown = Observable.FromEventPattern<KeyEventArgs>(ChatBox, nameof(ChatBox.KeyDown))
+                                    .Select(pattern => pattern.EventArgs);
+
+            keyUp.Where(args => args.Key is Key.Enter && args.KeyModifiers is not KeyModifiers.Shift)
+                                 .Select(_ => ChatBox.Text)
+                                 .Log(this, $"Sending message in chat of {ViewModel?.Channel}", s => s)
+                                 .InvokeCommand(ViewModel,vm => vm.SendMessageCommand)
+                                 .DisposeWith(disposable);
         });
         InitializeComponent();
     }
