@@ -18,7 +18,11 @@
 					<reactiveUi:ViewModelViewHost ViewModel="{CompiledBinding Mode=OneWay}"
 												  VerticalContentAlignment="Stretch"
 												  HorizontalContentAlignment="Stretch"
-												  IsTabStop="False" />
+												  IsTabStop="False">
+						<reactiveUi:ViewModelViewHost.PageTransition>
+							<CompositePageTransition/>
+						</reactiveUi:ViewModelViewHost.PageTransition>
+					</reactiveUi:ViewModelViewHost>
 				</DataTemplate>
 			</ListBox.ItemTemplate>
 		</ListBox>
