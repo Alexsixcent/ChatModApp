@@ -1,0 +1,25 @@
+<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:controls="using:ChatModApp.Controls">
+	<Design.PreviewWith>
+		<controls:PersonIcon />
+	</Design.PreviewWith>
+
+	<Style Selector="controls|PersonIcon">
+		<!-- Set Defaults -->
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Viewbox Stretch="Uniform" StretchDirection="Both">
+					<Ellipse Name="PART_Ellipse" 
+							 Stretch="Uniform"
+							 Stroke="{TemplateBinding BorderStroke}"
+							 StrokeThickness="{TemplateBinding BorderStrokeThickness}">
+						<Ellipse.Fill>
+							<ImageBrush Stretch="Uniform"/>
+						</Ellipse.Fill>
+					</Ellipse>
+				</Viewbox>
+			</ControlTemplate>
+		</Setter>
+	</Style>
+</Styles>

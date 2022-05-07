@@ -1,8 +1,10 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
-             x:Class="ChatModApp.App">
+			 x:Class="ChatModApp.App">
     <Application.Styles>
         <styling:FluentAvaloniaTheme RequestedTheme="Dark"/>
+		<StyleInclude Source="/Controls/PersonIcon.axaml"/>
+		<StyleInclude Source="/Controls/CachedImage.axaml"/>
     </Application.Styles>
 </Application>
