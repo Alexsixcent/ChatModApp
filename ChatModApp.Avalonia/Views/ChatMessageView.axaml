@@ -3,9 +3,18 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
+			 xmlns:controls="clr-namespace:ChatModApp.Controls"
+			 xmlns:tools="clr-namespace:ChatModApp.Tools"
 			 mc:Ignorable="d"
 			 x:Class="ChatModApp.Views.ChatMessageView"
 			 x:DataType="vm:ChatMessageViewModel">
+	<UserControl.Resources>
+		<tools:SystemColorToUiConverter x:Key="SysColToUiConverter" />
+	</UserControl.Resources>
 	
-	<WrapPanel x:Name="MessagePanel" Orientation="Horizontal" HorizontalAlignment="Stretch"/>
+	<controls:ChatMessage Badges="{CompiledBinding Badges, Mode=OneTime}"
+						  Username="{CompiledBinding Username, Mode=OneTime}"
+						  UsernameColor="{CompiledBinding UsernameColor, Mode=OneTime, Converter={StaticResource SysColToUiConverter}}"
+						  MessageFragments="{CompiledBinding Message, Mode=OneTime}" />
+
 </UserControl>

@@ -1,0 +1,38 @@
+<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:controls="using:ChatModApp.Controls"
+		xmlns:converters="clr-namespace:Avalonia.Markup.Xaml.Converters;assembly=Avalonia.Markup.Xaml">
+	<Design.PreviewWith>
+		<controls:ChatMessage />
+	</Design.PreviewWith>
+
+	<Style Selector="controls|ChatMessage">
+		<Style.Resources>
+			<converters:ColorToBrushConverter x:Key="ColorToBrushConverter" />
+		</Style.Resources>
+		<!-- Set Defaults -->
+		<Setter Property="Template">
+			<ControlTemplate>
+				<WrapPanel Name="PART_Panel">
+					<StackPanel Name="PART_BadgesPanel"
+								Orientation="Horizontal" />
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Name="PART_UserBlock"
+								   Text="{TemplateBinding Username}"
+								   TextWrapping="NoWrap"
+								   TextAlignment="Left"
+								   VerticalAlignment="Center"
+								   Margin="1,0,0,0"
+								   FontWeight="Bold"
+								   Foreground="{TemplateBinding UsernameColor, Converter={StaticResource ColorToBrushConverter}}" />
+						<TextBlock Text=": "
+								   TextWrapping="NoWrap"
+								   TextAlignment="Left"
+								   VerticalAlignment="Center"
+								   Margin="0,0,0,1" />
+					</StackPanel>
+				</WrapPanel>
+			</ControlTemplate>
+		</Setter>
+	</Style>
+</Styles>

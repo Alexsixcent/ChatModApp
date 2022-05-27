@@ -6,5 +6,6 @@
         <styling:FluentAvaloniaTheme RequestedTheme="Dark"/>
 		<StyleInclude Source="/Controls/PersonIcon.axaml"/>
 		<StyleInclude Source="/Controls/CachedImage.axaml"/>
+		<StyleInclude Source="/Controls/ChatMessage.axaml"/>
     </Application.Styles>
 </Application>
