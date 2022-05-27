@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Extensions.Controls;
 using Avalonia.Media;
@@ -12,6 +13,7 @@ using ChatModApp.Tools;
 
 namespace ChatModApp.Controls;
 
+[TemplatePart(ElementImage, typeof(Image))]
 public class CachedImage : TemplatedControl, IBitmapSource
 {
     public static readonly StyledProperty<Uri?> SourceProperty =
@@ -57,9 +59,9 @@ public class CachedImage : TemplatedControl, IBitmapSource
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        base.OnApplyTemplate(e);
-
         _image = e.NameScope.Find<Image>(ElementImage);
+        
+        base.OnApplyTemplate(e);
     }
 
     public void SetImageSource(IBitmap? bitmap)
