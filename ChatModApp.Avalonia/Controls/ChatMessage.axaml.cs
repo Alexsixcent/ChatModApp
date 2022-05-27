@@ -6,11 +6,11 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
-using Avalonia.Extensions.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using ChatModApp.Shared.Models.Chat;
 using ChatModApp.Shared.Models.Chat.Fragments;
+using FluentAvalonia.UI.Controls;
 
 namespace ChatModApp.Controls;
 
