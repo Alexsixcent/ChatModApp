@@ -14,20 +14,32 @@
 	<UserControl.Resources>
 		<tools:SystemColorToUiConverter x:Key="SysColToUiConverter" />
 	</UserControl.Resources>
-	<Grid RowDefinitions="8*,Auto">
-		<ListBox x:Name="MessageList"
-				 Items="{CompiledBinding ChatMessages, Mode=OneWay}">
-			<ListBox.ItemTemplate>
-				<DataTemplate x:DataType="viewModels:ChatMessageViewModel">
-					<controls:ChatMessage Badges="{CompiledBinding Badges, Mode=OneTime}"
-										  Username="{CompiledBinding Username, Mode=OneTime}"
-										  UsernameColor="{CompiledBinding UsernameColor, Mode=OneTime, Converter={StaticResource SysColToUiConverter}}"
-										  MessageFragments="{CompiledBinding Message, Mode=OneTime}" />
-				</DataTemplate>
-			</ListBox.ItemTemplate>
-		</ListBox>
+	<Grid RowDefinitions="8*,4,Auto">
+		<Grid>
+			<ListBox x:Name="MessageList"
+					 Items="{CompiledBinding ChatMessages, Mode=OneWay}">
+				<ListBox.ItemTemplate>
+					<DataTemplate x:DataType="viewModels:ChatMessageViewModel">
+						<controls:ChatMessage Badges="{CompiledBinding Badges, Mode=OneTime}"
+											  Username="{CompiledBinding Username, Mode=OneTime}"
+											  UsernameColor="{CompiledBinding UsernameColor, Mode=OneTime, Converter={StaticResource SysColToUiConverter}}"
+											  MessageFragments="{CompiledBinding Message, Mode=OneTime}" />
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+			
+			<Button x:Name="ResumeScrollButton"
+					VerticalAlignment="Bottom" HorizontalAlignment="Right"
+					MaxWidth="100" Margin="30, 20"
+					CornerRadius="25">
+				<ui:FontIcon FontFamily="Segoe MDL2 Assets"
+							 Glyph="&#xE96E;"/>
+			</Button>
+		</Grid>
 
-		<StackPanel Grid.Row="1"
+		<GridSplitter Grid.Row="1" ResizeDirection="Rows"/>
+
+		<StackPanel Grid.Row="2"
 					Orientation="Vertical">
 			<TextBox x:Name="ChatBox"
 					 Text="{CompiledBinding MessageText, Mode=TwoWay}"

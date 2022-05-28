@@ -35,17 +35,24 @@ public partial class ChatView : ReactiveUserControl<ChatViewModel>, IEnableLogge
                     if (scrollable is ScrollViewer sw) sw.ScrollChanged += OnScrollChanged;
                 })
                 .DisposeWith(disposable);
-            
+
+            Observable.FromEventPattern(ResumeScrollButton, nameof(ResumeScrollButton.Click))
+                      .Subscribe(_ =>
+                      {
+                          if (MessageList.Scroll is ScrollViewer sw) sw.ScrollToEnd();
+                      })
+                      .DisposeWith(disposable);
+
             var keyUp = Observable.FromEventPattern<KeyEventArgs>(ChatBox, nameof(ChatBox.KeyUp))
                                   .Select(pattern => pattern.EventArgs);
             var keyDown = Observable.FromEventPattern<KeyEventArgs>(ChatBox, nameof(ChatBox.KeyDown))
                                     .Select(pattern => pattern.EventArgs);
 
             keyUp.Where(args => args.Key is Key.Enter && args.KeyModifiers is not KeyModifiers.Shift)
-                                 .Select(_ => ChatBox.Text)
-                                 .Log(this, $"Sending message in chat of {ViewModel?.Channel}", s => s)
-                                 .InvokeCommand(ViewModel,vm => vm.SendMessageCommand)
-                                 .DisposeWith(disposable);
+                 .Select(_ => ChatBox.Text)
+                 .Log(this, $"Sending message in chat of {ViewModel?.Channel}", s => s)
+                 .InvokeCommand(ViewModel, vm => vm.SendMessageCommand)
+                 .DisposeWith(disposable);
         });
         InitializeComponent();
     }
@@ -65,6 +72,8 @@ public partial class ChatView : ReactiveUserControl<ChatViewModel>, IEnableLogge
             {
                 _scrollStatus = StatusType.AutoScrollingToBottomButSuppressed;
             }
+
+            ResumeScrollButton.Opacity = 1;
         }
 
         // Check if auto scrolling should be unsuppressed
@@ -74,6 +83,8 @@ public partial class ChatView : ReactiveUserControl<ChatViewModel>, IEnableLogge
             {
                 _scrollStatus = StatusType.AutoScrollingToBottom;
             }
+
+            ResumeScrollButton.Opacity = 0;
         }
 
         if (e.ExtentDelta.Y > 0 && _scrollStatus is StatusType.AutoScrollingToBottom)
