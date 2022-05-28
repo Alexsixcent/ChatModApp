@@ -10,6 +10,7 @@
 			 x:DataType="viewModels:ChatTabViewModel">
 	<controls:TabView x:Name="TabViewControl" x:DataType="viewModels:ChatTabViewModel"
 					  TabItems="{CompiledBinding ChatTabs}"
+					  TabWidthMode="SizeToContent"
 					  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 		<controls:TabView.TabItemTemplate>
 			<DataTemplate x:DataType="viewModels:ChatTabItemViewModel">
