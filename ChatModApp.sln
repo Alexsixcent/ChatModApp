@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31710.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatModApp.UWP", "ChatModApp.UWP\ChatModApp.UWP.csproj", "{04C11854-B9BA-4B8A-BD47-177045E4B838}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EFC16843-DFA0-4793-BA7B-C73C5EC40C7D}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -37,45 +35,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|Any CPU.Build.0 = Debug|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|Any CPU.Deploy.0 = Debug|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|ARM.ActiveCfg = Debug|ARM
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|ARM.Build.0 = Debug|ARM
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|ARM.Deploy.0 = Debug|ARM
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|arm64.ActiveCfg = Debug|ARM64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|arm64.Build.0 = Debug|ARM64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|arm64.Deploy.0 = Debug|ARM64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|x64.ActiveCfg = Debug|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|x64.Build.0 = Debug|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|x64.Deploy.0 = Debug|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|x86.ActiveCfg = Debug|x86
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|x86.Build.0 = Debug|x86
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Debug|x86.Deploy.0 = Debug|x86
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.DebugNative|Any CPU.ActiveCfg = DebugNative|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.DebugNative|Any CPU.Build.0 = DebugNative|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.DebugNative|Any CPU.Deploy.0 = DebugNative|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.DebugNative|ARM.ActiveCfg = DebugNative|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.DebugNative|arm64.ActiveCfg = DebugNative|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.DebugNative|x64.ActiveCfg = DebugNative|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.DebugNative|x64.Build.0 = DebugNative|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.DebugNative|x64.Deploy.0 = DebugNative|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.DebugNative|x86.ActiveCfg = DebugNative|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|Any CPU.ActiveCfg = Release|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|Any CPU.Build.0 = Release|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|Any CPU.Deploy.0 = Release|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|ARM.ActiveCfg = Release|ARM
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|ARM.Build.0 = Release|ARM
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|ARM.Deploy.0 = Release|ARM
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|arm64.ActiveCfg = Release|ARM64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|arm64.Build.0 = Release|ARM64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|arm64.Deploy.0 = Release|ARM64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|x64.ActiveCfg = Release|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|x64.Build.0 = Release|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|x64.Deploy.0 = Release|x64
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|x86.ActiveCfg = Release|x86
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|x86.Build.0 = Release|x86
-		{04C11854-B9BA-4B8A-BD47-177045E4B838}.Release|x86.Deploy.0 = Release|x86
 		{E7427D1C-E2FF-417A-9EF4-72F096727C73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E7427D1C-E2FF-417A-9EF4-72F096727C73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7427D1C-E2FF-417A-9EF4-72F096727C73}.Debug|ARM.ActiveCfg = Debug|Any CPU
