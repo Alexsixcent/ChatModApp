@@ -66,7 +66,7 @@
         <Version>3.5.2</Version>
       </PackageReference>
       <PackageReference Include="TwitchLib.Client">
-        <Version>3.2.6-preview-6109ec73405e067631aac6c8c837bc87dec6ad63</Version>
+        <Version>3.2.6-preview-68b54074c332c2df84025bb1798568ac16aafc66</Version>
       </PackageReference>
     </ItemGroup>
 
