@@ -13,7 +13,7 @@ using ChatModApp.Tools;
 
 namespace ChatModApp.Controls;
 
-[TemplatePart(ElementImage, typeof(Image))]
+[TemplatePart(ElementImage, typeof(AnimatedImage))]
 public class CachedImage : TemplatedControl, IBitmapSource
 {
     public static readonly StyledProperty<Uri?> SourceProperty =
@@ -31,7 +31,7 @@ public class CachedImage : TemplatedControl, IBitmapSource
 
     private const string ElementImage = "PART_Image";
 
-    private Image? _image;
+    private AnimatedImage? _image;
 
     public Uri? Source
     {
@@ -59,7 +59,7 @@ public class CachedImage : TemplatedControl, IBitmapSource
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        _image = e.NameScope.Find<Image>(ElementImage);
+        _image = e.NameScope.Find<AnimatedImage>(ElementImage);
         
         base.OnApplyTemplate(e);
     }

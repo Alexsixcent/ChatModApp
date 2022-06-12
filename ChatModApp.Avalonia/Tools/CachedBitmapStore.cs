@@ -11,7 +11,7 @@ namespace ChatModApp.Tools;
 
 public static class CachedBitmapStore
 {
-    private static readonly MemoryCache Cache = new(new MemoryCacheOptions{});
+    private static readonly MemoryCache Cache = new(new MemoryCacheOptions());
     private static readonly HttpClient Client = new();
 
     public static async Task<IBitmap?> Get(Uri? uri, CancellationToken cancellationToken = default)
@@ -36,18 +36,19 @@ public static class CachedBitmapStore
         }
     }
 
-    private static async Task<Bitmap> BitMapFactory(ICacheEntry entry, Uri uri, CancellationToken cancellationToken = default)
+    private static async Task<IBitmap> BitMapFactory(ICacheEntry entry, Uri uri,
+                                                     CancellationToken cancellationToken = default)
     {
         entry.SetSlidingExpiration(TimeSpan.FromHours(1));
         return await Download(uri, cancellationToken);
     }
 
-    private static async Task<Bitmap> Download(Uri uri, CancellationToken cancellationToken = default)
+    private static async Task<IBitmap> Download(Uri uri, CancellationToken cancellationToken = default)
     {
         var arr = await Client.GetByteArrayAsync(uri, cancellationToken);
 
         var stream = new MemoryStream(arr);
-
-        return new(stream);
+        
+        return new ImageGifBitmap(stream);
     }
 }

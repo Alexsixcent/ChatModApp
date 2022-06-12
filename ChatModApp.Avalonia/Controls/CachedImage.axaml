@@ -9,7 +9,7 @@
 		<!-- Set Defaults -->
 		<Setter Property="Template">
 			<ControlTemplate>
-				<Image Name="PART_Image"
+				<controls:AnimatedImage Name="PART_Image"
 					   Stretch="{TemplateBinding Stretch}"
 					   Source="{TemplateBinding ImageSource}"/>
 			</ControlTemplate>

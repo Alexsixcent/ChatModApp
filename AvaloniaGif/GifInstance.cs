@@ -12,7 +12,7 @@ using JetBrains.Annotations;
 
 namespace AvaloniaGif
 {
-    internal class GifInstance : IDisposable
+    public class GifInstance : IDisposable
     {
         public IterationCount IterationCount { get; set; }
         public bool AutoStart { get; private set; } = true;
