@@ -20,10 +20,10 @@
 					 Items="{CompiledBinding ChatMessages, Mode=OneWay}">
 				<ListBox.ItemTemplate>
 					<DataTemplate x:DataType="viewModels:ChatMessageViewModel">
-						<controls:ChatMessage Badges="{CompiledBinding Badges, Mode=OneTime}"
-											  Username="{CompiledBinding Username, Mode=OneTime}"
-											  UsernameColor="{CompiledBinding UsernameColor, Mode=OneTime, Converter={StaticResource SysColToUiConverter}}"
-											  MessageFragments="{CompiledBinding Message, Mode=OneTime}" />
+						<controls:ChatMessage Badges="{CompiledBinding Badges, Mode=OneWay}"
+											  Username="{CompiledBinding Username, Mode=OneWay}"
+											  UsernameColor="{CompiledBinding UsernameColor, Mode=OneWay, Converter={StaticResource SysColToUiConverter}}"
+											  MessageFragments="{CompiledBinding Message, Mode=OneWay}" />
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
