@@ -24,7 +24,7 @@ namespace AvaloniaGif
         public static readonly StyledProperty<IterationCount> IterationCountProperty =
             AvaloniaProperty.Register<GifImage, IterationCount>("IterationCount", IterationCount.Infinite);
 
-        private GifInstance gifInstance;
+        private GifInstance _gifInstance;
 
         public static readonly StyledProperty<bool> AutoStartProperty =
             AvaloniaProperty.Register<GifImage, bool>("AutoStart");
@@ -118,9 +118,9 @@ namespace AvaloniaGif
             if (_hasNewSource)
             {
                 StopAndDispose();
-                gifInstance = new GifInstance(_newSource);
-                gifInstance.IterationCount = IterationCount;
-                _backingRtb = new RenderTargetBitmap(gifInstance.GifPixelSize, new Vector(96, 96));
+                _gifInstance = new GifInstance(_newSource);
+                _gifInstance.IterationCount = IterationCount;
+                _backingRtb = new RenderTargetBitmap(_gifInstance.GifPixelSize, new Vector(96, 96));
                 _hasNewSource = false;
 
                 _stopwatch ??= new Stopwatch();
@@ -130,7 +130,7 @@ namespace AvaloniaGif
                 return;
             }
 
-            if (gifInstance is null || (gifInstance.CurrentCts?.IsCancellationRequested ?? true))
+            if (_gifInstance is null || (_gifInstance.CurrentCts?.IsCancellationRequested ?? true))
             {
                 return;
             }
@@ -140,7 +140,7 @@ namespace AvaloniaGif
                 _stopwatch.Start();
             }
 
-            var currentFrame = gifInstance.ProcessFrameTime(_stopwatch.Elapsed);
+            var currentFrame = _gifInstance.ProcessFrameTime(_stopwatch.Elapsed);
 
             if (currentFrame is { } source && _backingRtb is { })
             {
@@ -204,7 +204,7 @@ namespace AvaloniaGif
 
         public void StopAndDispose()
         {
-            gifInstance?.Dispose();
+            _gifInstance?.Dispose();
             _backingRtb?.Dispose();
         }
 

@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace AvaloniaGif
+namespace AvaloniaGif.Decoding
 {
     [StructLayout(LayoutKind.Explicit)]
     public readonly struct GifColor
