@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Avalonia.Logging;
 using Avalonia.Media.Imaging;
 using Microsoft.Extensions.Caching.Memory;
+using Serilog;
 
 namespace ChatModApp.Tools;
 
@@ -39,7 +40,15 @@ public static class CachedBitmapStore
     private static async Task<IBitmap> BitMapFactory(ICacheEntry entry, Uri uri,
                                                      CancellationToken cancellationToken = default)
     {
-        entry.SetSlidingExpiration(TimeSpan.FromHours(1));
+        entry.SetSlidingExpiration(TimeSpan.FromHours(1))
+             .RegisterPostEvictionCallback((key, value, reason, _) =>
+             {
+                 if (reason is not (EvictionReason.Capacity or EvictionReason.Expired) ||
+                     value is not IDisposable d) return;
+                 
+                 d.Dispose();
+                 Log.Debug("Bitmap expired, Reason: {Reason}, Uri: {BitMapUri}", reason, key);
+             });
         return await Download(uri, cancellationToken);
     }
 
