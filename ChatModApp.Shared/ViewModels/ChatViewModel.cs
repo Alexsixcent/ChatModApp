@@ -10,10 +10,13 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using TwitchLib.Api.Core.Enums;
 using TwitchLib.Api.Core.Models.Undocumented.Chatters;
+using TwitchLib.Client.Models;
+using TwitchLib.Client.Models.Builders;
+using TwitchLib.Client.Models.Internal;
 
 namespace ChatModApp.Shared.ViewModels;
 
-public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
+public class ChatViewModel : ReactiveObject, IActivatableViewModel, IRoutableViewModel, IDisposable
 {
     public string UrlPathSegment => Guid.NewGuid().ToString().Substring(0, 5);
     public IScreen? HostScreen { get; set; }
@@ -26,24 +29,28 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     [Reactive] public string MessageText { get; set; }
     [Reactive] public string UserSearchText { get; set; }
 
+    public ViewModelActivator Activator { get; }
     public ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages => _chatMessages;
     public ReadOnlyObservableCollection<IGrouping<UserType, string>> UsersList => _usersList;
 
 
     private readonly CompositeDisposable _disposables;
     private readonly TwitchChatService _chatService;
+    private readonly TwitchApiService _apiService;
     private readonly SourceList<ChatterFormatted> _chatters;
     private readonly ReadOnlyObservableCollection<ChatMessageViewModel> _chatMessages;
     private readonly ReadOnlyObservableCollection<IGrouping<UserType, string>> _usersList;
 
 
-    public ChatViewModel(TwitchChatService chatService, MessageProcessingService messageProcessingService)
+    public ChatViewModel(TwitchChatService chatService, TwitchApiService apiService, MessageProcessingService messageProcessingService)
     {
-        _disposables = new();
-        _chatters = new();
         MessageText = string.Empty;
         UserSearchText = string.Empty;
+        Activator = new();
+        _disposables = new();
+        _chatters = new();
         _chatService = chatService;
+        _apiService = apiService;
 
         var messageSent = _chatService.ChatMessageSent
                                       .Where(message => message.Channel == Channel?.Login)
@@ -87,6 +94,17 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
                 e.AddRange(list);
             });
         }).DisposeWith(_disposables);
+        
+        this.WhenActivated(disposable =>
+        {
+            Observable.FromAsync(async token =>
+                      {
+                          
+                          
+                      })
+                      .Subscribe()
+                      .DisposeWith(disposable);
+        });
     }
 
     public void Dispose() => _disposables.Dispose();

@@ -22,6 +22,7 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
 {
     public IScreen? HostScreen { get; set; }
     public string UrlPathSegment => "auth";
+    public ViewModelActivator Activator { get; }
 
     public Uri AuthUri { get; private set; }
     public readonly ReactiveCommand<WebNavigatedAction, Unit> AuthCompleteCommand;
@@ -56,6 +57,4 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
         _chatTabs.HostScreen = HostScreen;
         HostScreen.Router.NavigateAndReset.Execute(_chatTabs).Subscribe();
     }
-
-    public ViewModelActivator Activator { get; }
 }
