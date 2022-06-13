@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Logging;
 using Avalonia.Media.Imaging;
+using AvaloniaGif.Decoding;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
@@ -57,7 +58,19 @@ public static class CachedBitmapStore
         var arr = await Client.GetByteArrayAsync(uri, cancellationToken);
 
         var stream = new MemoryStream(arr);
-        
-        return new ImageGifBitmap(stream);
+
+        IBitmap bitmap;
+        try
+        {
+            bitmap = new ImageGifBitmap(stream);
+        }
+        catch (InvalidGifStreamException _)
+        {
+            Log.Verbose("Image {Uri} is not a GIF switching to still image bitmap", uri);
+            stream.Position = 0; //Reset stream to prevent exception
+            bitmap = new Bitmap(stream);
+        }
+
+        return bitmap;
     }
 }
