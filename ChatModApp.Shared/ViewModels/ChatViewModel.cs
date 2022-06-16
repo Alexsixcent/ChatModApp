@@ -18,7 +18,20 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     public string UrlPathSegment => Guid.NewGuid().ToString().Substring(0, 5);
     public IScreen? HostScreen { get; set; }
 
-    public ITwitchChannel? Channel { get; set; }
+    public ITwitchChannel? Channel
+    {
+        get => _channel;
+        set
+        {
+            _channel = value;
+            if (_channel is not null)
+            {
+                Observable.FromAsync(token => _chatService.LoadMessageHistory(Channel!, token), RxApp.TaskpoolScheduler)
+                          .Subscribe()
+                          .DisposeWith(_disposables);
+            }
+        }
+    }
 
     public ReactiveCommand<string, Unit> SendMessageCommand { get; }
     public ReactiveCommand<Unit, Unit> ChattersLoadCommand { get; }
@@ -26,6 +39,7 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     [Reactive] public string MessageText { get; set; }
     [Reactive] public string UserSearchText { get; set; }
 
+    public ViewModelActivator Activator { get; }
     public ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages => _chatMessages;
     public ReadOnlyObservableCollection<IGrouping<UserType, string>> UsersList => _usersList;
 
@@ -36,13 +50,16 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     private readonly ReadOnlyObservableCollection<ChatMessageViewModel> _chatMessages;
     private readonly ReadOnlyObservableCollection<IGrouping<UserType, string>> _usersList;
 
+    private ITwitchChannel? _channel;
+
 
     public ChatViewModel(TwitchChatService chatService, MessageProcessingService messageProcessingService)
     {
-        _disposables = new();
-        _chatters = new();
         MessageText = string.Empty;
         UserSearchText = string.Empty;
+        Activator = new();
+        _disposables = new();
+        _chatters = new();
         _chatService = chatService;
 
         var messageSent = _chatService.ChatMessageSent
@@ -58,7 +75,7 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
                     .Bind(out _chatMessages)
                     .Subscribe()
                     .DisposeWith(_disposables);
-        
+
         _chatters.Connect()
                  .AutoRefreshOnObservable(_ => this.WhenAnyValue(vm => vm.UserSearchText))
                  .Filter(c => string.IsNullOrWhiteSpace(UserSearchText) || c.Username.Contains(UserSearchText))
