@@ -12,7 +12,7 @@ namespace ChatModApp.Shared.Services;
 public class MessageProcessingService
 {
     private static readonly char[] Slash = { '/' }, Space = { ' ' };
-    
+
     private readonly GlobalStateService _globalStateService;
     private readonly EmotesService _emotesService;
     private readonly TwitchChatService _chatService;
@@ -105,7 +105,7 @@ public class MessageProcessingService
     {
         if (msg is null)
             return Array.Empty<IMessageFragment>();
-        
+
         var fragments = new List<IMessageFragment>();
 
         foreach (var frag in msg.Split(Space, StringSplitOptions.RemoveEmptyEntries))
@@ -131,23 +131,8 @@ public class MessageProcessingService
             if (HasValidHost(frag) &&
                 Uri.TryCreate(frag, UriKind.RelativeOrAbsolute, out var uriRes))
             {
-                if (uriRes.IsAbsoluteUri)
-                {
-                    if (uriRes.Scheme == Uri.UriSchemeHttp || uriRes.Scheme == Uri.UriSchemeHttps)
-                    {
-                        fragments.Add(new UriFragment(uriRes));
-                        continue;
-                    }
-                }
-                else
-                {
-                    fragments.Add(new UriFragment(new UriBuilder(frag)
-                    {
-                        Scheme = Uri.UriSchemeHttps,
-                        Port = -1
-                    }.Uri, frag));
-                    continue;
-                }
+                fragments.Add(new UriFragment(uriRes));
+                continue;
             }
 
             if (fragments.LastOrDefault() is TextFragment text)
