@@ -57,7 +57,7 @@
         <Version>14.2.8</Version>
       </PackageReference>
       <PackageReference Include="Splat.Serilog">
-        <Version>14.2.8</Version>
+        <Version>14.2.27</Version>
       </PackageReference>
       <PackageReference Include="System.Collections.Immutable">
         <Version>6.0.0</Version>
