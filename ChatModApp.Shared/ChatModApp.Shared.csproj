@@ -24,7 +24,7 @@
         <Version>18.1.8</Version>
       </PackageReference>
       <PackageReference Include="ReactiveUI.Fody">
-        <Version>18.1.8</Version>
+        <Version>18.2.5</Version>
       </PackageReference>
       <PackageReference Include="Refit">
         <Version>6.3.2</Version>
