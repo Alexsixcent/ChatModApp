@@ -9,7 +9,7 @@
 
     <ItemGroup>
       <PackageReference Include="akavache">
-        <Version>8.1.1</Version>
+        <Version>9.0.1</Version>
       </PackageReference>
       <PackageReference Include="DynamicData">
         <Version>7.9.1</Version>
