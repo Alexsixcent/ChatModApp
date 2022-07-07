@@ -28,6 +28,13 @@ public partial class ChatView : ReactiveUserControl<ChatViewModel>, IEnableLogge
             this.BindCommand(ViewModel, vm => vm.ChattersLoadCommand, v => v.UserListRefreshButton)
                 .DisposeWith(disposable);
 
+            //See https://github.com/AvaloniaUI/Avalonia/issues/8379
+            var flyout = UserListToggleButton.Flyout;
+            Observable.FromEventPattern(flyout!, nameof(flyout.Closed))
+                      .Log(this, "Flyout closed event")
+                      .Subscribe(_ => UserListToggleButton.IsChecked = false)
+                      .DisposeWith(disposable);
+            
             this.WhenAnyValue(v => v.MessageList.Scroll)
                 .WhereNotNull()
                 .Subscribe(scrollable =>

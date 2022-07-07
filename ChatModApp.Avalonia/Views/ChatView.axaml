@@ -27,17 +27,20 @@
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
-			
+
 			<Button x:Name="ResumeScrollButton"
-					VerticalAlignment="Bottom" HorizontalAlignment="Right"
-					MaxWidth="100" Margin="30, 20"
+					VerticalAlignment="Bottom"
+					HorizontalAlignment="Right"
+					MaxWidth="100"
+					Margin="30, 20"
 					CornerRadius="25">
 				<ui:FontIcon FontFamily="Segoe MDL2 Assets"
-							 Glyph="&#xE96E;"/>
+							 Glyph="&#xE96E;" />
 			</Button>
 		</Grid>
 
-		<GridSplitter Grid.Row="1" ResizeDirection="Rows"/>
+		<GridSplitter Grid.Row="1"
+					  ResizeDirection="Rows" />
 
 		<StackPanel Grid.Row="2"
 					Orientation="Vertical">
@@ -49,60 +52,63 @@
 					 AcceptsReturn="False"
 					 Margin="5" />
 
-			<StackPanel Orientation="Horizontal"
+			<StackPanel x:Name="UserListPanel"
+						Orientation="Horizontal"
 						VerticalAlignment="Stretch"
 						HorizontalAlignment="Right">
-				<ToggleButton Margin="0,0,5,5">
-					<ui:SymbolIcon Symbol="People" />
+				<ToggleButton x:Name="UserListToggleButton"
+							  Margin="0,0,5,5">
 					<ToggleButton.Flyout>
-						<Flyout>
-							<StackPanel Orientation="Vertical">
-								<StackPanel Orientation="Horizontal">
-									<TextBox Text="{CompiledBinding UserSearchText, Mode=OneWayToSource}"
-											 Watermark="Search user..."
-											 UseFloatingWatermark="True"
-											 Margin="0,0,0,5" />
-									<Button x:Name="UserListRefreshButton"
-											Margin="10,0,0,5"
-											VerticalAlignment="Top"
-											HorizontalAlignment="Right">
-										<ui:SymbolIcon Symbol="Refresh" />
-									</Button>
-								</StackPanel>
+											<Flyout Placement="TopEdgeAlignedRight">
+                        						<StackPanel Orientation="Vertical">
+                        							<StackPanel Orientation="Horizontal">
+                        								<TextBox Text="{CompiledBinding UserSearchText, Mode=OneWayToSource}"
+                        										 Watermark="Search user..."
+                        										 UseFloatingWatermark="True"
+                        										 Margin="0,0,0,5" />
+                        								<Button x:Name="UserListRefreshButton"
+                        										Margin="10,0,0,5"
+                        										VerticalAlignment="Top"
+                        										HorizontalAlignment="Right">
+                        									<ui:SymbolIcon Symbol="Refresh" />
+                        								</Button>
+                        							</StackPanel>
+                        
+                        							<ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                        										  Margin="5,0">
+                        								<ItemsRepeater Items="{CompiledBinding UsersList}">
+                        									<ItemsRepeater.ItemTemplate>
+                        										<DataTemplate x:DataType="tk:IReadOnlyObservableGroup">
+                        											<StackPanel Orientation="Vertical">
+                        												<Border>
+                        													<StackPanel Orientation="Horizontal">
+                        														<TextBlock FontStyle="Italic"
+                        																   FontWeight="Bold"
+                        																   Text="{CompiledBinding Key}" />
+                        														<TextBlock Margin="8,0,0,0"
+                        																   VerticalAlignment="Bottom"
+                        																   Opacity="0.8"
+                        																   Text="{CompiledBinding Count, StringFormat={}{0} item(s), Mode=OneWay}" />
+                        													</StackPanel>
+                        												</Border>
+                        												<ItemsRepeater Items="{Binding}">
+                        													<ItemsRepeater.ItemTemplate>
+                        														<DataTemplate x:DataType="system:String">
+                        															<TextBlock Text="{CompiledBinding .}" />
+                        														</DataTemplate>
+                        													</ItemsRepeater.ItemTemplate>
+                        												</ItemsRepeater>
+                        											</StackPanel>
+                        										</DataTemplate>
+                        									</ItemsRepeater.ItemTemplate>
+                        								</ItemsRepeater>
+                        							</ScrollViewer>
+                        
+                        						</StackPanel>
+                        					</Flyout>
 
-								<ScrollViewer HorizontalScrollBarVisibility="Disabled"
-											  Margin="5,0">
-									<ItemsRepeater Items="{CompiledBinding UsersList}">
-										<ItemsRepeater.ItemTemplate>
-											<DataTemplate x:DataType="tk:IReadOnlyObservableGroup">
-												<StackPanel Orientation="Vertical">
-													<Border>
-														<StackPanel Orientation="Horizontal">
-															<TextBlock FontStyle="Italic"
-																	   FontWeight="Bold"
-																	   Text="{CompiledBinding Key}" />
-															<TextBlock Margin="8,0,0,0"
-																	   VerticalAlignment="Bottom"
-																	   Opacity="0.8"
-																	   Text="{CompiledBinding Count, StringFormat={}{0} item(s), Mode=OneWay}" />
-														</StackPanel>
-													</Border>
-													<ItemsRepeater Items="{Binding}">
-														<ItemsRepeater.ItemTemplate>
-															<DataTemplate x:DataType="system:String">
-																<TextBlock Text="{CompiledBinding .}" />
-															</DataTemplate>
-														</ItemsRepeater.ItemTemplate>
-													</ItemsRepeater>
-												</StackPanel>
-											</DataTemplate>
-										</ItemsRepeater.ItemTemplate>
-									</ItemsRepeater>
-								</ScrollViewer>
-
-							</StackPanel>
-						</Flyout>
 					</ToggleButton.Flyout>
+					<ui:SymbolIcon Symbol="People" />
 				</ToggleButton>
 			</StackPanel>
 
