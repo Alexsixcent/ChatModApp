@@ -6,6 +6,7 @@ using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Services;
 using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
+using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using TwitchLib.Api.Core.Enums;
@@ -58,10 +59,14 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
                     .Bind(out _chatMessages)
                     .Subscribe()
                     .DisposeWith(_disposables);
-        
+
+        var searchChanged = this.WhenValueChanged(vm => vm.UserSearchText)
+                                .DistinctUntilChanged(StringComparer.InvariantCultureIgnoreCase)
+                                .Select(_ => (Func<ChatterFormatted, bool>)ChatterFilter)
+                                .ObserveOn(RxApp.TaskpoolScheduler);
         _chatters.Connect()
-                 .AutoRefreshOnObservable(_ => this.WhenAnyValue(vm => vm.UserSearchText))
-                 .Filter(c => string.IsNullOrWhiteSpace(UserSearchText) || c.Username.Contains(UserSearchText))
+                 .ObserveOn(RxApp.TaskpoolScheduler)
+                 .Filter(searchChanged)
                  .GroupByElement(c => c.UserType, c => c.Username)
                  .ObserveOn(RxApp.MainThreadScheduler)
                  .Bind(out _usersList)
@@ -88,6 +93,8 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
             });
         }).DisposeWith(_disposables);
     }
+
+    private bool ChatterFilter(ChatterFormatted f) => string.IsNullOrWhiteSpace(UserSearchText) || f.Username.Contains(UserSearchText);
 
     public void Dispose() => _disposables.Dispose();
 }

@@ -30,7 +30,7 @@ public static class DynamicDataExtensions
             throw new ArgumentException(nameof(elementSelector));
 
         return source.GroupOn(keySelector)
-                     .Transform(group => (IGrouping<TKey, TElement>)new ListViewGrouping<TObject, TKey, TElement>(group, elementSelector))
+                     .Transform(group => (IGrouping<TKey, TElement>)new ListViewGrouping<TObject, TKey, TElement>(group, elementSelector), true)
                      .DisposeMany();
     }
 }
