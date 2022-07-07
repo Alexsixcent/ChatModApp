@@ -41,6 +41,7 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
         this.WhenAnyValue(vm => vm.Channel)
             .Where(s => !string.IsNullOrWhiteSpace(s))
             .Throttle(TimeSpan.FromMilliseconds(250), RxApp.TaskpoolScheduler)
+            .ObserveOn(RxApp.TaskpoolScheduler)
             .SelectMany(SearchChannels)
             .ToObservableChangeSet(20)
             .Sort(SortExpressionComparer<ChannelSuggestionViewModel>.Descending(model => model.IsLive))
