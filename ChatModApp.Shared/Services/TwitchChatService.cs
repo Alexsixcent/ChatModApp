@@ -1,9 +1,12 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Models.Chat;
+using ChatModApp.Shared.Services.ApiClients;
+using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
@@ -13,6 +16,7 @@ using TwitchLib.Client;
 using TwitchLib.Client.Events;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Clients;
+using TwitchLib.Communication.Events;
 using TwitchLib.Communication.Models;
 
 namespace ChatModApp.Shared.Services;
@@ -27,7 +31,9 @@ public class TwitchChatService : IDisposable
 
     private readonly TwitchApiService _apiService;
     private readonly AuthenticationService _authService;
-    private readonly TwitchClient _client;
+    private readonly IRobottyApi _historyApi;
+    private readonly WebSocketClient _client;
+    private readonly TwitchClient _twitchClient;
 
     private readonly CompositeDisposable _disposables;
 
@@ -35,35 +41,39 @@ public class TwitchChatService : IDisposable
     public TwitchChatService(TwitchApiService apiService,
                              AuthenticationService authService,
                              ChatTabService tabService,
+                             IRobottyApi historyApi,
                              ILogger<TwitchClient> clientLogger)
     {
         _disposables = new();
         _apiService = apiService;
         _authService = authService;
+        _historyApi = historyApi;
 
-        var clientOptions = new ClientOptions
+        _client = new(new ClientOptions
         {
             MessagesAllowedInPeriod = 10000,
             ThrottlingPeriod = TimeSpan.FromSeconds(1)
-        };
-        _client = new(new WebSocketClient(clientOptions), logger: clientLogger);
+        });
+        _twitchClient = new(_client, logger: clientLogger);
 
         apiService.UserConnected
                   .Subscribe(Connect)
                   .DisposeWith(_disposables);
 
-        var globalBadges = Observable.FromEventPattern<OnConnectedArgs>(_client, nameof(_client.OnConnected))
-                                     .Select(_ => GetGlobalChatBadges().ToObservable())
-                                     .Concat()
-                                     .ToObservableChangeSet();
+        var globalBadges = Observable
+                           .FromEventPattern<OnConnectedArgs>(_twitchClient, nameof(_twitchClient.OnConnected))
+                           .Select(_ => GetGlobalChatBadges().ToObservable())
+                           .Concat()
+                           .ToObservableChangeSet();
 
         ChatMessageReceived = Observable
-                              .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
+                              .FromEventPattern<OnMessageReceivedArgs>(_twitchClient,
+                                                                       nameof(_twitchClient.OnMessageReceived))
                               .ObserveOn(RxApp.TaskpoolScheduler)
                               .Select(pattern => pattern.EventArgs.ChatMessage);
 
         ChatMessageSent = Observable
-                          .FromEventPattern<OnMessageSentArgs>(_client, nameof(_client.OnMessageSent))
+                          .FromEventPattern<OnMessageSentArgs>(_twitchClient, nameof(_twitchClient.OnMessageSent))
                           .ObserveOn(RxApp.TaskpoolScheduler)
                           .Select(pattern => pattern.EventArgs.SentMessage);
 
@@ -78,26 +88,43 @@ public class TwitchChatService : IDisposable
                                    .AsObservableList()
                                    .DisposeWith(_disposables);
         ChannelsJoined
-            .OnItemAdded(channel => _client.JoinChannel(channel.Login))
-            .OnItemRemoved(channel => _client.LeaveChannel(channel.Login))
+            .OnItemAdded(channel => _twitchClient.JoinChannel(channel.Login))
+            .OnItemRemoved(channel => _twitchClient.LeaveChannel(channel.Login))
             .Subscribe()
             .DisposeWith(_disposables);
     }
 
-    public void SendMessage(ITwitchChannel channel, string message) => _client.SendMessage(channel.Login, message);
+    public void Dispose() => _disposables.Dispose();
+
+    public void SendMessage(ITwitchChannel channel, string message) =>
+        _twitchClient.SendMessage(channel.Login, message);
+
+    public async Task LoadMessageHistory(ITwitchChannel channel, CancellationToken cancellationToken = default)
+    {
+        var res = await _historyApi.GetRecentMessages(channel.Login, cancellationToken);
+        if (!res.IsSuccessStatusCode)
+        {
+            return;
+        }
+
+        var messages = res.Content?.Messages ?? ImmutableArray<string>.Empty;
+
+        foreach (var msg in messages)
+        {
+            _client.RaiseEvent(nameof(_client.OnMessage), new OnMessageEventArgs { Message = msg });
+        }
+    }
 
     public async Task<IEnumerable<ChatterFormatted>> GetChatUserList(ITwitchChannel channel)
     {
         return await _apiService.Undocumented.GetChattersAsync(channel.Login);
     }
 
-    public void Dispose() => _disposables.Dispose();
-
 
     private void Connect(User user)
     {
-        _client.Initialize(new(user.Login, _authService.TwitchAccessToken));
-        _client.Connect();
+        _twitchClient.Initialize(new(user.Login, _authService.TwitchAccessToken));
+        _twitchClient.Connect();
     }
 
     private async Task<IEnumerable<TwitchChatBadge>> GetChannelChatBadges(ITwitchChannel channel)

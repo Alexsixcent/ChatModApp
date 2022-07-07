@@ -44,6 +44,10 @@ public static class Bootstrapper
                        services
                            .AddRefitClient<IFfzApi>()
                            .ConfigureHttpClient(c => c.BaseAddress = new("https://api.frankerfacez.com/v1"));
+
+                       services
+                           .AddRefitClient<IRobottyApi>()
+                           .ConfigureHttpClient(c => c.BaseAddress = new("https://recent-messages.robotty.de/api/v2"));
                    })
                    .UseSerilog()
                    .UseEnvironment(Environments.Development)
@@ -71,6 +75,7 @@ public static class Bootstrapper
         //#TODO: Streamline client registration process, RestEase migration ?
         container.RegisterInstance(services.GetRequiredService<IBttvApi>());
         container.RegisterInstance(services.GetRequiredService<IFfzApi>());
+        container.RegisterInstance(services.GetRequiredService<IRobottyApi>());
         container.RegisterInstance(services.GetRequiredService<ILoggerFactory>());
 
         var loggerFactoryMethod = typeof(LoggerFactoryExtensions).GetMethods(BindingFlags.Static | BindingFlags.Public)
