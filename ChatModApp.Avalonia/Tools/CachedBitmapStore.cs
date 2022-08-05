@@ -1,11 +1,13 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Logging;
 using Avalonia.Media.Imaging;
 using AvaloniaGif.Decoding;
+using ChatModApp.Shared.Tools.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 
@@ -55,7 +57,8 @@ public static class CachedBitmapStore
 
     private static async Task<IBitmap> Download(Uri uri, CancellationToken cancellationToken = default)
     {
-        var arr = await Client.GetByteArrayAsync(uri, cancellationToken);
+        var arr = await Observable.FromAsync(() => Client.GetByteArrayAsync(uri, cancellationToken))
+                                  .RetryWithBackoffStrategy<byte[], HttpRequestException>(5, TimeSpan.FromSeconds(2));
 
         var stream = new MemoryStream(arr);
 
