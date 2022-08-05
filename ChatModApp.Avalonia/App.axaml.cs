@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -17,17 +18,22 @@ namespace ChatModApp
     {
         public override void Initialize()
         {
+            Bootstrapper.Init(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                                           Name!));
+
             Name = "ChatModApp";
             var suspend = new AutoSuspendHelper(ApplicationLifetime!);
             RxApp.SuspensionHost.CreateNewAppState = () => new AppState();
             RxApp.SuspensionHost.SetupDefaultSuspendResume(new AkavacheSuspensionDriver<AppState>());
+            RxApp.SuspensionHost.WhenAnyValue(host => host.AppState)
+                 .WhereNotNull()
+                 .Cast<AppState>()
+                 .Subscribe(state => Locator.CurrentMutable.RegisterConstant(state));
             suspend.OnFrameworkInitializationCompleted();
-            
-            Bootstrapper.Init(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Name!));
 
             //Important since UseDryIocDependencyResolver in ConfigureService resets the scheduler to default
             RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
-            
+
             AvaloniaXamlLoader.Load(this);
         }
 
