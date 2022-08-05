@@ -8,6 +8,7 @@ using DryIoc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ReactiveUI;
 using Refit;
 using Serilog;
@@ -64,7 +65,8 @@ public static class Bootstrapper
         resolver.UseSerilogFullLogger();
         resolver.InitializeSplat();
         resolver.InitializeReactiveUI();
-        
+        resolver.RegisterConstant(new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.Auto});
+
         //#TODO: Streamline client registration process, RestEase migration ?
         container.RegisterInstance(services.GetRequiredService<IBttvApi>());
         container.RegisterInstance(services.GetRequiredService<IFfzApi>());

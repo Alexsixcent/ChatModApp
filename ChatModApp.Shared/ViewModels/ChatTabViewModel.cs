@@ -10,10 +10,11 @@ using ReactiveUI.Fody.Helpers;
 
 namespace ChatModApp.Shared.ViewModels;
 
-public class ChatTabViewModel : ReactiveObject, IRoutableViewModel, IDisposable
+public class ChatTabViewModel : ReactiveObject, IRoutableViewModel, IActivatableViewModel, IDisposable
 {
     public string UrlPathSegment => "chatTabs";
     public IScreen? HostScreen { get; set; }
+    public ViewModelActivator Activator { get; }
 
     public ReactiveCommand<Unit, Unit> AddTabCommand { get; }
     public ReactiveCommand<ChatTabItemViewModel, Unit> CloseTabCommand { get; }
@@ -30,17 +31,25 @@ public class ChatTabViewModel : ReactiveObject, IRoutableViewModel, IDisposable
         _tabService = tabService;
         _container = container;
         _disposable = new();
+        Activator = new();
         ChatTabs = new();
 
         AddTabCommand = ReactiveCommand.Create(AddTab).DisposeWith(_disposable);
         CloseTabCommand = ReactiveCommand.Create<ChatTabItemViewModel>(RemoveTab).DisposeWith(_disposable);
 
-        _tabService.Tabs
-                   .Cast(item => (ChatTabItemViewModel)item)
-                   .ObserveOn(RxApp.MainThreadScheduler)
-                   .Bind(ChatTabs)
-                   .Subscribe()
-                   .DisposeWith(_disposable);
+        this.WhenActivated(disposable =>
+        {
+            _tabService.Tabs
+                       .Cast(item => (ChatTabItemViewModel)item)
+                       .ObserveOn(RxApp.MainThreadScheduler)
+                       .Bind(ChatTabs)
+                       .Subscribe()
+                       .DisposeWith(disposable);
+
+            foreach (var tab in _tabService.TabCache.Items)
+                if (tab is ChatTabItemViewModel item)
+                    item.Activator.Activate().DisposeWith(_disposable);
+        });
     }
 
     public void Dispose() => _disposable.Dispose();
@@ -52,6 +61,8 @@ public class ChatTabViewModel : ReactiveObject, IRoutableViewModel, IDisposable
 
         _tabService.AddTab(newTab);
         OpenedTabIndex = ChatTabs.Count - 1;
+
+        newTab.Activator.Activate().DisposeWith(_disposable);
     }
 
     private void RemoveTab(ChatTabItemViewModel tab)

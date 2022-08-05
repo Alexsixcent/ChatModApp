@@ -1,39 +1,88 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reactive.Disposables;
+using System.Runtime.Serialization;
 using ChatModApp.Shared.Models;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using Splat;
 
 namespace ChatModApp.Shared.ViewModels;
 
-public class ChatTabItemViewModel : ReactiveObject, IChatTabItem, IScreen, IDisposable
+[DataContract]
+public class ChatTabItemViewModel : ReactiveObject, IChatTabItem, IScreen, IActivatableViewModel, IDisposable,
+                                    IEquatable<ChatTabItemViewModel>
 {
-    [Reactive]
-    public string Title { get; set; }
-    [Reactive]
-    public ITwitchChannel? Channel { get; set; }
+    [DataMember] public Guid Id { get; set; }
 
-    public Guid Id { get; }
+    [Reactive] [DataMember] public string Title { get; set; }
+
+    [Reactive] [DataMember] public ITwitchChannel? Channel { get; set; }
+
     public RoutingState Router { get; }
+
+    public ViewModelActivator Activator { get; }
+
 
     private readonly CompositeDisposable _disposables;
 
-    public ChatTabItemViewModel(ChatTabPromptViewModel promptViewModel)
+
+    public ChatTabItemViewModel(ChatTabPromptViewModel? prompt = null)
     {
         _disposables = new();
         Id = Guid.NewGuid();
         Title = "ChatTab";
         Router = new();
+        Activator = new();
 
-        promptViewModel.HostScreen = this;
-        promptViewModel.ParentTabId = Id;
+        this.WhenActivated(() =>
+        {
+            NavigateImpl(prompt);
+
+            return Enumerable.Empty<IDisposable>();
+        });
+    }
+
+    public void Navigate() => NavigateImpl();
+
+    public void Dispose() => _disposables.Dispose();
+
+
+    public bool Equals(ChatTabItemViewModel? other)
+    {
+        if (ReferenceEquals(null, other)) return false;
+        return ReferenceEquals(this, other) || Id.Equals(other.Id);
+    }
+
+    [SuppressMessage("ReSharper", "NonReadonlyMemberInGetHashCode")]
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
+
+    private void NavigateImpl(ChatTabPromptViewModel? prompt = null)
+    {
+        if (Channel is not null)
+        {
+            var cvm = Locator.Current.GetService<ChatViewModel>() ?? throw new InvalidOperationException();
+            cvm.HostScreen = this;
+            cvm.Channel = Channel;
+            Router.NavigateAndReset
+                  .Execute(cvm)
+                  .Subscribe()
+                  .DisposeWith(_disposables);
+            return;
+        }
+
+        var pvm = prompt ?? Locator.Current.GetService<ChatTabPromptViewModel>() ??
+                  throw new InvalidOperationException();
+        pvm.HostScreen = this;
+        pvm.ParentTabId = Id;
 
         Router.NavigateAndReset
-              .Execute(promptViewModel)
+              .Execute(pvm)
               .Subscribe()
               .DisposeWith(_disposables);
 
-        promptViewModel.DisposeWith(_disposables);
+        pvm.DisposeWith(_disposables);
     }
-
-    public void Dispose() => _disposables.Dispose();
 }

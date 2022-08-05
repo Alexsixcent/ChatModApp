@@ -5,6 +5,10 @@ namespace ChatModApp.Shared.Models;
 public interface IChatTabItem : INotifyPropertyChanged
 {
     Guid Id { get; }
+    
     string Title { get; set; }
+    
     ITwitchChannel? Channel { get; set; }
+
+    void Navigate();
 }

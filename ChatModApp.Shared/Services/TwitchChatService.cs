@@ -77,7 +77,27 @@ public class TwitchChatService : IDisposable
                                    .Or(globalBadges)
                                    .AsObservableList()
                                    .DisposeWith(_disposables);
+
+        var onConnect = Observable.FromEventPattern<OnConnectedArgs>(h => _client.OnConnected += h, h => _client.OnConnected -= h);
+
+        var list = ChannelsJoined.AsObservableList().DisposeWith(_disposables);
+
+        onConnect.Select(pattern => pattern.EventArgs).Subscribe(_ =>
+        {
+            var tabChannels = list.Items.Select(channel => channel.Login).ToArray();
+            var clientChannels = _client.JoinedChannels.Select(channel => channel.Channel).ToArray();
+
+            //Leaves unopened channels
+            foreach (var channel in clientChannels.Except(tabChannels)) 
+                _client.LeaveChannel(channel);
+            
+            //Rejoins channels that may have been missed while disconnected
+            foreach (var channel in tabChannels.Except(clientChannels)) 
+                _client.JoinChannel(channel);
+        }).DisposeWith(_disposables);
+        
         ChannelsJoined
+            .Where(_ => _client.IsConnected)
             .OnItemAdded(channel => _client.JoinChannel(channel.Login))
             .OnItemRemoved(channel => _client.LeaveChannel(channel.Login))
             .Subscribe()

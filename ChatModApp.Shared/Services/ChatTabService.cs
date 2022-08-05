@@ -1,4 +1,5 @@
 ﻿using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Tools;
 using DynamicData;
 
 namespace ChatModApp.Shared.Services;
@@ -8,24 +9,32 @@ public class ChatTabService
     public IObservableCache<IChatTabItem, Guid> TabCache { get; }
     public IObservable<IChangeSet<IChatTabItem>> Tabs { get; }
 
+    private readonly SourceList<IChatTabItem> _tabs;
 
-    private readonly SourceCache<IChatTabItem, Guid> _tabs;
 
-    public ChatTabService()
+    public ChatTabService(AppState state)
     {
-        _tabs = new(item => item.Id);
-        TabCache = _tabs.AsObservableCache();
-        Tabs = _tabs.Connect()
-                    .RemoveKey();
+        if (state.OpenedTabs is SourceList<IChatTabItem> list)
+            _tabs = list;
+        else
+        {
+            _tabs = new();
+            state.OpenedTabs = _tabs;
+        }
+        
+        Tabs = _tabs.Connect();
+        TabCache = Tabs.AddKey(item => item.Id).AsObservableCache();
     }
 
-    public void AddTab(IChatTabItem tabItem)
-    {
-        _tabs.AddOrUpdate(tabItem);
-    }
+    public void AddTab(IChatTabItem tabItem) => _tabs.Add(tabItem);
 
     public void RemoveTab(Guid id)
     {
-        _tabs.RemoveKey(id);
+        _tabs.Edit(list =>
+        {
+            var tab = TabCache.Lookup(id);
+            if (tab.HasValue)
+                list.Remove(tab.Value);
+        });
     }
 }
