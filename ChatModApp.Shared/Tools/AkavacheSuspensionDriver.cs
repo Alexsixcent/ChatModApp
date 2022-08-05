@@ -10,9 +10,24 @@ public class AkavacheSuspensionDriver<TAppState> : ISuspensionDriver where TAppS
 
     public AkavacheSuspensionDriver() => BlobCache.ApplicationName = "ChatModApp";
 
-    public IObservable<object> LoadState() => BlobCache.Secure.GetObject<TAppState>(AppStateKey)!;
+    public IObservable<object> LoadState() =>
+#if DEBUG
+        BlobCache.LocalMachine.GetObject<TAppState>(AppStateKey)!;
+#else
+        BlobCache.Secure.GetObject<TAppState>(AppStateKey)!;
+#endif
 
     public IObservable<Unit> SaveState(object state) =>
-        BlobCache.Secure.InsertObject(AppStateKey, (TAppState) state);
-    public IObservable<Unit> InvalidateState() => BlobCache.Secure.InvalidateObject<TAppState>(AppStateKey);
+#if DEBUG
+        BlobCache.LocalMachine.InsertObject(AppStateKey, (TAppState)state);
+#else
+        BlobCache.Secure.InsertObject(AppStateKey, (TAppState)state);
+#endif
+
+    public IObservable<Unit> InvalidateState() =>
+#if DEBUG
+        BlobCache.LocalMachine.InvalidateObject<TAppState>(AppStateKey);
+#else
+        BlobCache.Secure.InvalidateObject<TAppState>(AppStateKey);
+#endif
 }
