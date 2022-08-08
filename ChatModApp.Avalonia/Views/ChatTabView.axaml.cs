@@ -1,5 +1,8 @@
+using System;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using ChatModApp.Shared.ViewModels;
 using FluentAvalonia.UI.Controls;
@@ -27,5 +30,41 @@ public partial class ChatTabView : ReactiveUserControl<ChatTabViewModel>
                 .DisposeWith(disposable);
         });
         InitializeComponent();
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+
+        // Changed for SplashScreens:
+        // -- If using a SplashScreen, the window will be available when this is attached
+        //    and we can just call OnParentWindowOpened
+        // -- If not using a SplashScreen (like before), the window won't be initialized
+        //    yet and setting our custom titlebar won't work... so wait for the 
+        //    WindowOpened event first
+        if (e.Root is not Window b)
+            return;
+        if (!b.IsActive)
+            b.Opened += OnParentWindowOpened;
+        else
+            OnParentWindowOpened(b, null);
+    }
+
+    private void OnParentWindowOpened(object? sender, EventArgs? e)
+    {
+        if (e is not null && sender is Window win)
+            win.Opened -= OnParentWindowOpened;
+
+        if (sender is not CoreWindow cw)
+            return;
+        
+        var titleBar = cw.TitleBar;
+        if (titleBar is null) return;
+            
+        titleBar.LayoutMetricsChanged += (bar, _) =>
+            OverlayInsetHost.Margin = new(0, 0, bar.SystemOverlayRightInset, 0);
+                
+        cw.SetTitleBar(OverlayInsetHost);
+        OverlayInsetHost.Margin = new(0, 0, titleBar.SystemOverlayRightInset, 0);
     }
 }

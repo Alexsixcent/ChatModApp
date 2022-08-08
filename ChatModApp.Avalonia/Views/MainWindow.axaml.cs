@@ -109,6 +109,8 @@ namespace ChatModApp.Views
                 > 500 => 500,
                 _ => 400
             };
+            
+            TitleBar.ExtendViewIntoTitleBar = true;
         }
 
         private void OnRequestedThemeChanged(FluentAvaloniaTheme sender, RequestedThemeChangedEventArgs args)

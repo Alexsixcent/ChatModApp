@@ -8,14 +8,43 @@
 			 mc:Ignorable="d"
 			 x:Class="ChatModApp.Views.ChatTabView"
 			 x:DataType="viewModels:ChatTabViewModel">
-	<controls:TabView x:Name="TabViewControl" x:DataType="viewModels:ChatTabViewModel"
+
+	<controls:TabView x:Name="TabViewControl"
+					  x:DataType="viewModels:ChatTabViewModel"
 					  TabItems="{CompiledBinding ChatTabs}"
 					  TabWidthMode="SizeToContent"
-					  HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+					  HorizontalAlignment="Stretch"
+					  VerticalAlignment="Stretch">
+		<controls:TabView.TabStripHeader>
+			<Grid x:Name="TitleBarHost"
+				  ColumnDefinitions="Auto, Auto, *"
+				  Background="Transparent">
+				<Image Margin="10, 4,0, 4"
+					   IsHitTestVisible="False"
+					   Source="/Assets/avalonia-logo.ico"
+					   Width="18"
+					   Height="18"
+					   DockPanel.Dock="Left"
+					   x:Name="WindowIcon" />
+				<!--<TextBlock Text="{Binding Title, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}}"
+						   FontSize="12"
+						   IsHitTestVisible="False"
+						   VerticalAlignment="Center"
+						   Grid.Column="1" />-->
+			</Grid>
+		</controls:TabView.TabStripHeader>
+		
+		<controls:TabView.TabStripFooter>
+			<Grid x:Name="OverlayInsetHost"
+				  Background="Transparent"
+				  HorizontalAlignment="Stretch"
+				  MinWidth="20"/>
+		</controls:TabView.TabStripFooter>
+		
 		<controls:TabView.TabItemTemplate>
 			<DataTemplate x:DataType="viewModels:ChatTabItemViewModel">
 				<controls:TabViewItem Header="{CompiledBinding Title, Mode=OneWay}">
-					<reactiveUi:RoutedViewHost Router="{CompiledBinding Router, Mode=OneTime}"/> 
+					<reactiveUi:RoutedViewHost Router="{CompiledBinding Router, Mode=OneTime}" />
 				</controls:TabViewItem>
 			</DataTemplate>
 		</controls:TabView.TabItemTemplate>
