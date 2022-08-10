@@ -11,10 +11,6 @@
 		Title="ChatModApp">
 
 	<Panel>
-		<reactiveUi:RoutedViewHost x:Name="RoutedViewHost">
-			<reactiveUi:RoutedViewHost.DefaultContent>
-				<TextBlock Text="Loading..." />
-			</reactiveUi:RoutedViewHost.DefaultContent>
-		</reactiveUi:RoutedViewHost>
+		<reactiveUi:RoutedViewHost x:Name="RoutedViewHost"/>
 	</Panel>
 </Window>

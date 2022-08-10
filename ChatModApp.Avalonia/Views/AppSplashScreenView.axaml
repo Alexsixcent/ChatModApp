@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 mc:Ignorable="d"
+			 d:DesignWidth="800"
+			 d:DesignHeight="450"
+			 x:Class="ChatModApp.Views.AppSplashScreenView">
+
+	<StackPanel Orientation="Vertical"
+				HorizontalAlignment="Center"
+				VerticalAlignment="Center">
+		<Image VerticalAlignment="Bottom"
+			   HorizontalAlignment="Center"
+			   Stretch="Uniform"
+			   MaxWidth="200"
+			   MinWidth="50"
+			   Margin="0,0,0,50"
+			   Source="../Assets/avalonia-logo.ico" />
+		<ProgressBar ShowProgressText="True"
+					 IsIndeterminate="True" />
+		<TextBlock FontSize="25"
+				   FontWeight="DemiBold"
+				   HorizontalAlignment="Center"
+				   VerticalAlignment="Top"
+				   Margin="0,15,0,0"
+				   Text="Loading..." />
+	</StackPanel>
+</UserControl>

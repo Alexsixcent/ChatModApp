@@ -6,16 +6,18 @@ using Avalonia.Controls.Mixins;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using ChatModApp.Shared.ViewModels;
+using FluentAvalonia.Core.ApplicationModel;
 using FluentAvalonia.Styling;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Media;
 using ReactiveUI;
+using Splat;
 
 namespace ChatModApp.Views;
 
 public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
 {
-    public static readonly StyledProperty<MainViewModel?> ViewModelProperty = 
+    public static readonly StyledProperty<MainViewModel?> ViewModelProperty =
         AvaloniaProperty.Register<MainWindow, MainViewModel?>(nameof(ViewModel));
 
     public MainViewModel? ViewModel
@@ -29,21 +31,22 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
         get => ViewModel;
         set => ViewModel = (MainViewModel?)value;
     }
-
-    public MainWindow()
+    
+    public MainWindow(IApplicationSplashScreen splashScreen, MainViewModel mainViewModel)
     {
         this.WhenActivated(disposable =>
         {
             this.OneWayBind(ViewModel, vm => vm.Router, v => v.RoutedViewHost.Router)
                 .DisposeWith(disposable);
         });
-            
+
         this.GetObservable(DataContextProperty).Subscribe(OnDataContextChanged);
         this.GetObservable(ViewModelProperty).Subscribe(OnViewModelChanged);
-            
+
         InitializeComponent();
-            
-        //TODO: Set new splashscreen here
+
+        DataContext = mainViewModel;
+        SplashScreen = splashScreen;
 
 #if DEBUG
         this.AttachDevTools();
@@ -52,7 +55,11 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
         MinWidth = 100;
         MinHeight = 200;
     }
-        
+
+    public MainWindow() : this(Locator.Current.GetService<IApplicationSplashScreen>()!,
+                               Locator.Current.GetService<MainViewModel>()!)
+    { }
+
     private void OnDataContextChanged(object? value)
     {
         if (value is MainViewModel viewModel)
@@ -65,7 +72,7 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
     {
         if (value is null)
             ClearValue(DataContextProperty);
-        else if (DataContext != value) 
+        else if (DataContext != value)
             DataContext = value;
     }
 
@@ -73,26 +80,28 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
     {
         base.OnOpened(e);
 
-        var theme = AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>() ?? throw new PlatformNotSupportedException();
+        var theme = AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>() ??
+                    throw new PlatformNotSupportedException();
         theme.RequestedThemeChanged += OnRequestedThemeChanged;
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && IsWindows11 && theme.RequestedTheme != FluentAvaloniaTheme.HighContrastModeString)
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && IsWindows11 &&
+            theme.RequestedTheme != FluentAvaloniaTheme.HighContrastModeString)
         {
             TransparencyBackgroundFallback = Brushes.Transparent;
             TransparencyLevelHint = WindowTransparencyLevel.Mica;
-                
+
             TryEnableMicaEffect(theme);
         }
-            
+
         theme.ForceWin32WindowToTheme(this);
 
         var screen = Screens.ScreenFromVisual(this);
         // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         // There is a missing Nullable attribute in the Avalonia API
         if (screen is null)
-            return; 
+            return;
         // ReSharper restore ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            
+
         Width = screen.WorkingArea.Width switch
         {
             > 1280 => 1280,
@@ -109,15 +118,15 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
             > 500 => 500,
             _ => 400
         };
-            
+
         TitleBar.ExtendViewIntoTitleBar = true;
     }
 
     private void OnRequestedThemeChanged(FluentAvaloniaTheme sender, RequestedThemeChangedEventArgs args)
     {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) 
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             return;
-            
+
         if (IsWindows11 && args.NewTheme != FluentAvaloniaTheme.HighContrastModeString)
         {
             TryEnableMicaEffect(sender);
@@ -128,10 +137,9 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
             SetValue(BackgroundProperty, AvaloniaProperty.UnsetValue);
         }
     }
-        
+
     private void TryEnableMicaEffect(FluentAvaloniaTheme thm)
     {
-
         // The background colors for the Mica brush are still based around SolidBackgroundFillColorBase resource
         // BUT since we can't control the actual Mica brush color, we have to use the window background to create
         // the same effect. However, we can't use SolidBackgroundFillColorBase directly since its opaque, and if
@@ -141,7 +149,9 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
         // CompositionBrush to properly change the color but I don't know if we can do that or not
         if (thm.RequestedTheme == FluentAvaloniaTheme.DarkModeString)
         {
-            var color = this.TryFindResource("SolidBackgroundFillColorBase", out var value) ? (Color2)(Color)value : new Color2(32, 32, 32);
+            var color = this.TryFindResource("SolidBackgroundFillColorBase", out var value)
+                            ? (Color2)(Color)value
+                            : new Color2(32, 32, 32);
 
             color = color.LightenPercent(-0.8f);
 
@@ -150,7 +160,9 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
         else if (thm.RequestedTheme == FluentAvaloniaTheme.LightModeString)
         {
             // Similar effect here
-            var color = this.TryFindResource("SolidBackgroundFillColorBase", out var value) ? (Color2)(Color)value : new Color2(243, 243, 243);
+            var color = this.TryFindResource("SolidBackgroundFillColorBase", out var value)
+                            ? (Color2)(Color)value
+                            : new Color2(243, 243, 243);
 
             color = color.LightenPercent(0.5f);
 

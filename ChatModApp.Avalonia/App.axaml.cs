@@ -7,8 +7,10 @@ using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
 using ChatModApp.Shared.Tools;
-using ChatModApp.Shared.ViewModels;
+using ChatModApp.Tools;
 using ChatModApp.Views;
+using DryIoc;
+using FluentAvalonia.Core.ApplicationModel;
 using ReactiveUI;
 using Splat;
 
@@ -18,8 +20,12 @@ public class App : Application
 {
     public override void Initialize()
     {
+        var container = new Container();
         Bootstrapper.Init(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                                       Name!));
+                                       Name!), container);
+        
+        container.Register<IApplicationSplashScreen, AppSplashScreen>(Reuse.Singleton);
+        container.Register<MainWindow>(Reuse.Singleton, made:FactoryMethod.ConstructorWithResolvableArguments);
 
         Name = "ChatModApp";
         var suspend = new AutoSuspendHelper(ApplicationLifetime!);
@@ -41,10 +47,7 @@ public class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow
-            {
-                DataContext = Locator.Current.GetService<MainViewModel>(),
-            };
+            desktop.MainWindow = Locator.Current.GetService<MainWindow>();
         }
 
         base.OnFrameworkInitializationCompleted();
