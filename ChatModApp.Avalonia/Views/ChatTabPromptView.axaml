@@ -4,45 +4,60 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:viewModels="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
 			 xmlns:controls="clr-namespace:ChatModApp.Controls"
+			 xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
 			 mc:Ignorable="d"
 			 x:Class="ChatModApp.Views.ChatTabPromptView"
 			 x:DataType="viewModels:ChatTabPromptViewModel">
 	<StackPanel Orientation="Vertical"
-				HorizontalAlignment="Stretch"
+				HorizontalAlignment="Center"
 				VerticalAlignment="Center"
 				Margin="20">
 		<TextBlock Text="Enter the channel name" />
-		<AutoCompleteBox x:Name="ChannelCompleteBox"
-						 FilterMode="None"
-						 MaxDropDownHeight="600"
-						 Items="{CompiledBinding ChannelSuggestions, Mode=OneWay}"
-						 Watermark="Channel"
-						 IsDropDownOpen="True">
-			<AutoCompleteBox.ItemTemplate>
-				<DataTemplate x:DataType="viewModels:ChannelSuggestionViewModel">
-					<Grid ColumnDefinitions="Auto,*,*"
-						  MaxHeight="50">
-						<controls:PersonIcon Source="{CompiledBinding ThumbnailUrl}"
-											  HorizontalAlignment="Stretch"
-											  VerticalAlignment="Stretch" />
-						<TextBlock Grid.Column="1"
-								   HorizontalAlignment="Center"
-								   VerticalAlignment="Center"
-								   FontWeight="Bold"
-								   FontSize="20"
-								   Text="{CompiledBinding DisplayName}" />
-						<TextBlock Grid.Column="2"
-								   Text="Live"
-								   VerticalAlignment="Center"
-								   HorizontalAlignment="Right"
-								   Foreground="Red"
-								   FontSize="20"
-								   FontWeight="SemiBold"
-								   Margin="10,0"
-								   IsVisible="{CompiledBinding IsLive}" />
-					</Grid>
-				</DataTemplate>
-			</AutoCompleteBox.ItemTemplate>
-		</AutoCompleteBox>
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+			<controls:AutoSuggestBox x:Name="ChannelCompleteBox"
+									 Items="{CompiledBinding ChannelSuggestions, Mode=OneWay}"
+									 Watermark="Enter Twitch channel username"
+									 FilterMode="None"
+									 HorizontalAlignment="Stretch"
+									 MaxDropDownHeight="600"
+									 MinimumPrefixLength="0"
+									 MinimumPopulateDelay="0"
+									 CornerRadius="4,0, 0, 4"
+									 BorderThickness="1, 1, 0, 1">
+				<controls:AutoSuggestBox.ItemTemplate>
+					<DataTemplate x:DataType="viewModels:ChannelSuggestionViewModel">
+						<Grid ColumnDefinitions="Auto,*,*"
+							  MaxHeight="50">
+							<controls:PersonIcon Source="{CompiledBinding ThumbnailUrl}"
+												 HorizontalAlignment="Stretch"
+												 VerticalAlignment="Stretch" />
+							<TextBlock Grid.Column="1"
+									   HorizontalAlignment="Center"
+									   VerticalAlignment="Center"
+									   FontWeight="Bold"
+									   FontSize="20"
+									   Text="{CompiledBinding DisplayName}" />
+							<TextBlock Grid.Column="2"
+									   Text="Live"
+									   VerticalAlignment="Center"
+									   HorizontalAlignment="Right"
+									   Foreground="Red"
+									   FontSize="20"
+									   FontWeight="SemiBold"
+									   Margin="10,0"
+									   IsVisible="{CompiledBinding IsLive}" />
+						</Grid>
+					</DataTemplate>
+				</controls:AutoSuggestBox.ItemTemplate>
+			</controls:AutoSuggestBox>
+			<Button x:Name="SubmitButton"
+					IsDefault="True"
+					HorizontalAlignment="Left"
+					VerticalAlignment="Stretch"
+					CornerRadius="0, 4, 4, 0"
+					BorderThickness="0,1,1,1">
+				<ui:SymbolIcon Symbol="Find" />
+			</Button>
+		</StackPanel>
 	</StackPanel>
 </UserControl>
