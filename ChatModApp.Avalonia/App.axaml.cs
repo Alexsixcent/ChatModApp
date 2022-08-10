@@ -12,42 +12,41 @@ using ChatModApp.Views;
 using ReactiveUI;
 using Splat;
 
-namespace ChatModApp
+namespace ChatModApp;
+
+public class App : Application
 {
-    public class App : Application
+    public override void Initialize()
     {
-        public override void Initialize()
+        Bootstrapper.Init(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                                       Name!));
+
+        Name = "ChatModApp";
+        var suspend = new AutoSuspendHelper(ApplicationLifetime!);
+        RxApp.SuspensionHost.CreateNewAppState = () => new AppState();
+        RxApp.SuspensionHost.SetupDefaultSuspendResume(new AkavacheSuspensionDriver<AppState>());
+        RxApp.SuspensionHost.WhenAnyValue(host => host.AppState)
+             .WhereNotNull()
+             .Cast<AppState>()
+             .Subscribe(state => Locator.CurrentMutable.RegisterConstant(state));
+        suspend.OnFrameworkInitializationCompleted();
+
+        //Important since UseDryIocDependencyResolver in ConfigureService resets the scheduler to default
+        RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
+
+        AvaloniaXamlLoader.Load(this);
+    }
+
+    public override void OnFrameworkInitializationCompleted()
+    {
+        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            Bootstrapper.Init(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                                           Name!));
-
-            Name = "ChatModApp";
-            var suspend = new AutoSuspendHelper(ApplicationLifetime!);
-            RxApp.SuspensionHost.CreateNewAppState = () => new AppState();
-            RxApp.SuspensionHost.SetupDefaultSuspendResume(new AkavacheSuspensionDriver<AppState>());
-            RxApp.SuspensionHost.WhenAnyValue(host => host.AppState)
-                 .WhereNotNull()
-                 .Cast<AppState>()
-                 .Subscribe(state => Locator.CurrentMutable.RegisterConstant(state));
-            suspend.OnFrameworkInitializationCompleted();
-
-            //Important since UseDryIocDependencyResolver in ConfigureService resets the scheduler to default
-            RxApp.MainThreadScheduler = AvaloniaScheduler.Instance;
-
-            AvaloniaXamlLoader.Load(this);
-        }
-
-        public override void OnFrameworkInitializationCompleted()
-        {
-            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            desktop.MainWindow = new MainWindow
             {
-                desktop.MainWindow = new MainWindow
-                {
-                    DataContext = Locator.Current.GetService<MainViewModel>(),
-                };
-            }
-
-            base.OnFrameworkInitializationCompleted();
+                DataContext = Locator.Current.GetService<MainViewModel>(),
+            };
         }
+
+        base.OnFrameworkInitializationCompleted();
     }
 }
