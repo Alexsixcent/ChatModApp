@@ -5,8 +5,16 @@
 			 xmlns:webViewControl="clr-namespace:WebViewControl;assembly=WebViewControl.Avalonia"
 			 mc:Ignorable="d"
 			 x:Class="ChatModApp.Views.AuthenticationView">
-	<Grid RowDefinitions="Auto,*">
-		<TextBlock Text="Please authenticate on Twitch to continue"/>
-		<webViewControl:WebView Grid.Row="1" x:Name="AuthWebView"/>
+	
+	<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+		<Border ZIndex="2" Padding="10" Margin="10" 
+				VerticalAlignment="Top" HorizontalAlignment="Left"
+				Background="{DynamicResource ControlFillColorDefault}"
+				CornerRadius="5">
+			<TextBlock Text="Please authenticate to continue"
+					   FontWeight="Bold"/>
+		</Border>
+		
+		<webViewControl:WebView Grid.Row="0" x:Name="AuthWebView"/>
 	</Grid>
 </UserControl>

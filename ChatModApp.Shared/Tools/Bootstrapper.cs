@@ -22,7 +22,7 @@ namespace ChatModApp.Shared.Tools;
 
 public static class Bootstrapper
 {
-    public static void Init(string logFolder)
+    public static void Init(string logFolder, IContainer? container = null)
     {
         Log.Logger = new LoggerConfiguration()
                      .MinimumLevel.Debug()
@@ -50,18 +50,17 @@ public static class Bootstrapper
                    .UseEnvironment(Environments.Development)
                    .Build();
 
-        ConfigureServices(host.Services);
+        ConfigureServices(host.Services, container ?? new Container());
         RxApp.DefaultExceptionHandler =
             Observer.Create<Exception>(ex => Log.Fatal(ex, "Unhandled exception occurred in observable"));
     }
 
-    private static void ConfigureServices(IServiceProvider services)
+    private static void ConfigureServices(IServiceProvider services, IContainer container)
     {
-        var container = new Container();
         container.UseDryIocDependencyResolver();
 
         var resolver = Locator.CurrentMutable;
-
+        
         resolver.UseSerilogFullLogger();
         resolver.InitializeSplat();
         resolver.InitializeReactiveUI();

@@ -8,4 +8,9 @@
 		<StyleInclude Source="/Controls/CachedImage.axaml"/>
 		<StyleInclude Source="/Controls/ChatMessage.axaml"/>
     </Application.Styles>
+	
+	<Application.Resources>
+		<StaticResource x:Key="CoreSplashScreenBackground" ResourceKey="TextControlBackground" />
+		<StaticResource x:Key="CoreSplashScreenForeground" ResourceKey="TextControlForeground" />
+	</Application.Resources>
 </Application>

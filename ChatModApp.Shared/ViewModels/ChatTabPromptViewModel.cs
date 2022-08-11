@@ -4,6 +4,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Services;
+using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
@@ -40,7 +41,8 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
 
         this.WhenAnyValue(vm => vm.Channel)
             .Where(s => !string.IsNullOrWhiteSpace(s))
-            .Throttle(TimeSpan.FromMilliseconds(250), RxApp.TaskpoolScheduler)
+            .SampleFirst(TimeSpan.FromSeconds(2), RxApp.TaskpoolScheduler)
+            .Log(this, "Selected channel changed")
             .ObserveOn(RxApp.TaskpoolScheduler)
             .SelectMany(SearchChannels)
             .ToObservableChangeSet(20)
