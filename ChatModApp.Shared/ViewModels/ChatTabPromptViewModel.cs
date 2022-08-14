@@ -52,7 +52,7 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
             .Subscribe()
             .DisposeWith(_disposables);
 
-        SelectionCommand = ReactiveCommand.Create<ChannelSuggestionViewModel>(OpenChannel);
+        SelectionCommand = ReactiveCommand.CreateFromTask<ChannelSuggestionViewModel>(OpenChannel);
 
         SelectionCommand.DisposeWith(_disposables);
         _chatViewModel.DisposeWith(_disposables);
@@ -70,18 +70,18 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
                                                                         new(ch.ThumbnailUrl), ch.IsLive));
     }
 
-    private void OpenChannel(ChannelSuggestionViewModel suggestion)
+    private async Task OpenChannel(ChannelSuggestionViewModel suggestion)
     {
         var channel = new TwitchChannel(suggestion.DisplayName, suggestion.Login);
         var tab = _tabService.TabCache.Lookup(ParentTabId).Value;
 
-        tab.Channel = new TwitchChannel(channel.DisplayName, channel.Login);
+        tab.Channel = channel;
         tab.Title = channel.DisplayName;
+        tab.ChannelIcon = suggestion.ThumbnailUrl;
+        
         _chatViewModel.Channel = channel;
         _chatViewModel.HostScreen = HostScreen;
 
-        HostScreen?.Router.Navigate.Execute(_chatViewModel)
-                  .Subscribe()
-                  .DisposeWith(_disposables);
+        await (HostScreen?.Router.Navigate.Execute(_chatViewModel) ?? throw new InvalidOperationException());
     }
 }

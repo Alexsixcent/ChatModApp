@@ -7,10 +7,9 @@ namespace ChatModApp.Shared.ViewModels;
 
 public class ChatTabItemViewModel : ReactiveObject, IChatTabItem, IScreen, IDisposable
 {
-    [Reactive]
-    public string Title { get; set; }
-    [Reactive]
-    public ITwitchChannel? Channel { get; set; }
+    [Reactive] public string Title { get; set; }
+    [Reactive] public ITwitchChannel? Channel { get; set; }
+    [Reactive] public Uri? ChannelIcon { get; set; }
 
     public Guid Id { get; }
     public RoutingState Router { get; }
