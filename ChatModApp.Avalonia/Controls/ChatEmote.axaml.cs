@@ -53,12 +53,12 @@ public class ChatEmote : TemplatedControl
 
         if (arg1._toolTipImage is not null)
         {
-            arg1._toolTipImage.Source = emote.Uri;
+            arg1._toolTipImage.Source = emote.Large;
         }
 
         if (arg1._emoteImage is not null)
         {
-            arg1._emoteImage.Source = emote.Uri;
+            arg1._emoteImage.Source = emote.Small;
         }
 
         if (arg1._emoteCode is not null)

@@ -15,7 +15,9 @@ public class FfzEmote : IEmote
     public IDictionary<int, Uri> Urls { get; set; }
 
 
-    public Uri Uri => Urls.FirstOrDefault().Value.RewriteHttps();
+    public Uri Small => Urls.FirstOrDefault().Value.RewriteHttps();
+    public Uri Medium => Urls.TryGetValue(2, out var value) ? value.RewriteHttps() : Small;
+    public Uri Large => Urls.TryGetValue(4, out var value) ? value.RewriteHttps() : Medium;
 }
 
 public class FfzEmoteSet

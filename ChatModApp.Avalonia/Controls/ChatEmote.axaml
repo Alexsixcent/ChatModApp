@@ -14,7 +14,7 @@
 					<ToolTip.Tip>
 						<Grid RowDefinitions="Auto,Auto">
 							<controls:CachedImage Name="PART_ToolTipImage"
-												  Stretch="Uniform"
+												  Stretch="None"
 												  HorizontalAlignment="Center"
 												  Margin="5"
 												  MaxWidth="200"/>
