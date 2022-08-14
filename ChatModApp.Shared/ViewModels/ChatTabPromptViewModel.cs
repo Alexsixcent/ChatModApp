@@ -41,7 +41,7 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
 
         this.WhenAnyValue(vm => vm.Channel)
             .Where(s => !string.IsNullOrWhiteSpace(s))
-            .SampleFirst(TimeSpan.FromSeconds(2), RxApp.TaskpoolScheduler)
+            .QuickThrottle(TimeSpan.FromSeconds(0.5), RxApp.TaskpoolScheduler)
             .Log(this, "Selected channel changed")
             .ObserveOnThreadPool()
             .SelectMany(SearchChannels)

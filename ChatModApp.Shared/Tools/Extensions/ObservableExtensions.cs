@@ -19,6 +19,38 @@ public static class ObservableExtensions
                                   ps.Window(() => ps.Delay(sampleDuration, scheduler))
                                     .SelectMany(x => x.Take(1)));
     }
+    
+    //From https://stackoverflow.com/a/29743225
+    public static IObservable<T> QuickThrottle<T>(this IObservable<T> src, TimeSpan interval, IScheduler? scheduler)
+    {
+        scheduler ??= Scheduler.Default;
+        
+        return src
+               .Scan(new ValueAndDueTime<T>(), (prev, id) => AccumulateForQuickThrottle(prev, id, interval, scheduler))
+               .Where(vd => !vd.Ignore)
+               .SelectMany(sc => Observable.Timer(sc.DueTime, scheduler).Select(_ => sc.Value));
+    }
+
+    private static ValueAndDueTime<T> AccumulateForQuickThrottle<T>(ValueAndDueTime<T> prev, T value, TimeSpan interval, IScheduler s)
+    {
+        var now = s.Now;
+
+        // Ignore this completely if there is already a future item scheduled
+        //  but do keep the dueTime for accumulation!
+        if (prev.DueTime > now) return new() { DueTime = prev.DueTime, Ignore = true };
+
+        // Schedule this item at at least interval from the previous
+        var min = prev.DueTime + interval;
+        var nextTime = now < min ? min : now;
+        return new() { DueTime = nextTime, Value = value };
+    }
+
+    private class ValueAndDueTime<T>
+    {
+        public DateTimeOffset DueTime;
+        public T Value = default!;
+        public bool Ignore;
+    }
 
     public static IObservable<T> ObserveOnMainThread<T>(this IObservable<T> source)
         => source.ObserveOn(RxApp.MainThreadScheduler);
