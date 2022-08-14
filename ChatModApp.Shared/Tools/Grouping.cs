@@ -1,7 +1,7 @@
 ﻿using ChatModApp.Shared.Tools.Extensions;
+using CommunityToolkit.Mvvm.Collections;
 using DynamicData;
 using DynamicData.Binding;
-using Microsoft.Toolkit.Collections;
 
 namespace ChatModApp.Shared.Tools;
 
@@ -42,7 +42,9 @@ public class ListViewGrouping<TObject, TKey, TElement> : ObservableCollectionExt
 
     public TKey Key { get; }
 
-    object IReadOnlyObservableGroup.Key => Key;
+    public new object? this[int index] => base[index];
+
+    object IReadOnlyObservableGroup.Key => Key ?? throw new InvalidOperationException();
 
     public void Dispose() => _subscription.Dispose();
 }
