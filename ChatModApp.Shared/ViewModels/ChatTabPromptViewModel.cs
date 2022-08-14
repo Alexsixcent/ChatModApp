@@ -43,11 +43,11 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
             .Where(s => !string.IsNullOrWhiteSpace(s))
             .SampleFirst(TimeSpan.FromSeconds(2), RxApp.TaskpoolScheduler)
             .Log(this, "Selected channel changed")
-            .ObserveOn(RxApp.TaskpoolScheduler)
+            .ObserveOnThreadPool()
             .SelectMany(SearchChannels)
             .ToObservableChangeSet(20)
             .Sort(SortExpressionComparer<ChannelSuggestionViewModel>.Descending(model => model.IsLive))
-            .ObserveOn(RxApp.MainThreadScheduler)
+            .ObserveOnMainThread()
             .Bind(out _channelSuggestions)
             .Subscribe()
             .DisposeWith(_disposables);

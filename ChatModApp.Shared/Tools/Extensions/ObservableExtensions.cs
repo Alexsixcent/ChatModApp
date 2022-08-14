@@ -6,7 +6,6 @@ using Serilog;
 
 namespace ChatModApp.Shared.Tools.Extensions;
 
-
 public static class ObservableExtensions
 {
     //From https://stackoverflow.com/a/27160392
@@ -16,12 +15,17 @@ public static class ObservableExtensions
         IScheduler? scheduler = null)
     {
         scheduler = scheduler ?? Scheduler.Default;
-        return source.Publish(ps => 
-                                  ps.Window(() => ps.Delay(sampleDuration,scheduler))
+        return source.Publish(ps =>
+                                  ps.Window(() => ps.Delay(sampleDuration, scheduler))
                                     .SelectMany(x => x.Take(1)));
     }
-    
-    
+
+    public static IObservable<T> ObserveOnMainThread<T>(this IObservable<T> source)
+        => source.ObserveOn(RxApp.MainThreadScheduler);
+
+    public static IObservable<T> ObserveOnThreadPool<T>(this IObservable<T> source)
+        => source.ObserveOn(RxApp.TaskpoolScheduler);
+
     /// <summary>
     /// From https://stackoverflow.com/a/19000595
     /// An exponential back off strategy which starts with 1 second and then 4, 9, 16...
@@ -33,7 +37,8 @@ public static class ObservableExtensions
         this IObservable<T> source, int retryCount, TimeSpan duration, IScheduler? scheduler = null)
         where TException : Exception
     {
-        return source.RetryWithBackoffStrategy(retryCount, _ => duration, exception => exception is TException, scheduler);
+        return source.RetryWithBackoffStrategy(retryCount, _ => duration, exception => exception is TException,
+                                               scheduler);
     }
 
     /// <summary>
@@ -51,7 +56,7 @@ public static class ObservableExtensions
     /// </returns>
     [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
     public static IObservable<T> RetryWithBackoffStrategy<T>(
-        this IObservable<T> source, 
+        this IObservable<T> source,
         int retryCount = 3,
         Func<int, TimeSpan>? strategy = null,
         Func<Exception, bool>? retryOnError = null,
@@ -63,18 +68,24 @@ public static class ObservableExtensions
 
         var attempt = 0;
 
-        return Observable.Defer(() => 
-                                    (++attempt == 1 ? source : source.DelaySubscription(strategy(attempt - 1), scheduler))
-                                      .Select(item => new Tuple<bool, T, Exception>(true, item, null!))
-                                      .Catch<Tuple<bool, T, Exception>, Exception>(e =>
+        return Observable.Defer(() =>
+                                    (++attempt == 1
+                                         ? source
+                                         : source.DelaySubscription(strategy(attempt - 1), scheduler))
+                                    .Select(item => new Tuple<bool, T, Exception>(true, item, null!))
+                                    .Catch<Tuple<bool, T, Exception>, Exception>(e =>
                                     {
                                         if (retryOnError(e))
                                         {
-                                            Log.Warning(e, "Retry n°{Attempt}/{RetryCount}: Observable raised exception, retrying...", attempt - 1, retryCount);
+                                            Log.Warning(e,
+                                                        "Retry n°{Attempt}/{RetryCount}: Observable raised exception, retrying...",
+                                                        attempt - 1, retryCount);
                                             return Observable.Throw<Tuple<bool, T, Exception>>(e);
                                         }
 
-                                        Log.Error(e, "Retry n°{Attempt}/{RetryCount}: Observable raised unhandled exception", attempt - 1, retryCount);
+                                        Log.Error(e,
+                                                  "Retry n°{Attempt}/{RetryCount}: Observable raised unhandled exception",
+                                                  attempt - 1, retryCount);
                                         return Observable.Return(new Tuple<bool, T, Exception>(false, default!, e));
                                     }))
                          .Retry(retryCount)

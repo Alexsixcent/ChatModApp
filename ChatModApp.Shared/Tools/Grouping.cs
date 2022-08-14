@@ -1,8 +1,7 @@
-﻿using System.Reactive.Linq;
+﻿using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
 using DynamicData.Binding;
 using Microsoft.Toolkit.Collections;
-using ReactiveUI;
 
 namespace ChatModApp.Shared.Tools;
 
@@ -36,7 +35,7 @@ public class ListViewGrouping<TObject, TKey, TElement> : ObservableCollectionExt
         _subscription = group.List
                              .Connect()
                              .Transform(elementSelector)
-                             .ObserveOn(RxApp.MainThreadScheduler)
+                             .ObserveOnMainThread()
                              .Bind(this)
                              .Subscribe();
     }

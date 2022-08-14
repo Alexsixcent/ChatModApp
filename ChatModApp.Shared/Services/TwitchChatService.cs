@@ -4,9 +4,9 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Models.Chat;
+using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
 using Microsoft.Extensions.Logging;
-using ReactiveUI;
 using TwitchLib.Api.Core.Models.Undocumented.Chatters;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client;
@@ -59,12 +59,12 @@ public class TwitchChatService : IDisposable
 
         ChatMessageReceived = Observable
                               .FromEventPattern<OnMessageReceivedArgs>(_client, nameof(_client.OnMessageReceived))
-                              .ObserveOn(RxApp.TaskpoolScheduler)
+                              .ObserveOnThreadPool()
                               .Select(pattern => pattern.EventArgs.ChatMessage);
 
         ChatMessageSent = Observable
                           .FromEventPattern<OnMessageSentArgs>(_client, nameof(_client.OnMessageSent))
-                          .ObserveOn(RxApp.TaskpoolScheduler)
+                          .ObserveOnThreadPool()
                           .Select(pattern => pattern.EventArgs.SentMessage);
 
         ChannelsJoined = tabService.Tabs
