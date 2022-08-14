@@ -1,5 +1,4 @@
 using System;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -8,7 +7,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Extensions.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Threading;
+using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Tools;
 
 namespace ChatModApp.Controls;
@@ -48,12 +47,12 @@ public class CachedImage : TemplatedControl, IBitmapSource
     static CachedImage()
     {
         SourceProperty.Changed
-                      .ObserveOn(Scheduler.Default)
+                      .ObserveOnThreadPool()
                       .Where(args => args.IsEffectiveValueChange && !args.IsSameValue())
                       .SelectMany(async (args, _, token) =>
                                       ((IBitmapSource)args.Sender,
                                        await CachedBitmapStore.Get(args.NewValue.Value, token)))
-                      .ObserveOn(AvaloniaScheduler.Instance)
+                      .ObserveOnMainThread()
                       .Subscribe(tuple => tuple.Item1.SetImageSource(tuple.Item2));
     }
 

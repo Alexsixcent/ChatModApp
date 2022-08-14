@@ -1,7 +1,7 @@
 ﻿using System.Reactive;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using ChatModApp.Shared.Services;
+using ChatModApp.Shared.Tools.Extensions;
 using DryIoc;
 using DynamicData;
 using DynamicData.Binding;
@@ -37,7 +37,7 @@ public class ChatTabViewModel : ReactiveObject, IRoutableViewModel, IDisposable
 
         _tabService.Tabs
                    .Cast(item => (ChatTabItemViewModel)item)
-                   .ObserveOn(RxApp.MainThreadScheduler)
+                   .ObserveOnMainThread()
                    .Bind(ChatTabs)
                    .Subscribe()
                    .DisposeWith(_disposable);

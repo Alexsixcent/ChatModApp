@@ -55,7 +55,7 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
                     .Select(messageProcessingService.ProcessReceivedMessage)
                     .Merge(messageSent)
                     .ToObservableChangeSet(model => model.Id)
-                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .ObserveOnMainThread()
                     .Bind(out _chatMessages)
                     .Subscribe()
                     .DisposeWith(_disposables);
@@ -63,12 +63,12 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
         var searchChanged = this.WhenValueChanged(vm => vm.UserSearchText)
                                 .DistinctUntilChanged(StringComparer.InvariantCultureIgnoreCase)
                                 .Select(_ => (Func<ChatterFormatted, bool>)ChatterFilter)
-                                .ObserveOn(RxApp.TaskpoolScheduler);
+                                .ObserveOnThreadPool();
         _chatters.Connect()
-                 .ObserveOn(RxApp.TaskpoolScheduler)
+                 .ObserveOnThreadPool()
                  .Filter(searchChanged)
                  .GroupByElement(c => c.UserType, c => c.Username)
-                 .ObserveOn(RxApp.MainThreadScheduler)
+                 .ObserveOnMainThread()
                  .Bind(out _usersList)
                  .Subscribe()
                  .DisposeWith(_disposables);

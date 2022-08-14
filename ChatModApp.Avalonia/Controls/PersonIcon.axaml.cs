@@ -1,5 +1,4 @@
 using System;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -10,7 +9,7 @@ using Avalonia.Layout;
 using Avalonia.Logging;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Threading;
+using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Tools;
 
 namespace ChatModApp.Controls;
@@ -61,12 +60,12 @@ public class PersonIcon : TemplatedControl, IBitmapSource
                                      .Where(args => args.IsEffectiveValueChange && !args.IsSameValue())
                                      .Select(args => ((IBitmapSource)args.Sender, args.NewValue.Value));
         SourceProperty.Changed
-                      .ObserveOn(Scheduler.Default)
+                      .ObserveOnThreadPool()
                       .Where(args => args.IsEffectiveValueChange && !args.IsSameValue())
                       .SelectMany(async args =>
                                       ((IBitmapSource)args.Sender, await CachedBitmapStore.Get(args.NewValue.Value)))
                       .Merge(img)
-                      .ObserveOn(AvaloniaScheduler.Instance)
+                      .ObserveOnMainThread()
                       .Subscribe(tuple => tuple.Item1.SetImageSource(tuple.Item2));
     }
 

@@ -37,7 +37,7 @@ public partial class ChatTabPromptView : ReactiveUserControl<ChatTabPromptViewMo
                                                                                       .InvariantCultureIgnoreCase)))
                       .WhereNotNull()
                       .SampleFirst(TimeSpan.FromSeconds(1))
-                      .ObserveOn(RxApp.MainThreadScheduler)
+                      .ObserveOnMainThread()
                       .InvokeCommand(ViewModel, vm => vm.SelectionCommand)
                       .DisposeWith(disposable);
         });

@@ -4,7 +4,7 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:viewModels="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
 			 xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-			 xmlns:tk="clr-namespace:Microsoft.Toolkit.Collections;assembly=Microsoft.Toolkit"
+			 xmlns:tk="clr-namespace:CommunityToolkit.Mvvm.Collections;assembly=CommunityToolkit.Mvvm"
 			 xmlns:system="clr-namespace:System;assembly=System.Runtime"
 			 xmlns:controls="clr-namespace:ChatModApp.Controls"
 			 xmlns:tools="clr-namespace:ChatModApp.Tools"
