@@ -9,6 +9,7 @@ using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
 using ChatModApp.Shared.Models.Chat;
+using ChatModApp.Shared.Models.Chat.Emotes;
 using ChatModApp.Shared.Models.Chat.Fragments;
 using FluentAvalonia.UI.Controls;
 
@@ -107,7 +108,7 @@ public class ChatMessage : TemplatedControl
     private void BuildBadges(IEnumerable<IChatBadge> badges)
     {
         _badgesPanel?.Children.Clear();
-        _badgesPanel?.Children.AddRange(badges.Select(badge => GetImageFromUri(badge.Small)));
+        _badgesPanel?.Children.AddRange(badges.Select(GetControlFromBadge));
     }
 
     private void RebuildFragments(IEnumerable<IMessageFragment> fragments)
@@ -116,25 +117,25 @@ public class ChatMessage : TemplatedControl
         {
             _panel?.Children.RemoveRange(2, _panel.Children.Count - 2);
         }
-        
+
         _panel?.Children.AddRange(fragments.Select(GetMsgFragControl));
     }
 
-    private static Control GetImageFromUri(Uri uri)
-    {
-        return new CachedImage
+    private static Control GetControlFromBadge(IChatBadge badge) =>
+        new CachedImage
         {
-            Source = uri,
+            Source = badge.Small,
             Stretch = Stretch.None,
             Margin = new(1, 0)
         };
-    }
+
+    private static Control GetControlFromEmote(IEmote emote) => new ChatEmote { Emote = emote };
 
     private static Control GetMsgFragControl(IMessageFragment frag)
     {
         return frag switch
         {
-            EmoteFragment emoteFragment => GetImageFromUri(emoteFragment.Emote.Uri),
+            EmoteFragment emoteFragment => GetControlFromEmote(emoteFragment.Emote),
             TextFragment textFragment => new TextBlock
             {
                 Text = textFragment.Text,
