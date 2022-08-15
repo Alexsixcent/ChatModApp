@@ -22,7 +22,9 @@ public class BttvUserEmote : IBttvEmote
 
     [AliasAs("userId")]
     public string UserId { get; set; }
-    
+
+    public string Provider => "BetterTTV User";
+
     public Uri Small => new($"https://cdn.betterttv.net/emote/{Id}/1x");
     public Uri Medium => new($"https://cdn.betterttv.net/emote/{Id}/2x");
     public Uri Large => new($"https://cdn.betterttv.net/emote/{Id}/3x");
@@ -41,7 +43,9 @@ public class BttvSharedEmote : IBttvEmote
 
     [AliasAs("user")]
     public BttvUser User { get; set; }
-    
+
+    public string Provider => "BetterTTV Shared";
+
     public Uri Small => new($"https://cdn.betterttv.net/emote/{Id}/1x");
     public Uri Medium => new($"https://cdn.betterttv.net/emote/{Id}/2x");
     public Uri Large => new($"https://cdn.betterttv.net/emote/{Id}/3x");

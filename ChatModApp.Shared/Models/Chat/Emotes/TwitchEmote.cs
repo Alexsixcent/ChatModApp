@@ -33,6 +33,7 @@ public class TwitchEmote : IEmote
 
     public string Id { get; }
     public string Code { get; }
+    public string Provider => "Twitch";
     public Uri Small { get; }
     public Uri Medium { get; }
     public Uri Large { get; }

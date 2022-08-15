@@ -46,24 +46,24 @@ public class ChatEmote : TemplatedControl
     }
 
     //TODO : Replace with template bindings when https://github.com/AvaloniaUI/Avalonia/issues/3823 is fixed
-    private static void OnEmoteChanged(ChatEmote arg1, AvaloniaPropertyChangedEventArgs arg2)
+    private static void OnEmoteChanged(ChatEmote control, AvaloniaPropertyChangedEventArgs change)
     {
-        if (arg2.NewValue is not IEmote emote)
+        if (change.NewValue is not IEmote emote)
             return;
 
-        if (arg1._toolTipImage is not null)
+        if (control._toolTipImage is not null)
         {
-            arg1._toolTipImage.Source = emote.Large;
+            control._toolTipImage.Source = emote.Large;
         }
 
-        if (arg1._emoteImage is not null)
+        if (control._emoteImage is not null)
         {
-            arg1._emoteImage.Source = emote.Small;
+            control._emoteImage.Source = emote.Small;
         }
 
-        if (arg1._emoteCode is not null)
+        if (control._emoteCode is not null)
         {
-            arg1._emoteCode.Text = $"Code: {emote.Code}";
+            control._emoteCode.Text = $"Code: {emote.Code}\nProvider: {emote.Provider}";
         }
     }
 }

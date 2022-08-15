@@ -21,6 +21,7 @@
 							<TextBlock Grid.Row="1"
 									   Name="PART_EmoteCode"
 									   HorizontalAlignment="Center"
+									   TextAlignment="Center"
 									   Margin="5" />
 						</Grid>
 					</ToolTip.Tip>

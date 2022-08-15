@@ -13,8 +13,8 @@ public class FfzEmote : IEmote
 
     [JsonPropertyName("urls")]
     public IDictionary<int, Uri> Urls { get; set; }
-
-
+    
+    public string Provider => "FrankerFaceZ";
     public Uri Small => Urls.FirstOrDefault().Value.RewriteHttps();
     public Uri Medium => Urls.TryGetValue(2, out var value) ? value.RewriteHttps() : Small;
     public Uri Large => Urls.TryGetValue(4, out var value) ? value.RewriteHttps() : Medium;
