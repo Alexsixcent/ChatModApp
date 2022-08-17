@@ -63,7 +63,7 @@ public class ChatEmote : TemplatedControl
 
         if (control._emoteCode is not null)
         {
-            control._emoteCode.Text = $"Code: {emote.Code}\nProvider: {emote.Provider}";
+            control._emoteCode.Text = $"Code: {emote.Code}\nProvider: {emote.Provider}\n{emote.Description}";
         }
     }
 }

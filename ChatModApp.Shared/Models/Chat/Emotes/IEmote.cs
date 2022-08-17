@@ -4,4 +4,5 @@ public interface IEmote : IImageFrag
 {
     string Code { get; }
     string Provider { get; }
+    string? Description { get; }
 }
