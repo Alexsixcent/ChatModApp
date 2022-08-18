@@ -121,13 +121,7 @@ public class ChatMessage : TemplatedControl
         _panel?.Children.AddRange(fragments.Select(GetMsgFragControl));
     }
 
-    private static Control GetControlFromBadge(IChatBadge badge) =>
-        new CachedImage
-        {
-            Source = badge.Small,
-            Stretch = Stretch.None,
-            Margin = new(1, 0)
-        };
+    private static Control GetControlFromBadge(IChatBadge badge) => new ChatBadge{Badge = badge};
 
     private static Control GetControlFromEmote(IEmote emote) => new ChatEmote { Emote = emote };
 

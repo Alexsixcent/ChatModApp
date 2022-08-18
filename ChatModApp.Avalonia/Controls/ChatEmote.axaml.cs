@@ -8,13 +8,13 @@ using ChatModApp.Shared.Models.Chat.Emotes;
 namespace ChatModApp.Controls;
 
 [TemplatePart(ToolTipImage, typeof(CachedImage))]
+[TemplatePart(ToolTipText, typeof(TextBlock))]
 [TemplatePart(EmoteImage, typeof(CachedImage))]
-[TemplatePart(EmoteCode, typeof(TextBlock))]
 public class ChatEmote : TemplatedControl
 {
     private const string ToolTipImage = "PART_ToolTipImage",
-                         EmoteImage = "PART_EmoteImage",
-                         EmoteCode = "PART_EmoteCode";
+                         ToolTipText = "PART_ToolTipText",
+                         EmoteImage = "PART_EmoteImage";
     
     public static readonly StyledProperty<IEmote?> EmoteProperty = AvaloniaProperty.Register<ChatEmote, IEmote?>(
      nameof(Emote));
@@ -26,7 +26,7 @@ public class ChatEmote : TemplatedControl
     }
 
     private CachedImage? _toolTipImage, _emoteImage;
-    private TextBlock? _emoteCode;
+    private TextBlock? _toolTipTextBlock;
 
     static ChatEmote()
     {
@@ -37,7 +37,7 @@ public class ChatEmote : TemplatedControl
     {
         _toolTipImage = e.NameScope.Find<CachedImage>(ToolTipImage);
         _emoteImage = e.NameScope.Find<CachedImage>(EmoteImage);
-        _emoteCode = e.NameScope.Find<TextBlock>(EmoteCode);
+        _toolTipTextBlock = e.NameScope.Find<TextBlock>(ToolTipText);
         
         base.OnApplyTemplate(e);
         
@@ -61,9 +61,9 @@ public class ChatEmote : TemplatedControl
             control._emoteImage.Source = emote.Small;
         }
 
-        if (control._emoteCode is not null)
+        if (control._toolTipTextBlock is not null)
         {
-            control._emoteCode.Text = $"Code: {emote.Code}\nProvider: {emote.Provider}\n{emote.Description}";
+            control._toolTipTextBlock.Text = $"Code: {emote.Code}\nProvider: {emote.Provider}\n{emote.Description}";
         }
     }
 }

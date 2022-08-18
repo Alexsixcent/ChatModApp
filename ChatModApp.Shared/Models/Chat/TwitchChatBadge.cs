@@ -32,4 +32,5 @@ public class TwitchChatBadge : IChatBadge
         obj is TwitchChatBadge other && Channel == other.Channel && SetId == other.SetId && Id == other.Id;
 
     public override int GetHashCode() => (Channel, SetId, Id).GetHashCode();
+    public string? Description => SetId;
 }
