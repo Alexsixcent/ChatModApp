@@ -47,20 +47,11 @@ public class MessageProcessingService
     }
 
     private IEnumerable<IChatBadge> GetMessageBadges(string channel,
-                                                     IEnumerable<KeyValuePair<string, string>> badgePairs)
-    {
-        var badges = new List<TwitchChatBadge>();
-
-        foreach (var pair in badgePairs)
-        {
-            badges.AddRange(_chatService.ChatBadges.Items
-                                        .Where(chatBadge => chatBadge.SetId == pair.Key && chatBadge.Id == pair.Value)
-                                        .Where(badge => badge.Channel is null ||
-                                                        badge.Channel.Login == channel));
-        }
-
-        return badges;
-    }
+                                                     IEnumerable<KeyValuePair<string, string>> badgePairs) =>
+        badgePairs.Select(pair => _chatService.ChatBadges.Items
+                                              .Where(chatBadge => chatBadge.SetId == pair.Key && chatBadge.Id == pair.Value)
+                                              .LastOrDefault(badge => badge.Channel is null || badge.Channel.Login == channel))
+                  .Where(b => b is not null);
 
     private IEnumerable<IMessageFragment> GetMessageFragments(ChatMessage chatMessage)
     {
