@@ -1,7 +1,8 @@
 ﻿namespace ChatModApp.Shared.Models.Chat.Emotes;
 
-public interface IEmote
+public interface IEmote : IImageFrag
 {
     string Code { get; }
-    Uri Uri { get; }
+    string Provider { get; }
+    string? Description { get; }
 }

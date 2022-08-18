@@ -1,8 +1,6 @@
 ﻿namespace ChatModApp.Shared.Models.Chat;
 
-public interface IChatBadge
+public interface IChatBadge : IImageFrag
 {
-    Uri Small { get; }
-    Uri Medium { get; }
-    Uri Large { get; }
+    string? Description { get; }
 }

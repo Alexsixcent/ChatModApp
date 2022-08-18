@@ -7,6 +7,8 @@
 		<StyleInclude Source="/Controls/PersonIcon.axaml"/>
 		<StyleInclude Source="/Controls/CachedImage.axaml"/>
 		<StyleInclude Source="/Controls/ChatMessage.axaml"/>
+		<StyleInclude Source="/Controls/ChatEmote.axaml"/>
+		<StyleInclude Source="/Controls/ChatBadge.axaml"/>
     </Application.Styles>
 	
 	<Application.Resources>

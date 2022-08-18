@@ -124,35 +124,31 @@ public class EmotesService : IDisposable
 
     private async Task LoadChannelEmotes(ITwitchChannel channel)
     {
-        var res1 = await _apiService.Helix.Users.GetUsersAsync(logins: new() { channel.Login }).ConfigureAwait(false);
-        var id = int.Parse(res1.Users.Single().Id);
+        var userRes = await _apiService.Helix.Users.GetUsersAsync(logins: new() { channel.Login }).ConfigureAwait(false);
+        var id = int.Parse(userRes.Users.Single().Id);
 
-        var (bttv, ffz) = await (_bttvApi.GetUserEmotes(id), _ffzApi.GetChannelEmotes(id)).ConfigureAwait(false);
+        var (res1, res2) = await (_bttvApi.GetUserEmotes(id), _ffzApi.GetChannelEmotes(id)).ConfigureAwait(false);
 
+        const EmoteKey.EmoteType bttvKey = EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member,
+                                 ffzKey = EmoteKey.EmoteType.FrankerZ | EmoteKey.EmoteType.Member;
+
+        var bttv = res1.Content?.ChannelEmotes
+                       .Select(emote =>
+                       {
+                           emote.Description = $"By: {channel.DisplayName}";
+                           return emote;
+                       })
+                       .Concat(res1.Content?.SharedEmotes ?? Enumerable.Empty<IEmote>())
+                       .Select(emote => new EmoteKeyValue(new(bttvKey, emote, channel.Login), emote));
+        var ffz = res2.Content?.Sets
+                      .SelectMany(pair => pair.Value.Emoticons)
+                      .Select(emote => new EmoteKeyValue(new(ffzKey, emote, channel.Login), emote));
+                      
+        
         _emotes.Edit(updater =>
         {
-            if (bttv.IsSuccessStatusCode)
-            {
-                updater.AddOrUpdate(bttv.Content!.ChannelEmotes.Select(
-                                                                       emote => new EmoteKeyValue(
-                                                                        new(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member,
-                                                                            emote,
-                                                                            channel.Login), emote)));
-                updater.AddOrUpdate(bttv.Content.SharedEmotes.Select(
-                                                                     emote => new EmoteKeyValue(
-                                                                      new(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Member,
-                                                                          emote,
-                                                                          channel.Login), emote)));
-            }
-
-            if (ffz.IsSuccessStatusCode)
-            {
-                updater.AddOrUpdate(ffz.Content!.Sets.SelectMany(pair => pair.Value.Emoticons)
-                                       .Select(emote => new EmoteKeyValue(
-                                                                          new(EmoteKey.EmoteType.FrankerZ |
-                                                                              EmoteKey.EmoteType.Member,
-                                                                              emote, channel.Login), emote)));
-            }
+            updater.AddOrUpdate(bttv ?? Enumerable.Empty<EmoteKeyValue>());
+            updater.AddOrUpdate(ffz ?? Enumerable.Empty<EmoteKeyValue>());
         });
     }
 
@@ -173,32 +169,32 @@ public class EmotesService : IDisposable
     [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
     private async Task<Unit> LoadGlobalEmotes(User user, CancellationToken cancel)
     {
-        var (twitchGlobal, bttv, ffz) =
+        var (res1, res2, res3) =
             await (_apiService.Helix.Chat.GetGlobalEmotesAsync(_authService.TwitchAccessToken),
                    _bttvApi.GetGlobalEmotes(), _ffzApi.GetGlobalEmotes())
                 .ConfigureAwait(false);
 
-        var globalFfzEmotes = ffz.DefaultSets.Select(key => ffz.Sets[key]).SelectMany(set => set.Emoticons);
+        const EmoteKey.EmoteType twitchKey = EmoteKey.EmoteType.Twitch | EmoteKey.EmoteType.Global,
+                                 bttvKey = EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Global,
+                                 ffzKey = EmoteKey.EmoteType.FrankerZ | EmoteKey.EmoteType.Global;
+
+        var twitch = res1.GlobalEmotes
+                         .Select(emote => new TwitchEmote(emote))
+                         .Select(emote => new EmoteKeyValue(new(twitchKey, emote), emote));
+
+        var bttv = res2
+            .Select(emote => new EmoteKeyValue(new(bttvKey, emote), emote));
+
+        var ffz = res3.DefaultSets
+                      .Select(key => res3.Sets[key])
+                      .SelectMany(set => set.Emoticons)
+                      .Select(emote => new EmoteKeyValue(new(ffzKey, emote), emote));
+
 
         _emotes.Edit(updater =>
         {
             updater.Clear();
-            updater.AddOrUpdate(twitchGlobal.GlobalEmotes
-                                            .Select(emote => (TwitchEmote)emote)
-                                            .Select(emote => new EmoteKeyValue(
-                                                                               new(EmoteKey.EmoteType.Twitch | EmoteKey.EmoteType.Global,
-                                                                                   emote),
-                                                                               emote)));
-            updater.AddOrUpdate(bttv
-                                    .Select(emote => new EmoteKeyValue(
-                                                                       new(EmoteKey.EmoteType.Bttv | EmoteKey.EmoteType.Global,
-                                                                           emote),
-                                                                       emote)));
-            updater.AddOrUpdate(globalFfzEmotes
-                                    .Select(emote => new EmoteKeyValue(
-                                                                       new(EmoteKey.EmoteType.FrankerZ | EmoteKey.EmoteType.Global,
-                                                                           emote),
-                                                                       emote)));
+            updater.AddOrUpdate(twitch.Concat(bttv).Concat(ffz));
         });
 
         return Unit.Default;

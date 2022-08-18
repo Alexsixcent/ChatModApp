@@ -77,7 +77,7 @@ public class MessageProcessingService
                                                          chatMessage.Channel, lastEndIndex == 0));
                 }
 
-                fragments.Add(new EmoteFragment((TwitchEmote)emote));
+                fragments.Add(new EmoteFragment(new TwitchEmote(emote)));
                 lastEndIndex = emote.EndIndex + 1;
             }
 

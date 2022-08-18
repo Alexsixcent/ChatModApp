@@ -2,59 +2,99 @@
 
 namespace ChatModApp.Shared.Models.Chat.Emotes;
 
-public interface IBttvEmote : IEmote
+public abstract class BttvEmote : IEmote
 {
-    public string Id { get; set; }
-    public new string Code { get; set; }
-    public string ImageType { get; set; }
+    public abstract string Id { get; set; }
+    public abstract string Code { get; set; }
+    public abstract string ImageType { get; set; }
+
+    public Uri Small => new($"https://cdn.betterttv.net/emote/{Id}/1x");
+    public Uri Medium => new($"https://cdn.betterttv.net/emote/{Id}/2x");
+    public Uri Large => new($"https://cdn.betterttv.net/emote/{Id}/3x");
+    public abstract string? Description { get; set; }
+    public abstract string Provider { get; }
 }
 
-public class BttvUserEmote : IBttvEmote
+public sealed class BttvUserEmote : BttvEmote
 {
-    [AliasAs("id")]
-    public string Id { get; set; }
+    public BttvUserEmote()
+    {
+        Id = Code = ImageType = UserId = "";
+    }
 
-    [AliasAs("code")]
-    public string Code { get; set; }
+    [AliasAs("id")] public override string Id { get; set; }
 
-    [AliasAs("imageType")]
-    public string ImageType { get; set; }
+    [AliasAs("code")] public override string Code { get; set; }
 
-    [AliasAs("userId")]
-    public string UserId { get; set; }
+    [AliasAs("imageType")] public override string ImageType { get; set; }
 
+    [AliasAs("userId")] public string UserId { get; set; }
 
-    public Uri Uri => new($"https://cdn.betterttv.net/emote/{Id}/1x");
+    public override string Provider => "BetterTTV Channel";
+    public override string? Description { get; set; }
 }
 
-public class BttvSharedEmote : IBttvEmote
+public sealed class BttvGlobalEmote : BttvEmote
 {
-    [AliasAs("id")]
-    public string Id { get; set; }
+    public BttvGlobalEmote()
+    {
+        Id = Code = ImageType = UserId = "";
+    }
 
-    [AliasAs("code")]
-    public string Code { get; set; }
+    [AliasAs("id")] public override string Id { get; set; }
 
-    [AliasAs("imageType")]
-    public string ImageType { get; set; }
+    [AliasAs("code")] public override string Code { get; set; }
+
+    [AliasAs("imageType")] public override string ImageType { get; set; }
+
+    [AliasAs("userId")] public string UserId { get; set; }
+
+    public override string Provider => "BetterTTV Global";
+    public override string? Description { get; set; }
+}
+
+public sealed class BttvSharedEmote : BttvEmote
+{
+    private BttvUser _user = null!;
+
+    public BttvSharedEmote()
+    {
+        Id= Code = ImageType = "";
+    }
+
+    [AliasAs("id")] public override string Id { get; set; }
+
+    [AliasAs("code")] public override string Code { get; set; }
+
+    [AliasAs("imageType")] public override string ImageType { get; set; }
 
     [AliasAs("user")]
-    public BttvUser User { get; set; }
+    public BttvUser User
+    {
+        get => _user;
+        set
+        {
+            _user = value;
+            Description = $"By: {value.DisplayName}";
+        }
+    }
 
-    public Uri Uri => new($"https://cdn.betterttv.net/emote/{Id}/1x");
+    public override string Provider => "BetterTTV Shared";
+    public override string? Description { get; set; }
 }
 
 public class BttvUser
 {
-    [AliasAs("id")]
-    public string Id { get; set; }
+    public BttvUser()
+    {
+        Id = Name = DisplayName = ProviderId = "";
+    }
 
-    [AliasAs("name")]
-    public string Name { get; set; }
+    [AliasAs("id")] public string Id { get; set; }
 
-    [AliasAs("displayName")]
-    public string DisplayName { get; set; }
+    [AliasAs("name")] public string Name { get; set; }
 
-    [AliasAs("providerId")]
-    public string ProviderId { get; set; }
+    [AliasAs("displayName")] public string DisplayName { get; set; }
+
+    [AliasAs("providerId")] public string ProviderId { get; set; }
 }
