@@ -6,7 +6,7 @@ namespace ChatModApp.Shared.Services.ApiClients;
 public interface IFfzApi
 {
     [Get("/set/global")]
-    public Task<FfzGlobalEmoteResponse> GetGlobalEmotes();
+    public Task<ApiResponse<FfzGlobalEmoteResponse>> GetGlobalEmotes();
 
     [Get("/room/id/{id}")]
     public Task<ApiResponse<FfzUserEmoteResponse>> GetChannelEmotes([AliasAs("id")] int userId);

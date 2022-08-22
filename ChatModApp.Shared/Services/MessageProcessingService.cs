@@ -108,15 +108,11 @@ public class MessageProcessingService
                 continue;
             }
 
-            var res2 = _emotesService.UserEmotes.Lookup(channel);
+            var res2 = _emotesService.UserEmotePairs.Lookup(new(channel, frag));
             if (res2.HasValue)
             {
-                var res3 = res2.Value.Cache.Lookup(frag);
-                if (res3.HasValue)
-                {
-                    fragments.Add(new EmoteFragment(res3.Value));
-                    continue;
-                }
+                fragments.Add(new EmoteFragment(res2.Value));
+                continue;
             }
 
             if (HasValidHost(frag) &&

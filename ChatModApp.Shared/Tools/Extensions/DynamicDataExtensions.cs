@@ -1,4 +1,5 @@
 using DynamicData;
+using DynamicData.Alias;
 
 namespace ChatModApp.Shared.Tools.Extensions;
 
@@ -33,4 +34,8 @@ public static class DynamicDataExtensions
                      .Transform(group => (IGrouping<TKey, TElement>)new ListViewGrouping<TObject, TKey, TElement>(group, elementSelector), true)
                      .DisposeMany();
     }
+
+    public static IObservable<IChangeSet<TConvert>> WhereIsType<TObject, TConvert>(this IObservable<IChangeSet<TObject>> source) 
+        where TConvert : class
+        => source.Select(o => o as TConvert).Where(convert => convert is not null)!;
 }
