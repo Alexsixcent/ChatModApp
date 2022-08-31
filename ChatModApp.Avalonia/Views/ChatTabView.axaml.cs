@@ -1,10 +1,13 @@
 using System;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
+using Avalonia.VisualTree;
 using ChatModApp.Shared.ViewModels;
+using FluentAvalonia.Core.ApplicationModel;
 using FluentAvalonia.UI.Controls;
 using ReactiveUI;
 
@@ -61,10 +64,21 @@ public partial class ChatTabView : ReactiveUserControl<ChatTabViewModel>
         var titleBar = cw.TitleBar;
         if (titleBar is null) return;
             
-        titleBar.LayoutMetricsChanged += (bar, _) =>
-            OverlayInsetHost.Margin = new(0, 0, bar.SystemOverlayRightInset, 0);
-                
+        titleBar.LayoutMetricsChanged += OnTitleBarLayoutMetricsChanged;
+
         cw.SetTitleBar(OverlayInsetHost);
-        OverlayInsetHost.Margin = new(0, 0, titleBar.SystemOverlayRightInset, 0);
+        OnTitleBarLayoutMetricsChanged(titleBar);
+        
+        //Finds the existing default title bar in the visual tree
+        var def = cw.GetVisualDescendants()
+                    .OfType<Panel>()
+                    .FirstOrDefault(panel => panel.Name is "DefaultTitleBar");
+        
+        OverlayInsetHost.MinHeight = def?.Height ?? titleBar.Height;
+    }
+
+    private void OnTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar bar, EventArgs? _ = null)
+    {
+        OverlayInsetHost.Margin = new(0, 0, bar.SystemOverlayRightInset, 0);
     }
 }
