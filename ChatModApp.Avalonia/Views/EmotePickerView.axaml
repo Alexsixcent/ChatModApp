@@ -8,6 +8,7 @@
 			 xmlns:tkCol="clr-namespace:CommunityToolkit.Mvvm.Collections;assembly=CommunityToolkit.Mvvm"
 			 xmlns:emo="clr-namespace:ChatModApp.Shared.Models.Chat.Emotes;assembly=ChatModApp.Shared"
 			 xmlns:vm="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
+			 xmlns:tools="clr-namespace:ChatModApp.Tools"
 			 mc:Ignorable="d"
 			 d:DesignWidth="800"
 			 d:DesignHeight="450"
@@ -17,7 +18,13 @@
 	<UserControl.Resources>
 		<DataTemplate x:Key="EmoteTemplate"
 					  DataType="{x:Type emo:IEmote}">
-			<ctrls:ChatEmote Emote="{CompiledBinding }" />
+			<Button Background="Transparent" 
+					BorderThickness="0"
+					Padding="3"
+					VerticalAlignment="Stretch"
+					HorizontalAlignment="Stretch">
+				<ctrls:ChatEmote Emote="{CompiledBinding }" />
+			</Button>
 		</DataTemplate>
 
 		<DataTemplate x:Key="EmoteGroupTemplate"
@@ -38,17 +45,15 @@
 									   Text="{CompiledBinding Count, StringFormat={}{0} item(s), Mode=OneWay}" />
 						</StackPanel>
 					</Expander.Header>
-					<ItemsRepeater Items="{Binding}"
-								   ItemTemplate="{StaticResource EmoteTemplate}">
-						<ItemsRepeater.Layout>
-							<UniformGridLayout Orientation="Horizontal"
-											   ItemsJustification="Center"
-											   MinColumnSpacing="2"
-											   MinRowSpacing="2"
-											   ItemsStretch="None"
-											   MaximumRowsOrColumns="7" />
-						</ItemsRepeater.Layout>
-					</ItemsRepeater>
+					<ItemsControl Items="{Binding}"
+								  ItemTemplate="{StaticResource EmoteTemplate}">
+						<ItemsControl.ItemsPanel>
+							<ItemsPanelTemplate>
+								<tools:AlignableWrapPanel Orientation="Horizontal" 
+														  HorizontalContentAlignment="Center"/>
+							</ItemsPanelTemplate>
+						</ItemsControl.ItemsPanel>
+					</ItemsControl>
 				</Expander>
 			</StackPanel>
 		</DataTemplate>
@@ -66,6 +71,7 @@
 	<TabControl TabStripPlacement="Bottom"
 				HorizontalAlignment="Right"
 				MaxHeight="400"
+				MaxWidth="300"
 				ContentTemplate="{StaticResource ListGroupTemplate}">
 		<TabItem ToolTip.Tip="Favorites">
 			<TabItem.Header>
