@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:fa="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+			 xmlns:ctrls="clr-namespace:ChatModApp.Controls"
+			 xmlns:col="clr-namespace:System.Collections;assembly=System.Runtime"
+			 xmlns:tkCol="clr-namespace:CommunityToolkit.Mvvm.Collections;assembly=CommunityToolkit.Mvvm"
+			 xmlns:emo="clr-namespace:ChatModApp.Shared.Models.Chat.Emotes;assembly=ChatModApp.Shared"
+			 xmlns:vm="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
+			 mc:Ignorable="d"
+			 d:DesignWidth="800"
+			 d:DesignHeight="450"
+			 x:Class="ChatModApp.Views.EmotePicker"
+			 x:DataType="vm:EmotePickerViewModel">
+
+	<UserControl.Resources>
+		<DataTemplate x:Key="EmoteTemplate"
+					  DataType="{x:Type emo:IEmote}">
+			<ctrls:ChatEmote Emote="{CompiledBinding }" />
+		</DataTemplate>
+
+		<DataTemplate x:Key="EmoteGroupTemplate"
+					  DataType="{x:Type tkCol:IReadOnlyObservableGroup}">
+			<StackPanel Orientation="Vertical">
+				<Expander ExpandDirection="Down"
+						  IsExpanded="True">
+					<Expander.Header>
+						<StackPanel Orientation="Horizontal">
+							<TextBlock FontStyle="Italic"
+									   FontWeight="Bold"
+									   TextWrapping="NoWrap"
+									   TextTrimming="None"
+									   Text="{CompiledBinding Key}" />
+							<TextBlock Margin="8,0,0,0"
+									   VerticalAlignment="Bottom"
+									   Opacity="0.8"
+									   Text="{CompiledBinding Count, StringFormat={}{0} item(s), Mode=OneWay}" />
+						</StackPanel>
+					</Expander.Header>
+					<ItemsRepeater Items="{Binding}"
+								   ItemTemplate="{StaticResource EmoteTemplate}">
+						<ItemsRepeater.Layout>
+							<UniformGridLayout Orientation="Horizontal"
+											   ItemsJustification="Center"
+											   MinColumnSpacing="2"
+											   MinRowSpacing="2"
+											   ItemsStretch="None"
+											   MaximumRowsOrColumns="7" />
+						</ItemsRepeater.Layout>
+					</ItemsRepeater>
+				</Expander>
+			</StackPanel>
+		</DataTemplate>
+
+		<DataTemplate x:Key="ListGroupTemplate"
+					  DataType="{x:Type col:IEnumerable}">
+			<ScrollViewer>
+				<ItemsControl Items="{CompiledBinding}"
+							  ItemTemplate="{StaticResource EmoteGroupTemplate}"/>
+			</ScrollViewer>
+		</DataTemplate>
+
+	</UserControl.Resources>
+
+	<TabControl TabStripPlacement="Bottom"
+				HorizontalAlignment="Right"
+				MaxHeight="400"
+				ContentTemplate="{StaticResource ListGroupTemplate}">
+		<TabItem ToolTip.Tip="Favorites">
+			<TabItem.Header>
+				<fa:SymbolIcon Symbol="Favorite" />
+			</TabItem.Header>
+		</TabItem>
+		<TabItem ToolTip.Tip="Channel Emotes"
+				 Content="{CompiledBinding ChannelEmotes}">
+			<TabItem.Header>
+				<fa:SymbolIcon Symbol="VideoFilled" />
+			</TabItem.Header>
+		</TabItem>
+		<TabItem ToolTip.Tip="My Emotes">
+			<TabItem.Header>
+				<fa:SymbolIcon Symbol="ClearSelection" />
+			</TabItem.Header>
+		</TabItem>
+		<TabItem ToolTip.Tip="Emojis">
+			<TabItem.Header>
+				<fa:SymbolIcon Symbol="Emoji2" />
+			</TabItem.Header>
+		</TabItem>
+	</TabControl>
+
+</UserControl>
