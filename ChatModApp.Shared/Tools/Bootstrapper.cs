@@ -5,9 +5,9 @@ using ChatModApp.Shared.Services.ApiClients;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Shared.ViewModels;
 using DryIoc;
+using DryIoc.Microsoft.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using Refit;
 using Serilog;
@@ -21,7 +21,7 @@ namespace ChatModApp.Shared.Tools;
 
 public static class Bootstrapper
 {
-    public static void Init(string logFolder, IContainer? container = null)
+    public static void Init(string logFolder, Action<IContainer>? additionalReg = null)
     {
         Log.Logger = new LoggerConfiguration()
                      .MinimumLevel.Debug()
@@ -32,51 +32,44 @@ public static class Bootstrapper
                      .WriteTo.Debug()
                      .WriteTo.File(new CompactJsonFormatter(), Path.Combine(logFolder, "globalLogs.log"))
                      .CreateLogger();
-        
-        var host = Host
-                   .CreateDefaultBuilder()
-                   .ConfigureServices(services =>
-                   {
-                       services
-                           .AddRefitClient<IBttvApi>()
-                           .ConfigureHttpClient(c => c.BaseAddress = new("https://api.betterttv.net/3/cached"));
 
-                       services
-                           .AddRefitClient<IFfzApi>()
-                           .ConfigureHttpClient(c => c.BaseAddress = new("https://api.frankerfacez.com/v1"));
-                   })
-                   .UseSerilog()
-                   .UseEnvironment(Environments.Development)
-                   .Build();
+        Host.CreateDefaultBuilder()
+            .UseServiceProviderFactory(new DryIocServiceProviderFactory(new Container()))
+            .ConfigureContainer<IContainer>(container =>
+            {
+                additionalReg?.Invoke(container);
+                ConfigureServices(container);
+            })
+            .ConfigureServices(services =>
+            {
+                services
+                    .AddRefitClient<IBttvApi>()
+                    .ConfigureHttpClient(c => c.BaseAddress = new("https://api.betterttv.net/3/cached"));
 
-        ConfigureServices(host.Services, container ?? new Container());
+                services
+                    .AddRefitClient<IFfzApi>()
+                    .ConfigureHttpClient(c => c.BaseAddress = new("https://api.frankerfacez.com/v1"));
+            })
+            .UseSerilog()
+            .UseEnvironment(Environments.Development)
+            .Build();
+
         RxApp.DefaultExceptionHandler =
             Observer.Create<Exception>(ex => Log.Fatal(ex, "Unhandled exception occurred in observable"));
     }
 
-    private static void ConfigureServices(IServiceProvider services, IContainer container)
+    private static void ConfigureServices(IContainer container)
     {
         container.UseDryIocDependencyResolver();
 
         var resolver = Locator.CurrentMutable;
-        
+
         resolver.UseSerilogFullLogger();
         resolver.InitializeSplat();
         resolver.InitializeReactiveUI();
         
-        //#TODO: Streamline client registration process, RestEase migration ?
-        container.RegisterInstance(services.GetRequiredService<IBttvApi>());
-        container.RegisterInstance(services.GetRequiredService<IFfzApi>());
-        container.RegisterInstance(services.GetRequiredService<ILoggerFactory>());
-
-        var loggerFactoryMethod = typeof(LoggerFactoryExtensions).GetMethods(BindingFlags.Static | BindingFlags.Public)
-                                                                 .First(
-                                                                        info => info.Name == nameof(LoggerFactoryExtensions.CreateLogger) &&
-                                                                            info.IsGenericMethod);
-
-        container.Register(typeof(ILogger<>), made: Made.Of(req => loggerFactoryMethod.MakeGenericMethod(req.ServiceType.GenericTypeArguments.First())));
-
-        container.RegisterViewsForViewModels(Assembly.GetEntryAssembly() ?? throw new PlatformNotSupportedException("Couldn't find entry application assembly where views are defined"), "ChatModApp.Views");
+        container.RegisterViewsForViewModels(Assembly.GetEntryAssembly() ?? throw new PlatformNotSupportedException("Couldn't find entry application assembly where views are defined"),
+                                             "ChatModApp.Views");
 
 
         container.Register<AuthenticationViewModel>(Reuse.Singleton);

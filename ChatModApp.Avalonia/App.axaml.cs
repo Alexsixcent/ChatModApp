@@ -20,12 +20,13 @@ public class App : Application
 {
     public override void Initialize()
     {
-        var container = new Container();
-        Bootstrapper.Init(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                                       Name!), container);
-        
-        container.Register<IApplicationSplashScreen, AppSplashScreen>(Reuse.Singleton);
-        container.Register<MainWindow>(Reuse.Singleton, made:FactoryMethod.ConstructorWithResolvableArguments);
+        var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), Name!);
+        Bootstrapper.Init(appDataPath, container =>
+        {
+            container.Register<IApplicationSplashScreen, AppSplashScreen>(Reuse.Singleton);
+            container.Register<MainWindow>(Reuse.Singleton, made: FactoryMethod.ConstructorWithResolvableArguments);
+        });
+
 
         Name = "ChatModApp";
         var suspend = new AutoSuspendHelper(ApplicationLifetime!);
