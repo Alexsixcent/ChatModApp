@@ -87,6 +87,6 @@ public static class Bootstrapper
         container.Register<ChatViewModel>(setup: Setup.With(allowDisposableTransient: true));
         container.Register<ChatTabItemViewModel>(setup: Setup.With(allowDisposableTransient: true));
         container.Register<ChatTabPromptViewModel>(setup: Setup.With(allowDisposableTransient: true));
-        container.Register<EmotePickerViewModel>();
+        container.Register<EmotePickerViewModel>(setup: Setup.With(allowDisposableTransient:true));
     }
 }

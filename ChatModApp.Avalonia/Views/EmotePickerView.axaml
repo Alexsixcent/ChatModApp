@@ -15,10 +15,38 @@
 			 x:Class="ChatModApp.Views.EmotePicker"
 			 x:DataType="vm:EmotePickerViewModel">
 
-	<UserControl.Resources>
-		<DataTemplate x:Key="EmoteTemplate"
-					  DataType="{x:Type emo:IEmote}">
-			<Button Background="Transparent" 
+	<UserControl.Styles>
+		<Style Selector="ItemsControl ItemsControl:empty">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<StackPanel Orientation="Vertical">
+						<TextBlock>No items to display</TextBlock>
+					</StackPanel>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<Style Selector="ItemsControl:empty">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<StackPanel Orientation="Vertical">
+						<ctrls:CachedImage Stretch="None"
+										   Source="https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_4c39207000564711868f3196cc0a8748/default/dark/3.0" />
+						<TextBlock TextWrapping="Wrap"
+								   TextAlignment="Center"
+								   HorizontalAlignment="Center">
+							You don't have any favorite emotes ! Find an emote and add it with Ctrl-Click
+						</TextBlock>
+					</StackPanel>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+	</UserControl.Styles>
+
+
+	<UserControl.DataTemplates>
+		<DataTemplate DataType="{x:Type emo:IEmote}">
+			<Button Background="Transparent"
 					BorderThickness="0"
 					Padding="3"
 					VerticalAlignment="Stretch"
@@ -27,8 +55,7 @@
 			</Button>
 		</DataTemplate>
 
-		<DataTemplate x:Key="EmoteGroupTemplate"
-					  DataType="{x:Type tkCol:IReadOnlyObservableGroup}">
+		<DataTemplate DataType="{x:Type tkCol:IReadOnlyObservableGroup}">
 			<StackPanel Orientation="Vertical">
 				<Expander ExpandDirection="Down"
 						  IsExpanded="True">
@@ -45,12 +72,11 @@
 									   Text="{CompiledBinding Count, StringFormat={}{0} item(s), Mode=OneWay}" />
 						</StackPanel>
 					</Expander.Header>
-					<ItemsControl Items="{Binding}"
-								  ItemTemplate="{StaticResource EmoteTemplate}">
+					<ItemsControl Items="{Binding}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
-								<tools:AlignableWrapPanel Orientation="Horizontal" 
-														  HorizontalContentAlignment="Center"/>
+								<tools:AlignableWrapPanel Orientation="Horizontal"
+														  HorizontalContentAlignment="Center" />
 							</ItemsPanelTemplate>
 						</ItemsControl.ItemsPanel>
 					</ItemsControl>
@@ -58,42 +84,32 @@
 			</StackPanel>
 		</DataTemplate>
 
-		<DataTemplate x:Key="ListGroupTemplate"
-					  DataType="{x:Type col:IEnumerable}">
+		<DataTemplate DataType="{x:Type col:IEnumerable}">
 			<ScrollViewer>
-				<ItemsControl Items="{CompiledBinding}"
-							  ItemTemplate="{StaticResource EmoteGroupTemplate}"/>
+				<ItemsControl Items="{CompiledBinding}" />
 			</ScrollViewer>
 		</DataTemplate>
-
-	</UserControl.Resources>
+		
+		<DataTemplate DataType="{x:Type fa:Symbol}">
+			<fa:SymbolIcon Symbol="{CompiledBinding}" />
+		</DataTemplate>
+	</UserControl.DataTemplates>
 
 	<TabControl TabStripPlacement="Bottom"
 				HorizontalAlignment="Right"
 				MaxHeight="400"
-				MaxWidth="300"
-				ContentTemplate="{StaticResource ListGroupTemplate}">
-		<TabItem ToolTip.Tip="Favorites">
-			<TabItem.Header>
-				<fa:SymbolIcon Symbol="Favorite" />
-			</TabItem.Header>
-		</TabItem>
+				MaxWidth="300">
+		<TabItem ToolTip.Tip="Favorites"
+				 Header="{x:Static fa:Symbol.Favorite}"
+				 Content="{CompiledBinding FavoriteEmotes}" />
 		<TabItem ToolTip.Tip="Channel Emotes"
-				 Content="{CompiledBinding ChannelEmotes}">
-			<TabItem.Header>
-				<fa:SymbolIcon Symbol="VideoFilled" />
-			</TabItem.Header>
-		</TabItem>
-		<TabItem ToolTip.Tip="My Emotes">
-			<TabItem.Header>
-				<fa:SymbolIcon Symbol="ClearSelection" />
-			</TabItem.Header>
-		</TabItem>
-		<TabItem ToolTip.Tip="Emojis">
-			<TabItem.Header>
-				<fa:SymbolIcon Symbol="Emoji2" />
-			</TabItem.Header>
-		</TabItem>
+				 Header="{x:Static fa:Symbol.VideoFilled}"
+				 Content="{CompiledBinding ChannelEmotes}" />
+		<TabItem ToolTip.Tip="My Emotes"
+				 Header="{x:Static fa:Symbol.ClearSelection}"
+				 Content="{CompiledBinding GlobalEmotes}" />
+		<TabItem ToolTip.Tip="Emojis"
+				 Header="{x:Static fa:Symbol.Emoji2}" />
 	</TabControl>
 
 </UserControl>
