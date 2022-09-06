@@ -1,20 +1,52 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:webViewControl="clr-namespace:WebViewControl;assembly=WebViewControl.Avalonia"
-			 mc:Ignorable="d"
-			 x:Class="ChatModApp.Views.AuthenticationView">
-	
-	<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-		<Border ZIndex="2" Padding="10" Margin="10" 
-				VerticalAlignment="Top" HorizontalAlignment="Left"
-				Background="{DynamicResource ControlFillColorDefault}"
-				CornerRadius="5">
-			<TextBlock Text="Please authenticate to continue"
-					   FontWeight="Bold"/>
-		</Border>
-		
-		<webViewControl:WebView Grid.Row="0" x:Name="AuthWebView"/>
-	</Grid>
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:webView="clr-namespace:WebViewControl;assembly=WebViewControl.Avalonia"
+             xmlns:vms="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
+             xmlns:tools="clr-namespace:ChatModApp.Tools"
+             mc:Ignorable="d"
+             x:Class="ChatModApp.Views.AuthenticationView"
+             x:DataType="vms:AuthenticationViewModel">
+
+    <UserControl.Resources>
+        <Styles x:Key="WebViewSelector">
+            <Style Selector="TemplatedControl#AuthContent"
+                   tools:StyleSelect.Key="{StaticResource False}">
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                CornerRadius="5">
+                            <TextBlock>Please authenticate on your browser</TextBlock>
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+            </Style>
+            <Style Selector="TemplatedControl#AuthContent"
+                   tools:StyleSelect.Key="{StaticResource True}">
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <webView:WebView Address="{CompiledBinding AuthUri.AbsolutePath, Mode=OneWay}"
+                                         BeforeNavigate="WebView_OnBeforeNavigate" />
+                    </ControlTemplate>
+                </Setter>
+            </Style>
+            
+        </Styles>
+    </UserControl.Resources>
+
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Border ZIndex="2" Padding="10" Margin="10"
+                VerticalAlignment="Top" HorizontalAlignment="Left"
+                Background="{DynamicResource ControlFillColorDefault}"
+                CornerRadius="5">
+            <TextBlock Text="Please authenticate to continue"
+                       FontWeight="Bold" />
+        </Border>
+
+        <TemplatedControl Name="AuthContent"
+                          Styles="{StaticResource WebViewSelector}"
+                          tools:StyleSelect.Current="{CompiledBinding UsingEmbedBrowser}"/>
+    </Grid>
 </UserControl>

@@ -3,6 +3,7 @@ using System.Reactive.Disposables;
 using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Services;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace ChatModApp.Shared.ViewModels;
 
@@ -26,6 +27,8 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
     public Uri AuthUri { get; private set; }
     public readonly ReactiveCommand<WebNavigatedAction, Unit> AuthCompleteCommand;
 
+    [Reactive]
+    public bool UsingEmbedBrowser { get; set; } = OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
 
     private readonly AuthenticationService _authService;
     private readonly ChatTabViewModel _chatTabs;
@@ -54,7 +57,7 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
 
         action.Cancel();
         _chatTabs.HostScreen = HostScreen;
-        HostScreen.Router.NavigateAndReset.Execute(_chatTabs).Subscribe();
+        HostScreen?.Router.NavigateAndReset.Execute(_chatTabs).Subscribe();
     }
 
     public ViewModelActivator Activator { get; }
