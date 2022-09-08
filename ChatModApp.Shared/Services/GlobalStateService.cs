@@ -26,27 +26,35 @@ public class GlobalStateService : IDisposable
 
         //From https://github.com/dotnet/aspnetcore/issues/35648#issuecomment-904728134
         var curr = Directory.GetCurrentDirectory();
-        var isContentRootPresent = Directory.EnumerateDirectories(curr, "wwwroot").Any();
+        var isWebRootPresent = Directory.EnumerateDirectories(curr, "wwwroot").Any();
         var pIndex = curr.LastIndexOf(solutionName + Path.DirectorySeparatorChar, StringComparison.Ordinal);
 
+        string webRoot;
         string contentRoot;
-        if (isContentRootPresent)
+        if (isWebRootPresent)
         {
-            contentRoot = Path.Combine(curr, "wwwroot");
+            webRoot = Path.Combine(curr, "wwwroot");
+            contentRoot = Directory.EnumerateDirectories(webRoot, "_content")
+                .SingleOrDefault() ?? curr;
         }
         else if (pIndex < 0)
         {
+            //Falls back to current directory
+            webRoot = curr;
             contentRoot = curr;
         }
         else
         {
+            //Sets content root to project directory
             var solDir = curr[..(pIndex + solutionName.Length)];
             contentRoot = Path.Combine(solDir, blazorAppName);
+            webRoot = Path.Combine(contentRoot, "wwwroot");
         }
 
         var options = new WebApplicationOptions
         {
             ApplicationName = blazorAppName,
+            WebRootPath = webRoot,
             ContentRootPath = contentRoot
         };
 
