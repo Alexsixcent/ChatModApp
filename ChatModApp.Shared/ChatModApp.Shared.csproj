@@ -62,4 +62,8 @@
       <None Remove="FodyWeavers.xml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\ChatModApp.AuthCallback\ChatModApp.AuthCallback.csproj" />
+    </ItemGroup>
+
 </Project>
