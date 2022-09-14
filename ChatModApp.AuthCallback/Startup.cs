@@ -13,7 +13,9 @@ public static class StartupHelpers
         builder.Services.AddServerSideBlazor();
         builder.Services.AddFluentUIComponents();
         builder.Services.AddHttpClient();
-        
+
+        builder.Services.AddSingleton<AuthTriggeredService>();
+
         return builder;
     }
 

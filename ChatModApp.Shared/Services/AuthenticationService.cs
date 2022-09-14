@@ -13,8 +13,8 @@ public class AuthenticationService
 
     public string? TwitchAccessToken
     {
-        get => _state.TwitchAccessToken; 
-        private set=> _state.TwitchAccessToken = value; 
+        get => _state.TwitchAccessToken;
+        private set => _state.TwitchAccessToken = value;
     }
 
     public bool IsAuthenticated => !string.IsNullOrWhiteSpace(TwitchAccessToken);
@@ -22,7 +22,7 @@ public class AuthenticationService
     public IEnumerable<TwitchAuthScope> Scopes { get; }
 
 
-    private const string RedirectUri = "http://localhost:3000/callback";
+    private const string RedirectUri = "https://localhost:7167/auth";
     private event EventHandler<string>? AccessTokenChangedEvent;
 
     public AuthenticationService(AppState state)
@@ -36,8 +36,7 @@ public class AuthenticationService
             TwitchAuthScope.UserSubscriptions
         };
 
-        var connectable = Observable.FromEventPattern<string>(
-                                                              h => AccessTokenChangedEvent += h,
+        var connectable = Observable.FromEventPattern<string>(h => AccessTokenChangedEvent += h,
                                                               h => AccessTokenChangedEvent -= h)
                                     .Select(pattern => pattern.EventArgs)
                                     .Replay(1);
@@ -63,33 +62,34 @@ public class AuthenticationService
 
     public async Task<bool> TryAuthFromStorage()
     {
-        if (string.IsNullOrWhiteSpace(_state.TwitchAccessToken))
-            return false;
+        var res = await TryAuthFromToken(_state.TwitchAccessToken);
+        if (!res)
+            _state.TwitchAccessToken = null;
 
-        var res = await TwitchApiService.ValidateAccessToken(_state.TwitchAccessToken);
-        if (res is not null)
-        {
-            AccessTokenChangedEvent?.Invoke(this, TwitchAccessToken!);
-            return true;
-        }
-
-        _state.TwitchAccessToken = null;
-        return false;
+        return res;
     }
 
-    public bool AuthFromCallbackUri(Uri callbackUri)
+    public async Task<bool> TryAuthFromCallbackUri(Uri callbackUri)
     {
         if (!callbackUri.AbsoluteUri.StartsWith(RedirectUri))
             return false;
 
-        var accessToken = HttpUtility.ParseQueryString(callbackUri.Fragment.Substring(1))["access_token"];
+        var accessToken = HttpUtility.ParseQueryString(callbackUri.Fragment[1..])["access_token"];
 
+        return await TryAuthFromToken(accessToken);
+    }
+
+    public async Task<bool> TryAuthFromToken(string? accessToken)
+    {
         if (string.IsNullOrWhiteSpace(accessToken))
+            return false;
+
+        var res = await TwitchApiService.ValidateAccessToken(accessToken);
+        if (res is null)
             return false;
 
         TwitchAccessToken = accessToken;
         AccessTokenChangedEvent?.Invoke(this, accessToken);
-
         return true;
     }
 }

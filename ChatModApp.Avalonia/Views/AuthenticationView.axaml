@@ -2,9 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:webView="clr-namespace:WebViewControl;assembly=WebViewControl.Avalonia"
-             xmlns:vms="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
              xmlns:tools="clr-namespace:ChatModApp.Tools"
+             xmlns:vms="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
+             xmlns:webView="clr-namespace:WebViewControl;assembly=WebViewControl.Avalonia"
+             xmlns:fa="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              mc:Ignorable="d"
              x:Class="ChatModApp.Views.AuthenticationView"
              x:DataType="vms:AuthenticationViewModel">
@@ -18,7 +19,12 @@
                         <Border HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 CornerRadius="5">
-                            <TextBlock>Please authenticate on your browser</TextBlock>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock>Please authenticate on your browser :</TextBlock>
+                                <fa:HyperlinkButton NavigateUri="{CompiledBinding AuthUri, Mode=OneWay}">
+                                    AUTHENTICATE
+                                </fa:HyperlinkButton>
+                            </StackPanel>
                         </Border>
                     </ControlTemplate>
                 </Setter>

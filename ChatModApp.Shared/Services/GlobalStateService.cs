@@ -1,16 +1,24 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net;
+using System.Reactive.Linq;
 using ChatModApp.AuthCallback;
+using ChatModApp.Shared.Tools.Extensions;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace ChatModApp.Shared.Services;
 
-public class GlobalStateService : IDisposable
+public sealed class GlobalStateService : IDisposable
 {
     public ImmutableHashSet<string> TLDs { get; private set; }
 
+    public IObservable<AuthenticatedEventArgs> AuthFromBlazor { get; private set; }
+
+    
     private WebApplication? _webApplication;
 
     public async Task Initialize()
@@ -35,7 +43,7 @@ public class GlobalStateService : IDisposable
         {
             webRoot = Path.Combine(curr, "wwwroot");
             contentRoot = Directory.EnumerateDirectories(webRoot, "_content")
-                .SingleOrDefault() ?? curr;
+                                   .SingleOrDefault() ?? curr;
         }
         else if (pIndex < 0)
         {
@@ -59,10 +67,23 @@ public class GlobalStateService : IDisposable
         };
 
         var builder = StartupHelpers.CreateBuilder(options);
+        builder.WebHost.UseUrls("https://localhost:5000",
+                                "https://localhost:5001",
+                                "https://localhost:5244",
+                                "https://localhost:7167");
         builder.Host.UseSerilog();
         _webApplication = StartupHelpers.CreateApplication(builder);
 
         await _webApplication.StartAsync();
+
+        var authManager = _webApplication.Services.GetService<AuthTriggeredService>();
+
+        Debug.Assert(authManager != null, nameof(authManager) + " != null");
+
+        AuthFromBlazor = Observable.FromEventPattern<AuthenticatedEventArgs>(h => authManager.Authenticated += h,
+                                                            h => authManager.Authenticated -= h)
+                  .ObserveOnThreadPool()
+                  .Select(pattern => pattern.EventArgs);
     }
 
     private static async Task<IEnumerable<string>> GetTLDs()

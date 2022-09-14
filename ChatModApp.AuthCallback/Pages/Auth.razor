@@ -1,0 +1,24 @@
+﻿@page "/auth"
+@inject AuthTriggeredService AuthService
+@inject NavigationManager Nav
+
+<PageTitle>Authenticated</PageTitle>
+
+<FluentCard>
+    <h1>Authentication complete !</h1>
+    Congrats ! You have successfully authenticated on Twitch, you can now close this page and return to ChatModApp.
+</FluentCard>
+
+
+@code {
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        if (!string.IsNullOrWhiteSpace(uri.Fragment))
+        {
+            AuthService.Authenticate(new(uri));
+        }
+    }
+}

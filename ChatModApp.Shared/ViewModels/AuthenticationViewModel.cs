@@ -1,7 +1,9 @@
 ﻿using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Services;
+using ChatModApp.Shared.Tools.Extensions;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -35,24 +37,33 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
     private TwitchAuthQueryParams _queryParams;
 
 
-    public AuthenticationViewModel(AuthenticationService authService, ChatTabViewModel chatTabs)
+    public AuthenticationViewModel(AuthenticationService authService, GlobalStateService stateService, ChatTabViewModel chatTabs)
     {
         _authService = authService;
         _chatTabs = chatTabs;
         Activator = new();
-        AuthCompleteCommand = ReactiveCommand.Create<WebNavigatedAction>(AuthComplete);
+        AuthCompleteCommand = ReactiveCommand.CreateFromTask<WebNavigatedAction>(AuthComplete);
         
-        this.WhenActivated(() =>
+        this.WhenActivated(disposable =>
         {
             (AuthUri, _queryParams) = authService.GenerateAuthUri();
-            return new CompositeDisposable();
+
+            stateService.AuthFromBlazor
+                        .SelectMany(args => authService.TryAuthFromCallbackUri(args.CallbackUri))
+                        .Where(b => b)
+                        .ObserveOnMainThread()
+                        .Subscribe(_ =>
+                        {
+                            chatTabs.HostScreen = HostScreen;
+                            HostScreen?.Router.NavigateAndReset.Execute(chatTabs).Subscribe();
+                        }).DisposeWith(disposable);
         });
     }
 
 
-    private void AuthComplete(WebNavigatedAction action)
+    private async Task AuthComplete(WebNavigatedAction action)
     {
-        if (!_authService.AuthFromCallbackUri(action.Uri))
+        if (!await _authService.TryAuthFromCallbackUri(action.Uri))
             return;
 
         action.Cancel();
