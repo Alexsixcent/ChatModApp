@@ -18,10 +18,14 @@
                     <ControlTemplate>
                         <Border HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
-                                CornerRadius="5">
+                                Background="{DynamicResource ControlFillColorDefault}"
+                                CornerRadius="5"
+                                Padding="40">
                             <StackPanel Orientation="Vertical">
                                 <TextBlock>Please authenticate on your browser :</TextBlock>
-                                <fa:HyperlinkButton NavigateUri="{CompiledBinding AuthUri, Mode=OneWay}">
+                                <fa:HyperlinkButton NavigateUri="{CompiledBinding AuthUri, Mode=OneWay}"
+                                                    HorizontalAlignment="Center"
+                                                    Margin="0,5,0,0">
                                     AUTHENTICATE
                                 </fa:HyperlinkButton>
                             </StackPanel>
@@ -38,7 +42,6 @@
                     </ControlTemplate>
                 </Setter>
             </Style>
-            
         </Styles>
     </UserControl.Resources>
 
