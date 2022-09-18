@@ -1,70 +1,88 @@
-.page {
-    position: relative;
+body {
+    height: 100%;
+    --body-font: Segoe UI, sans-serif;
+    font-family: var(--body-font);
+    font-size: var(--type-ramp-base-font-size);
+    line-height: var(--type-ramp-base-line-height);
+    margin: 0;
+}
+
+#container {
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+        'header'
+        'main'
+        'footer';
+}
+
+header {
+    padding: 12px 0;
+    background-color: var(--neutral-layer-4);
+    grid-area: header;
+    display: grid;
+    grid-template-columns: 150px auto 1fr;
+    grid-template-rows: 1fr;
+    align-items: center;
+    justify-content: end;
+}
+
+header .logo {
+    width: 108px;
+    height: 23px;
+    padding: 0 30px;
+    grid-column: 1;
+}
+
+header .links {
+    padding: 0 10px;
     display: flex;
-    flex-direction: column;
-}
-
-main {
-    flex: 1;
-}
-
-.sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
-}
-
-.top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #d6d5d5;
-    justify-content: flex-end;
-    height: 3.5rem;
-    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-around;
     align-items: center;
 }
 
-    .top-row ::deep a, .top-row .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-    }
-
-    .top-row a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-@media (max-width: 640.98px) {
-    .top-row:not(.auth) {
-        display: none;
-    }
-
-    .top-row.auth {
-        justify-content: space-between;
-    }
-
-    .top-row a, .top-row .btn-link {
-        margin-left: 0;
-    }
+header .switches {
+    grid-column: 3;
+    justify-self: end;
+    padding: 0 20px;
 }
 
-@media (min-width: 641px) {
-    .page {
-        flex-direction: row;
-    }
+.links img {
+    height: 50px;
+    width: 50px;
+}
 
-    .sidebar {
-        width: 250px;
-        height: 100vh;
-        position: sticky;
-        top: 0;
-    }
+.github-logo {
+    fill: white;
+    border: 2px gray;
+}
 
-    .top-row {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-    }
+footer {
+    display: grid;
+    grid-template-columns: 10px auto auto 10px;
+    background: var(--neutral-layer-4);
+    color: var(--neutral-foreground-rest);
+    align-items: center;
+    grid-area: footer;
+    padding: 10px 10px;
+}
 
-    .top-row, article {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
+footer .version {
+    grid-column: 2;
+    justify-content: start;
+}
+
+footer .copy {
+    grid-column: 3;
+    justify-self: end;
+}
+
+main {
+    grid-area: main;
+    background-color: var(--neutral-layer-2);
+    color: var(--neutral-foreground-rest);
+    display: grid;
 }
