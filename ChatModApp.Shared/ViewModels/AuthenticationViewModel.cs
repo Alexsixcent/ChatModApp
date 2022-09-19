@@ -28,7 +28,7 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
 
     public readonly ReactiveCommand<WebNavigatedAction, Unit> AuthCompleteCommand;
 
-    [Reactive] public Uri AuthUri { get; }
+    public Uri AuthUri { get; }
 
     [Reactive] public bool UsingEmbedBrowser { get; set; }
 
