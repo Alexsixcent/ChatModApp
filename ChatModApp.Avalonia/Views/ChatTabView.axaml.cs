@@ -49,8 +49,8 @@ public partial class ChatTabView : ReactiveUserControl<ChatTabViewModel>
             return;
         if (!b.IsActive)
             b.Opened += OnParentWindowOpened;
-        else
-            OnParentWindowOpened(b, null);
+        
+        OnParentWindowOpened(b, null);
     }
 
     private void OnParentWindowOpened(object? sender, EventArgs? e)
