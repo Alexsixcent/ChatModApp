@@ -1,8 +1,11 @@
 ﻿using System.Reactive;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Services;
+using ChatModApp.Shared.Tools.Extensions;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace ChatModApp.Shared.ViewModels;
 
@@ -23,38 +26,51 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
     public IScreen? HostScreen { get; set; }
     public string UrlPathSegment => "auth";
 
-    public Uri AuthUri { get; private set; }
     public readonly ReactiveCommand<WebNavigatedAction, Unit> AuthCompleteCommand;
 
+    public Uri AuthUri { get; }
+
+    [Reactive] public bool UsingEmbedBrowser { get; set; }
 
     private readonly AuthenticationService _authService;
     private readonly ChatTabViewModel _chatTabs;
     private TwitchAuthQueryParams _queryParams;
 
 
-    public AuthenticationViewModel(AuthenticationService authService, ChatTabViewModel chatTabs)
+    public AuthenticationViewModel(AuthenticationService authService, BlazorHostingService blazorService,
+                                   ChatTabViewModel chatTabs)
     {
         _authService = authService;
         _chatTabs = chatTabs;
         Activator = new();
-        AuthCompleteCommand = ReactiveCommand.Create<WebNavigatedAction>(AuthComplete);
-        
-        this.WhenActivated(() =>
+        UsingEmbedBrowser = BlazorHostingService.IsBlazorAuthDisabled;
+        AuthCompleteCommand = ReactiveCommand.CreateFromTask<WebNavigatedAction>(AuthComplete);
+        var redirectUri = UsingEmbedBrowser ? null : new Uri(new(blazorService.CurrentHostingUrl!), "auth");
+        (AuthUri, _queryParams) = authService.GenerateAuthUri(redirectUri);
+
+        this.WhenActivated(disposable =>
         {
-            (AuthUri, _queryParams) = authService.GenerateAuthUri();
-            return new CompositeDisposable();
+            blazorService.AuthFromBlazor
+                         ?.SelectMany(args => authService.TryAuthFromCallbackUri(args.CallbackUri))
+                         .Where(b => b)
+                         .ObserveOnMainThread()
+                         .Subscribe(_ =>
+                         {
+                             chatTabs.HostScreen = HostScreen;
+                             HostScreen?.Router.NavigateAndReset.Execute(chatTabs).Subscribe();
+                         }).DisposeWith(disposable);
         });
     }
 
 
-    private void AuthComplete(WebNavigatedAction action)
+    private async Task AuthComplete(WebNavigatedAction action)
     {
-        if (!_authService.AuthFromCallbackUri(action.Uri))
+        if (!await _authService.TryAuthFromCallbackUri(action.Uri))
             return;
 
         action.Cancel();
         _chatTabs.HostScreen = HostScreen;
-        HostScreen.Router.NavigateAndReset.Execute(_chatTabs).Subscribe();
+        HostScreen?.Router.NavigateAndReset.Execute(_chatTabs).Subscribe();
     }
 
     public ViewModelActivator Activator { get; }

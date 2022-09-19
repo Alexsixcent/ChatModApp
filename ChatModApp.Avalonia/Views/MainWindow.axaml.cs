@@ -119,7 +119,8 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
             _ => 400
         };
 
-        TitleBar.ExtendViewIntoTitleBar = true;
+        if (TitleBar is not null) 
+            TitleBar.ExtendViewIntoTitleBar = true;
     }
 
     private void OnRequestedThemeChanged(FluentAvaloniaTheme sender, RequestedThemeChangedEventArgs args)

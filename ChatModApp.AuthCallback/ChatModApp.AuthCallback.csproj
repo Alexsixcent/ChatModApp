@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.5.1" GeneratePathProperty="true" />
+    </ItemGroup>
+
+    <!-- Copies all content root files to output dir for app to load -->
+    <ItemGroup>
+        <None Include="$(ProjectDir)wwwroot\**\*" LinkBase="wwwroot\" Visible="false" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="$(IntermediateOutputPath)scopedcss\bundle\$(ProjectName).styles.css" Link="wwwroot\$(ProjectName).styles.css" Visible="false" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="$(IntermediateOutputPath)jsmodules\jsmodules.build.manifest.json" Link="wwwroot\$(ProjectName).modules.json" Visible="false" CopyToOutputDirectory="PreserveNewest" />
+        <None Include="$(PkgMicrosoft_Fast_Components_FluentUI)\staticwebassets\**\*" LinkBase="wwwroot\_content\Microsoft.Fast.Components.FluentUI\" Visible="false" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+<!-- Alternative with Copy method, problem: doesn't replicate files to dependant project
+<Target Name="ContentTarget" AfterTargets="AfterBuild">
+        <ItemGroup>
+            <RootSources Include="$(ProjectDir)wwwroot\**\*.*"/>
+            <BundleSources Include="$(IntermediateOutputPath)scopedcss\bundle\**\*.*"/>
+            <ModulesSources Include="$(IntermediateOutputPath)jsmodules\jsmodules.build.manifest.json"/>
+            <FluentSources Include="$(PkgMicrosoft_Fast_Components_FluentUI)\staticwebassets\**\*.*"/>
+        </ItemGroup>
+
+        <Copy SourceFiles="@(RootSources)"
+              DestinationFolder="$(OutDir)\wwwroot\%(RecursiveDir)"/>
+        <Copy SourceFiles="@(BundleSources)"
+              DestinationFolder="$(OutDir)\wwwroot\%(RecursiveDir)"/>
+        <Copy SourceFiles="@(ModulesSources)"
+              DestinationFiles="$(OutDir)\wwwroot\$(ProjectName).modules.json"/>
+        <Copy SourceFiles="@(FluentSources)"
+              DestinationFolder="$(OutDir)\wwwroot\_content\Microsoft.Fast.Components.FluentUI\%(RecursiveDir)"/>
+        <ItemGroup>
+            <Content CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" Update="$(OutDir)\wwwroot\**\*"/>
+        </ItemGroup>
+    </Target>-->
+</Project>

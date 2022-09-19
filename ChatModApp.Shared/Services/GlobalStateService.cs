@@ -4,16 +4,18 @@ using ChatModApp.Shared.Models.Chat.Emotes;
 
 namespace ChatModApp.Shared.Services;
 
-public class GlobalStateService
+public sealed class GlobalStateService
 {
     public ImmutableHashSet<string> TLDs { get; private set; }
 
     
     private readonly HttpClient _client;
+    private readonly BlazorHostingService _blazorService;
 
     
-    public GlobalStateService(HttpClient client)
+    public GlobalStateService(BlazorHostingService blazorService, HttpClient client)
     {
+        _blazorService = blazorService;
         _client = client;
         TLDs = ImmutableHashSet<string>.Empty;
     }
@@ -25,6 +27,9 @@ public class GlobalStateService
 
         TLDs = ImmutableHashSet.CreateRange(await tldTask);
         var emojis = await emojiTask;
+
+        if(!BlazorHostingService.IsBlazorAuthDisabled)
+            await _blazorService.StartBlazor();
     }
 
     private async Task<IEnumerable<string>> GetTLDs()
@@ -35,7 +40,7 @@ public class GlobalStateService
                                    .ConfigureAwait(false);
 
         return tldText
-               .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+               .Split( '\n' , StringSplitOptions.RemoveEmptyEntries)
                .Skip(1)
                .Select(s => mapping.GetUnicode(s.ToLowerInvariant()));
     }

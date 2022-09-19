@@ -1,0 +1,59 @@
+﻿@page "/auth"
+@inject AuthTriggeredService AuthService
+@inject NavigationManager Nav
+
+<PageTitle>Authenticated</PageTitle>
+
+@if (!string.IsNullOrWhiteSpace(Error))
+{
+    <FluentCard>
+        <h1>An Error occurred while authentifying...</h1>
+        <FluentDivider Orientation="Orientation.Horizontal" Role="DividerRole.Presentation"/>
+        <h2>Code: @Error</h2>
+        <strong>Description:</strong> @ErrorDescription
+    </FluentCard>
+}
+else if (Complete ?? false)
+{
+    <FluentCard>
+        <h1>Authentication complete !</h1>
+        Congrats ! You have successfully authenticated on Twitch, you can now close this page and return to ChatModApp.
+    </FluentCard>
+}
+else
+{
+    <FluentCard>
+        <span style="display: inline-flex; align-items: center;">
+            <h1 style="padding: 0 10px 0 0"> Authentifying... </h1> <FluentProgressRing/>
+        </span>
+    </FluentCard>
+}
+
+
+
+
+@code {
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "error")]
+    public string? Error { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "error_description")]
+    public string? ErrorDescription { get; set; }
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "complete")]
+    public bool? Complete { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        var uri = Nav.ToAbsoluteUri(Nav.Uri);
+        if (string.IsNullOrWhiteSpace(uri.Fragment)) return;
+        
+        AuthService.Authenticate(new(uri));
+        Nav.NavigateTo("/auth?complete=true", false, true);
+    }
+}

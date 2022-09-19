@@ -1,7 +1,8 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
-			 x:Class="ChatModApp.App">
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             x:Class="ChatModApp.App">
     <Application.Styles>
         <styling:FluentAvaloniaTheme RequestedTheme="Dark"/>
 		<StyleInclude Source="/Controls/PersonIcon.axaml"/>
@@ -14,5 +15,8 @@
 	<Application.Resources>
 		<StaticResource x:Key="CoreSplashScreenBackground" ResourceKey="TextControlBackground" />
 		<StaticResource x:Key="CoreSplashScreenForeground" ResourceKey="TextControlForeground" />
+		
+		<system:Boolean x:Key="True">True</system:Boolean>
+		<system:Boolean x:Key="False">False</system:Boolean>
 	</Application.Resources>
 </Application>
