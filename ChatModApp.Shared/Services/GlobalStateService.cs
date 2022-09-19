@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using ChatModApp.AuthCallback;
 using ChatModApp.Shared.Tools.Extensions;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
@@ -16,10 +15,18 @@ public sealed class GlobalStateService : IDisposable
 {
     public ImmutableHashSet<string> TLDs { get; private set; }
 
-    public IObservable<AuthenticatedEventArgs> AuthFromBlazor { get; private set; }
+    public IObservable<AuthenticatedEventArgs> AuthFromBlazor { get; private set; } = null!;
 
-    
+
     private WebApplication? _webApplication;
+
+    private static string[] HostingUrls => new[]
+    {
+        "https://localhost:5244",
+        "https://localhost:5000",
+        "https://localhost:5001",
+        "https://localhost:7167"
+    };
 
     public async Task Initialize()
     {
@@ -65,25 +72,44 @@ public sealed class GlobalStateService : IDisposable
             WebRootPath = webRoot,
             ContentRootPath = contentRoot
         };
+        
+        bool retryWithUrl;
+        var currentUrlIndex = 0;
+        do
+        {
+            var builder = StartupHelpers.CreateBuilder(options);
+            builder.Host.UseSerilog();
+            _webApplication = StartupHelpers.CreateApplication(builder);
+            _webApplication.Urls.Add(HostingUrls[currentUrlIndex]);
+            try
+            {
+                await _webApplication.StartAsync();
+                retryWithUrl = false;
+            }
+            catch (IOException e)
+            {
+                Log.Logger.Error(e, "Couldn't start Blazor server at {Url}, retrying...", HostingUrls[currentUrlIndex]);
+                retryWithUrl = true;
+                currentUrlIndex++;
+                if (currentUrlIndex >= HostingUrls.Length)
+                {
+                    Log.Logger.Fatal("No available remaining URL for hosting the Blazor authentication were found");
+                    throw;
+                }
 
-        var builder = StartupHelpers.CreateBuilder(options);
-        builder.WebHost.UseUrls("https://localhost:5000",
-                                "https://localhost:5001",
-                                "https://localhost:5244",
-                                "https://localhost:7167");
-        builder.Host.UseSerilog();
-        _webApplication = StartupHelpers.CreateApplication(builder);
-
-        await _webApplication.StartAsync();
+                await _webApplication.DisposeAsync();
+                Log.Logger.Information("Restarting Blazor server at {Url}", HostingUrls[currentUrlIndex]);
+            }
+        } while (retryWithUrl);
 
         var authManager = _webApplication.Services.GetService<AuthTriggeredService>();
 
         Debug.Assert(authManager != null, nameof(authManager) + " != null");
 
         AuthFromBlazor = Observable.FromEventPattern<AuthenticatedEventArgs>(h => authManager.Authenticated += h,
-                                                            h => authManager.Authenticated -= h)
-                  .ObserveOnThreadPool()
-                  .Select(pattern => pattern.EventArgs);
+                                                                             h => authManager.Authenticated -= h)
+                                   .ObserveOnThreadPool()
+                                   .Select(pattern => pattern.EventArgs);
     }
 
     private static async Task<IEnumerable<string>> GetTLDs()
@@ -94,13 +120,13 @@ public sealed class GlobalStateService : IDisposable
         var tldText = await client.DownloadStringTaskAsync("https://data.iana.org/TLD/tlds-alpha-by-domain.txt");
 
         return tldText
-            .Split(new[] {'\n'}, StringSplitOptions.RemoveEmptyEntries)
-            .Skip(1)
-            .Select(s => mapping.GetUnicode(s.ToLowerInvariant()));
+               .Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries)
+               .Skip(1)
+               .Select(s => mapping.GetUnicode(s.ToLowerInvariant()));
     }
 
     public void Dispose()
     {
-        ((IDisposable?) _webApplication)?.Dispose();
+        ((IDisposable?)_webApplication)?.Dispose();
     }
 }
