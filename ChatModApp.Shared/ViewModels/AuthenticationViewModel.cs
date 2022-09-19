@@ -26,11 +26,11 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
     public IScreen? HostScreen { get; set; }
     public string UrlPathSegment => "auth";
 
-    public Uri AuthUri { get; private set; }
     public readonly ReactiveCommand<WebNavigatedAction, Unit> AuthCompleteCommand;
 
-    [Reactive]
-    public bool UsingEmbedBrowser { get; set; } = OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
+    [Reactive] public Uri AuthUri { get; }
+
+    [Reactive] public bool UsingEmbedBrowser { get; set; }
 
     private readonly AuthenticationService _authService;
     private readonly ChatTabViewModel _chatTabs;
@@ -43,17 +43,15 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
         _authService = authService;
         _chatTabs = chatTabs;
         Activator = new();
+        UsingEmbedBrowser = BlazorHostingService.IsBlazorAuthDisabled;
         AuthCompleteCommand = ReactiveCommand.CreateFromTask<WebNavigatedAction>(AuthComplete);
+        var redirectUri = UsingEmbedBrowser ? null : new Uri(new(blazorService.CurrentHostingUrl!), "auth");
+        (AuthUri, _queryParams) = authService.GenerateAuthUri(redirectUri);
 
         this.WhenActivated(disposable =>
         {
-            var redirectUri = blazorService.CurrentHostingUrl is null
-                                  ? null
-                                  : new Uri(new(blazorService.CurrentHostingUrl), "auth");
-            (AuthUri, _queryParams) = authService.GenerateAuthUri(redirectUri);
-
             blazorService.AuthFromBlazor
-                         .SelectMany(args => authService.TryAuthFromCallbackUri(args.CallbackUri))
+                         ?.SelectMany(args => authService.TryAuthFromCallbackUri(args.CallbackUri))
                          .Where(b => b)
                          .ObserveOnMainThread()
                          .Subscribe(_ =>

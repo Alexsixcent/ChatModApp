@@ -22,7 +22,8 @@ public sealed class GlobalStateService
     {
         TLDs = ImmutableHashSet.CreateRange(await GetTLDs());
 
-        await _blazorService.StartBlazor();
+        if(!BlazorHostingService.IsBlazorAuthDisabled)
+            await _blazorService.StartBlazor();
     }
 
     

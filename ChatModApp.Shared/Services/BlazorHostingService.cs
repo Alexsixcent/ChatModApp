@@ -11,8 +11,10 @@ namespace ChatModApp.Shared.Services;
 
 public sealed class BlazorHostingService : IDisposable, IAsyncDisposable
 {
+    public static bool IsBlazorAuthDisabled { get; } = OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
+    
     public string? CurrentHostingUrl { get; private set; }
-    public IObservable<AuthenticatedEventArgs> AuthFromBlazor { get; private set; } = null!;
+    public IObservable<AuthenticatedEventArgs>? AuthFromBlazor { get; private set; }
 
 
     private const string SolutionName = "ChatModApp", BlazorAppName = "ChatModApp.AuthCallback";

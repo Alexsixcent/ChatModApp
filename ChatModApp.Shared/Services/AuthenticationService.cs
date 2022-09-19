@@ -49,7 +49,7 @@ public class AuthenticationService
         {
             ClientId = ClientId,
             ResponseType = TwitchAuthResponseType.Token,
-            RedirectUri = redirectUri ?? new("http://localhost"),
+            RedirectUri = redirectUri ?? new("https://localhost/"),
             Scopes = Scopes,
             ForceVerify = false,
             State = Guid.NewGuid().ToString("N")
@@ -69,6 +69,9 @@ public class AuthenticationService
 
     public async Task<bool> TryAuthFromCallbackUri(Uri callbackUri)
     {
+        if (string.IsNullOrWhiteSpace(callbackUri.Fragment))
+            return false;
+
         var accessToken = HttpUtility.ParseQueryString(callbackUri.Fragment[1..])["access_token"];
 
         return await TryAuthFromToken(accessToken);
