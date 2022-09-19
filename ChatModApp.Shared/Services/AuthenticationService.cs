@@ -20,9 +20,7 @@ public class AuthenticationService
     public bool IsAuthenticated => !string.IsNullOrWhiteSpace(TwitchAccessToken);
     public IObservable<string> AccessTokenChanged { get; }
     public IEnumerable<TwitchAuthScope> Scopes { get; }
-
-
-    private const string RedirectUri = "https://localhost:7167/auth";
+    
     private event EventHandler<string>? AccessTokenChangedEvent;
 
     public AuthenticationService(AppState state)
@@ -45,13 +43,13 @@ public class AuthenticationService
         AccessTokenChanged = connectable;
     }
 
-    public (Uri Uri, TwitchAuthQueryParams QueryParams) GenerateAuthUri()
+    public (Uri Uri, TwitchAuthQueryParams QueryParams) GenerateAuthUri(Uri? redirectUri = null)
     {
         var queryParams = new TwitchAuthQueryParams
         {
             ClientId = ClientId,
             ResponseType = TwitchAuthResponseType.Token,
-            RedirectUri = new(RedirectUri),
+            RedirectUri = redirectUri ?? new("http://localhost"),
             Scopes = Scopes,
             ForceVerify = false,
             State = Guid.NewGuid().ToString("N")
@@ -71,9 +69,6 @@ public class AuthenticationService
 
     public async Task<bool> TryAuthFromCallbackUri(Uri callbackUri)
     {
-        if (!callbackUri.AbsoluteUri.StartsWith(RedirectUri))
-            return false;
-
         var accessToken = HttpUtility.ParseQueryString(callbackUri.Fragment[1..])["access_token"];
 
         return await TryAuthFromToken(accessToken);

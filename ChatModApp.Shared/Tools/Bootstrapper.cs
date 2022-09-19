@@ -120,6 +120,7 @@ public class Bootstrapper : IDisposable
 
         container.Register<GlobalStateService>(Reuse.Singleton);
         container.Register<AuthenticationService>(Reuse.Singleton);
+        container.Register<BlazorHostingService>(Reuse.Singleton);
         container.Register<TwitchApiService>(Reuse.Singleton);
         container.Register<TwitchChatService>(Reuse.Singleton);
         container.Register<EmotesService>(Reuse.Singleton);

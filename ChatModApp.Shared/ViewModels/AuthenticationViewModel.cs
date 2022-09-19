@@ -37,26 +37,30 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
     private TwitchAuthQueryParams _queryParams;
 
 
-    public AuthenticationViewModel(AuthenticationService authService, GlobalStateService stateService, ChatTabViewModel chatTabs)
+    public AuthenticationViewModel(AuthenticationService authService, BlazorHostingService blazorService,
+                                   ChatTabViewModel chatTabs)
     {
         _authService = authService;
         _chatTabs = chatTabs;
         Activator = new();
         AuthCompleteCommand = ReactiveCommand.CreateFromTask<WebNavigatedAction>(AuthComplete);
-        
+
         this.WhenActivated(disposable =>
         {
-            (AuthUri, _queryParams) = authService.GenerateAuthUri();
+            var redirectUri = blazorService.CurrentHostingUrl is null
+                                  ? null
+                                  : new Uri(new(blazorService.CurrentHostingUrl), "auth");
+            (AuthUri, _queryParams) = authService.GenerateAuthUri(redirectUri);
 
-            stateService.AuthFromBlazor
-                        .SelectMany(args => authService.TryAuthFromCallbackUri(args.CallbackUri))
-                        .Where(b => b)
-                        .ObserveOnMainThread()
-                        .Subscribe(_ =>
-                        {
-                            chatTabs.HostScreen = HostScreen;
-                            HostScreen?.Router.NavigateAndReset.Execute(chatTabs).Subscribe();
-                        }).DisposeWith(disposable);
+            blazorService.AuthFromBlazor
+                         .SelectMany(args => authService.TryAuthFromCallbackUri(args.CallbackUri))
+                         .Where(b => b)
+                         .ObserveOnMainThread()
+                         .Subscribe(_ =>
+                         {
+                             chatTabs.HostScreen = HostScreen;
+                             HostScreen?.Router.NavigateAndReset.Execute(chatTabs).Subscribe();
+                         }).DisposeWith(disposable);
         });
     }
 
