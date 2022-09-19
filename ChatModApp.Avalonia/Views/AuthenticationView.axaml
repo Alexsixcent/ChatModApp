@@ -37,7 +37,7 @@
                    tools:StyleSelect.Key="{StaticResource True}">
                 <Setter Property="Template">
                     <ControlTemplate>
-                        <webView:WebView Address="{CompiledBinding AuthUri.AbsolutePath, Mode=OneWay}"
+                        <webView:WebView Address="{CompiledBinding AuthUri.AbsoluteUri, Mode=OneWay}"
                                          BeforeNavigate="WebView_OnBeforeNavigate" />
                     </ControlTemplate>
                 </Setter>
