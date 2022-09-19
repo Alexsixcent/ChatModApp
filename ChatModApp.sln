@@ -8,17 +8,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatModApp.Shared", "ChatModApp.Shared\ChatModApp.Shared.csproj", "{E7427D1C-E2FF-417A-9EF4-72F096727C73}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatModApp.Shared", "ChatModApp.Shared\ChatModApp.Shared.csproj", "{E7427D1C-E2FF-417A-9EF4-72F096727C73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatModApp.Avalonia", "ChatModApp.Avalonia\ChatModApp.Avalonia.csproj", "{DEBD9888-90FE-4D41-A90E-4D26BA489E13}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatModApp.Avalonia", "ChatModApp.Avalonia\ChatModApp.Avalonia.csproj", "{DEBD9888-90FE-4D41-A90E-4D26BA489E13}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaGif", "AvaloniaGif\AvaloniaGif.csproj", "{703EEBBB-BA3F-4BBB-9035-DEE5ED168162}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaGif", "AvaloniaGif\AvaloniaGif.csproj", "{703EEBBB-BA3F-4BBB-9035-DEE5ED168162}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatModApp.AuthCallback", "ChatModApp.AuthCallback\ChatModApp.AuthCallback.csproj", "{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}"
 EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Tools\Tools.projitems*{04c11854-b9ba-4b8a-bd47-177045e4b838}*SharedItemsImports = 4
-		Tools\Tools.projitems*{79439f80-8dd9-44ff-925a-99fb42483f6e}*SharedItemsImports = 13
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM
@@ -127,6 +125,36 @@ Global
 		{703EEBBB-BA3F-4BBB-9035-DEE5ED168162}.Release|x64.Build.0 = Release|Any CPU
 		{703EEBBB-BA3F-4BBB-9035-DEE5ED168162}.Release|x86.ActiveCfg = Release|Any CPU
 		{703EEBBB-BA3F-4BBB-9035-DEE5ED168162}.Release|x86.Build.0 = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|ARM.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|arm64.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|arm64.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|x64.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Debug|x86.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|Any CPU.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|ARM.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|ARM.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|arm64.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|arm64.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|x64.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|x64.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|x86.ActiveCfg = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.DebugNative|x86.Build.0 = Debug|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|ARM.ActiveCfg = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|ARM.Build.0 = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|arm64.ActiveCfg = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|arm64.Build.0 = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|x64.ActiveCfg = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|x64.Build.0 = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|x86.ActiveCfg = Release|Any CPU
+		{B6EE6035-72D9-4D41-A799-1DC57D06FFC2}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

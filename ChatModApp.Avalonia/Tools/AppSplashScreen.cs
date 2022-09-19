@@ -28,8 +28,8 @@ public class AppSplashScreen : IApplicationSplashScreen
     }
 
     //This method runs on a background thread so we can safely synchronously wait for it
-    public void RunTasks() => Run().Wait();
-
+    public void RunTasks() => Run().GetAwaiter().GetResult();
+    
     private async Task Run()
     {
         var scheduler = AvaloniaScheduler.Instance;

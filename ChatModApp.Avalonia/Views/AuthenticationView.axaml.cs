@@ -1,7 +1,6 @@
-using System.Reactive.Disposables;
-using System.Reactive.Linq;
+using System;
 using Avalonia.ReactiveUI;
-using ChatModApp.Shared.Tools.Extensions;
+using Avalonia.Threading;
 using ChatModApp.Shared.ViewModels;
 using ReactiveUI;
 using WebViewControl;
@@ -12,19 +11,15 @@ public partial class AuthenticationView : ReactiveUserControl<AuthenticationView
 {
     public AuthenticationView()
     {
-        this.WhenActivated(disposable =>
-        {
-            this.OneWayBind(ViewModel, vm => vm.AuthUri, v => v.AuthWebView.Address, uri => uri.AbsoluteUri)
-                .DisposeWith(disposable);
+        this.WhenActivated(_ => { });
 
-            Observable.FromEvent<BeforeNavigateEventHandler, Request>(h => AuthWebView.BeforeNavigate += h,
-                                                                      h => AuthWebView.BeforeNavigate -= h)
-                      .Select(req => new WebNavigatedAction(new(req.Url), req.Cancel))
-                      .ObserveOnMainThread()
-                      .InvokeCommand(ViewModel, vm => vm.AuthCompleteCommand)
-                      .DisposeWith(disposable);
-        });
-        
         InitializeComponent();
+    }
+
+
+    private void WebView_OnBeforeNavigate(Request request)
+    {
+        var action = new WebNavigatedAction(new(request.Url), request.Cancel);
+        Dispatcher.UIThread.Post(() => { ViewModel?.AuthCompleteCommand.Execute(action).Subscribe(); });
     }
 }
