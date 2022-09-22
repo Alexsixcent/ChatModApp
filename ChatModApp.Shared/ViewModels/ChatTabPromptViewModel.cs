@@ -40,7 +40,7 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
         Channel = string.Empty;
 
         this.WhenAnyValue(vm => vm.Channel)
-            .Where(s => !string.IsNullOrWhiteSpace(s))
+            .WhereNotNullOrWhiteSpace()
             .QuickThrottle(TimeSpan.FromSeconds(0.5), RxApp.TaskpoolScheduler)
             .Log(this, "Selected channel changed")
             .ObserveOnThreadPool()
@@ -66,13 +66,13 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
     {
         var res = await _apiService.Helix.Search.SearchChannelsAsync(searchTerm);
 
-        return res.Channels.Select(ch => new ChannelSuggestionViewModel(ch.BroadcasterLogin, ch.DisplayName,
+        return res.Channels.Select(ch => new ChannelSuggestionViewModel(new TwitchChannel(ch.Id, ch.DisplayName, ch.BroadcasterLogin),
                                                                         new(ch.ThumbnailUrl), ch.IsLive));
     }
 
     private async Task OpenChannel(ChannelSuggestionViewModel suggestion)
     {
-        var channel = new TwitchChannel(suggestion.DisplayName, suggestion.Login);
+        var channel = suggestion.Channel;
         var tab = _tabService.TabCache.Lookup(ParentTabId).Value;
 
         tab.Channel = channel;
