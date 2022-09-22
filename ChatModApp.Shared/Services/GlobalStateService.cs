@@ -1,6 +1,10 @@
 ﻿using System.Collections.Immutable;
 using System.Globalization;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using ChatModApp.Shared.Models.Chat.Emotes;
+using ChatModApp.Shared.Tools.Extensions;
+using ReactiveUI;
 
 namespace ChatModApp.Shared.Services;
 
@@ -8,89 +12,91 @@ public sealed class GlobalStateService
 {
     public ImmutableHashSet<string> TLDs { get; private set; }
 
-    
+
     private readonly HttpClient _client;
     private readonly BlazorHostingService _blazorService;
+    private readonly EmotesService _emotesService;
 
-    
-    public GlobalStateService(BlazorHostingService blazorService, HttpClient client)
+
+    public GlobalStateService(BlazorHostingService blazorService, EmotesService emotesService, HttpClient client)
     {
         _blazorService = blazorService;
+        _emotesService = emotesService;
         _client = client;
         TLDs = ImmutableHashSet<string>.Empty;
     }
 
     public async Task Initialize()
     {
-        var tldTask = GetTLDs();
-        var emojiTask = GetEmojis().ToListAsync();
+        var tldObv = GetTLDs().ToArray().ToTask();
+        var emojiObv = GetEmojis().ToArray().ToTask();
 
-        TLDs = ImmutableHashSet.CreateRange(await tldTask);
-        var emojis = await emojiTask;
-
-        if(!BlazorHostingService.IsBlazorAuthDisabled)
+        var (tlds, emojis) = await (tldObv, emojiObv);
+        
+        TLDs = ImmutableHashSet.CreateRange(tlds);
+        
+        if (!BlazorHostingService.IsBlazorAuthDisabled)
             await _blazorService.StartBlazor();
     }
 
-    private async Task<IEnumerable<string>> GetTLDs()
+    private IObservable<string> GetTLDs()
     {
         var mapping = new IdnMapping();
 
-        var tldText = await _client.GetStringAsync("https://data.iana.org/TLD/tlds-alpha-by-domain.txt")
-                                   .ConfigureAwait(false);
-
-        return tldText
-               .Split( '\n' , StringSplitOptions.RemoveEmptyEntries)
+        return Observable
+               .FromAsync(token => _client.GetStreamAsync("https://data.iana.org/TLD/tlds-alpha-by-domain.txt",
+                                                          token))
+               .ReadLinesToEnd()
                .Skip(1)
+               .WhereNotNullOrWhiteSpace()
                .Select(s => mapping.GetUnicode(s.ToLowerInvariant()));
     }
 
     private const float MaxVersion = 13.0F;
-    
-    private async IAsyncEnumerable<EmojiEmote> GetEmojis()
-    {
+
+    private IObservable<EmojiEmote> GetEmojis()
+    {        
         const string groupPrefix = "# group:";
         const string subgroupPrefix = "# subgroup:";
         const string commentPrefix = "#";
-        
-        var emojisText = await _client.GetStreamAsync("https://unicode.org/Public/emoji/14.0/emoji-test.txt")
-                                      .ConfigureAwait(false);
 
-        var reader = new StreamReader(emojisText);
-        
-        var group = string.Empty;
-        var subgroup = string.Empty;
+        return Observable
+               .FromAsync(token => _client.GetStreamAsync("https://unicode.org/Public/emoji/14.0/emoji-test.txt",
+                                                          token))
+               .ReadLinesToEnd()
+               .WhereNotNullOrWhiteSpace()
+               .Select(line =>
+               {
+                   (string line, string? group, string? subgroup) data = (line, null, null);
 
-        while (!reader.EndOfStream)
-        {
-            var line = await reader.ReadLineAsync();
+                   if (line.StartsWith(groupPrefix, StringComparison.Ordinal))
+                   {
+                       data.group = FormatName(line[groupPrefix.Length..]);
+                       return data;
+                   }
 
-            if (string.IsNullOrWhiteSpace(line))
-                continue;
-
-            if (line.StartsWith(groupPrefix, StringComparison.Ordinal))
-            {
-                group = FormatName(line[groupPrefix.Length..]);
-                continue;
-            }
-
-            if (line.StartsWith(subgroupPrefix, StringComparison.Ordinal))
-            {
-                subgroup = FormatName(line[subgroupPrefix.Length..]);
-                continue;
-            }
-
-            if (line.StartsWith(commentPrefix, StringComparison.Ordinal))
-                continue;
-
-            var emoji = ParseEmoji(line);
-            if (emoji is not null)
-            {
-                yield return new(emoji.Value.name, emoji.Value.value, group, subgroup);
-            }
-        }
+                   if (!line.StartsWith(subgroupPrefix, StringComparison.Ordinal)) 
+                       return data;
+                   
+                   data.subgroup = FormatName(line[subgroupPrefix.Length..]);
+                   return data;
+               })
+               .Scan((l, r) =>
+               {
+                   r.group ??= l.group;
+                   r.subgroup ??= l.subgroup;
+                   return r;
+               })
+               .Where(tuple => !tuple.line.StartsWith(commentPrefix, StringComparison.Ordinal))
+               .Select(tuple =>
+               {
+                   var value = ParseEmoji(tuple.line);
+                   return value is null ? null 
+                              : new EmojiEmote(value.Value.name, value.Value.value, tuple.group!, tuple.subgroup!);
+               })
+               .WhereNotNull();
     }
-        
+
     private static (string name, string value)? ParseEmoji(string line)
     {
         var parts = line.Split(new[] { ';', '#' }, 3);
@@ -117,7 +123,7 @@ public sealed class GlobalStateService
 
         return (name, value);
     }
-    
+
     private static string FormatName(string source)
     {
         var parts = source
@@ -128,7 +134,8 @@ public sealed class GlobalStateService
                     .Replace("*", "Asterisk")
                     .Replace(",", string.Empty)
                     .Replace("’", string.Empty)
-                    .Split(new[] { ' ', '-', ',', '’', '!', '“', '”', '(', ')', '.' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(new[] { ' ', '-', ',', '’', '!', '“', '”', '(', ')', '.' },
+                           StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => CultureInfo.InvariantCulture.TextInfo.ToTitleCase(x));
 
         return string.Concat(parts);
