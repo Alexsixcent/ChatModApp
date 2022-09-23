@@ -1,6 +1,6 @@
 namespace ChatModApp.Shared.Models.Chat.Emotes;
 
-public class EmojiEmote : IGlobalEmote
+public sealed class EmojiEmote : IGlobalEmote
 {
     public EmojiEmote(string code, string emojiValue, string emojiGroup, string emojiSubGroup)
     {
