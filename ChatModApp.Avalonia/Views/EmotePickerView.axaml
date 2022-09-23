@@ -109,7 +109,8 @@
 				 Header="{x:Static fa:Symbol.ClearSelection}"
 				 Content="{CompiledBinding GlobalEmotes}" />
 		<TabItem ToolTip.Tip="Emojis"
-				 Header="{x:Static fa:Symbol.Emoji2}" />
+				 Header="{x:Static fa:Symbol.Emoji2}"
+				 Content="{CompiledBinding Emojis}"/>
 	</TabControl>
 
 </UserControl>

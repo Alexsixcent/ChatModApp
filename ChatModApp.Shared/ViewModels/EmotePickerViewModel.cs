@@ -12,7 +12,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace ChatModApp.Shared.ViewModels;
 
-public class EmotePickerViewModel : ReactiveObject, IActivatableViewModel, IDisposable
+public sealed class EmotePickerViewModel : ReactiveObject, IActivatableViewModel, IDisposable
 {
     public ViewModelActivator Activator { get; }
 
@@ -21,6 +21,7 @@ public class EmotePickerViewModel : ReactiveObject, IActivatableViewModel, IDisp
     public ReadOnlyObservableCollection<IEmote> FavoriteEmotes => _favoriteEmotes;
     public ReadOnlyObservableCollection<IGrouping<string, IMemberEmote>> ChannelEmotes => _channelEmotes;
     public ReadOnlyObservableCollection<IGrouping<string, IGlobalEmote>> GlobalEmotes => _globalEmotes;
+    public ReadOnlyObservableCollection<IGrouping<string, EmojiEmote>> Emojis => _emojis;
 
 
     private Func<IMemberEmote, bool> MemberEmoteFilter => emote => emote.MemberChannel == SrcChannel;
@@ -30,7 +31,7 @@ public class EmotePickerViewModel : ReactiveObject, IActivatableViewModel, IDisp
     private readonly ReadOnlyObservableCollection<IEmote> _favoriteEmotes;
     private readonly ReadOnlyObservableCollection<IGrouping<string, IMemberEmote>> _channelEmotes;
     private readonly ReadOnlyObservableCollection<IGrouping<string, IGlobalEmote>> _globalEmotes;
-
+    private readonly ReadOnlyObservableCollection<IGrouping<string, EmojiEmote>> _emojis;
 
     public EmotePickerViewModel(EmotesService emotesService)
     {
@@ -52,7 +53,6 @@ public class EmotePickerViewModel : ReactiveObject, IActivatableViewModel, IDisp
         
         emotesService.Emotes
                      .Connect()
-                     .ObserveOnThreadPool()
                      .WhereIsType<IEmote, IMemberEmote>()
                      .Filter(filterChanged)
                      .GroupByElement(emote => emote.Provider, emote => emote)
@@ -63,11 +63,20 @@ public class EmotePickerViewModel : ReactiveObject, IActivatableViewModel, IDisp
 
         emotesService.Emotes
                      .Connect()
-                     .ObserveOnThreadPool()
                      .WhereIsType<IEmote, IGlobalEmote>()
+                     .Filter(emote => emote is not EmojiEmote)
                      .GroupByElement(emote => emote.Provider, emote => emote)
                      .ObserveOnMainThread()
                      .Bind(out _globalEmotes)
+                     .Subscribe()
+                     .DisposeWith(_disposables);
+
+        emotesService.Emotes
+                     .Connect()
+                     .WhereIsType<IEmote, EmojiEmote>()
+                     .GroupByElement(emote => emote.EmojiGroup, emote => emote)
+                     .ObserveOnMainThread()
+                     .Bind(out _emojis)
                      .Subscribe()
                      .DisposeWith(_disposables);
     }
