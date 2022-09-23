@@ -23,8 +23,7 @@ public class EmotePickerViewModel : ReactiveObject, IActivatableViewModel, IDisp
     public ReadOnlyObservableCollection<IGrouping<string, IGlobalEmote>> GlobalEmotes => _globalEmotes;
 
 
-    private Func<IMemberEmote, bool> MemberEmoteFilter => emote =>
-        emote.MemberChannel.Equals(SrcChannel?.Login, StringComparison.InvariantCultureIgnoreCase);
+    private Func<IMemberEmote, bool> MemberEmoteFilter => emote => emote.MemberChannel == SrcChannel;
 
     private readonly CompositeDisposable _disposables;
 

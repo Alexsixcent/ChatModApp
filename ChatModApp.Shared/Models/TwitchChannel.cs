@@ -1,15 +1,7 @@
 ﻿namespace ChatModApp.Shared.Models;
 
-public class TwitchChannel : ITwitchChannel
+public sealed record TwitchChannel(string Id, string DisplayName, string Login) : ITwitchChannel
 {
-    public string Id { get; }
-    public string DisplayName { get; }
-    public string Login { get; }
-
-    public TwitchChannel(string id, string displayName, string login)
-    {
-        Id = id;
-        DisplayName = displayName;
-        Login = login;
-    }
+    public bool Equals(TwitchChannel? other) => ReferenceEquals(this, other) || Id == other?.Id;
+    public override int GetHashCode() => Id.GetHashCode();
 }

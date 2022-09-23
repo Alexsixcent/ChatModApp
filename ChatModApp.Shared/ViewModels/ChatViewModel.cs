@@ -16,7 +16,7 @@ namespace ChatModApp.Shared.ViewModels;
 
 public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
 {
-    public string UrlPathSegment => Guid.NewGuid().ToString().Substring(0, 5);
+    public string UrlPathSegment => Guid.NewGuid().ToString()[..5];
     public IScreen? HostScreen { get; set; }
 
     public ReactiveCommand<string, Unit> SendMessageCommand { get; }
@@ -56,11 +56,11 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
 
         var messageSent = _chatService.ChatMessageSent
                                       .Where(message => message.Channel == Channel?.Login)
-                                      .Select(msgProcService.ProcessSentMessage);
+                                      .Select(msg => msgProcService.ProcessSentMessage(Channel!, msg));
         
         _chatService.ChatMessageReceived
                     .Where(message => message.Channel == Channel?.Login)
-                    .Select(msgProcService.ProcessReceivedMessage)
+                    .Select(msg => msgProcService.ProcessReceivedMessage(Channel!, msg))
                     .Merge(messageSent)
                     .ToObservableChangeSet(model => model.Id)
                     .ObserveOnMainThread()

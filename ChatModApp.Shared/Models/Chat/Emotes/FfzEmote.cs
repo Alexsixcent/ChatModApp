@@ -59,7 +59,7 @@ public class FfzUserEmote : FfzEmote, IMemberEmote
     [JsonPropertyName("owner")]
     public override User Owner { get; set; }
     
-    public string MemberChannel { get; set; }
+    public ITwitchChannel MemberChannel { get; set; }
 }
 
 

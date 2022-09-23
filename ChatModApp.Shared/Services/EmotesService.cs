@@ -11,9 +11,9 @@ using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
 namespace ChatModApp.Shared.Services;
 
-public record EmotePair(string MemberChannel, string Code)
+public record EmotePair(ITwitchChannel MemberChannel, string Code)
 {
-    public string MemberChannel { get; } = MemberChannel;
+    public ITwitchChannel MemberChannel { get; } = MemberChannel;
 
     public string Code { get; } = Code;
 }
@@ -94,15 +94,14 @@ public class EmotesService : IDisposable
         
         _emotes.AddRange(bttv.Concat(ffz).Select(emote =>
         {
-            emote.MemberChannel = channel.Login;
+            emote.MemberChannel = channel;
             return emote;
         }));
     }
 
     private void UnloadChannelEmotes(ITwitchChannel channel)
     {
-        var emotes = UserEmotePairs.Items.Where(emote => emote.MemberChannel.Equals(channel.Login,
-                                                                   StringComparison.InvariantCultureIgnoreCase));
+        var emotes = UserEmotePairs.Items.Where(emote => emote.MemberChannel == channel);
 
         _emotes.RemoveMany(emotes);
     }

@@ -30,7 +30,7 @@ public sealed class BttvUserEmote : BttvEmote, IMemberEmote
 
     [JsonPropertyName("userId")] public string UserId { get; set; }
 
-    public string MemberChannel { get; set; }
+    public ITwitchChannel MemberChannel { get; set; } = null!;
     public override string Provider => "BetterTTV Channel";
     public override string? Description { get; set; }
 }
@@ -80,7 +80,8 @@ public sealed class BttvSharedEmote : BttvEmote, IMemberEmote
         }
     }
 
-    public string MemberChannel { get; set; }
+    public ITwitchChannel MemberChannel { get; set; } = null!;
+
     public override string Provider => "BetterTTV Shared";
     public override string? Description { get; set; }
 }
