@@ -31,6 +31,8 @@ public sealed class GlobalStateService
         var tldObv = GetTLDs().ToArray().ToTask();
         var emojiObv = GetEmojis().ToArray().ToTask();
 
+        _emotesService.Initialize();
+
         var (tlds, emojis) = await (tldObv, emojiObv);
         
         TLDs = ImmutableHashSet.CreateRange(tlds);

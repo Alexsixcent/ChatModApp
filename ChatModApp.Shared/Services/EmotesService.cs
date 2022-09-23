@@ -1,24 +1,21 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reactive;
-using System.Reactive.Disposables;
+﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Models.Chat.Emotes;
-using ChatModApp.Shared.Services.ApiClients;
+using ChatModApp.Shared.Services.EmoteProviders;
 using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
-using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
 namespace ChatModApp.Shared.Services;
 
-public record EmotePair(ITwitchChannel MemberChannel, string Code)
+public sealed record EmotePair(ITwitchChannel MemberChannel, string Code)
 {
     public ITwitchChannel MemberChannel { get; } = MemberChannel;
 
     public string Code { get; } = Code;
 }
 
-public class EmotesService : IDisposable
+public sealed class EmotesService : IDisposable
 {
     public IObservableList<IEmote> Emotes { get; }
     public IObservableCache<IGlobalEmote, string> GlobalEmotes { get; }
@@ -27,109 +24,65 @@ public class EmotesService : IDisposable
     private readonly TwitchApiService _apiService;
     private readonly TwitchChatService _chatService;
     private readonly AuthenticationService _authService;
-    private readonly IBttvApi _bttvApi;
-    private readonly IFfzApi _ffzApi;
+    private readonly IEmoteProvider[] _emoteProviders;
 
     private readonly CompositeDisposable _disposable;
-    private readonly SourceList<IEmote> _emotes;
+    private readonly SourceList<IEmoteProvider> _providers;
 
-    public EmotesService(TwitchApiService apiService, AuthenticationService authService, IBttvApi bttvApi,
-                         TwitchChatService chatService, IFfzApi ffzApi)
+    public EmotesService(TwitchApiService apiService, AuthenticationService authService,
+                         TwitchChatService chatService, IEmoteProvider[] emoteProviders)
     {
         _disposable = new();
-        _emotes = new SourceList<IEmote>().DisposeWith(_disposable);
+        _providers = new SourceList<IEmoteProvider>().DisposeWith(_disposable);
         _apiService = apiService;
         _authService = authService;
-        _bttvApi = bttvApi;
         _chatService = chatService;
-        _ffzApi = ffzApi;
+        _emoteProviders = emoteProviders;
 
-        _apiService.UserConnected
-                   .SelectMany(LoadGlobalEmotes)
-                   .Subscribe()
-                   .DisposeWith(_disposable);
+        var providers = _providers
+                        .Connect()
+                        .ObserveOnThreadPool()
+                        .RefCount();
+        var globalEmotes = providers.TransformMany(provider => provider.LoadGlobalEmotes()
+                                                                       .ToEnumerable())
+                                    .RefCount();
+        var connectedEmotes = _apiService.UserConnected
+                                         .ObserveOnThreadPool()
+                                         .Select(user => new TwitchChannel(user.Id, user.DisplayName, user.Login))
+                                         .SelectMany(user => providers.TransformMany(provider => provider
+                                                         .LoadConnectedEmotes(user)
+                                                         .ToEnumerable()));
 
-        _chatService.ChannelsJoined
-                    .OnItemAdded(async s => await LoadChannelEmotes(s))
-                    .OnItemRemoved(UnloadChannelEmotes)
-                    .Subscribe()
-                    .DisposeWith(_disposable);
+        var memberEmotes = _chatService.ChannelsJoined
+                                       .ObserveOnThreadPool()
+                                       .Transform(channel => providers
+                                                             .TransformMany(provider => provider
+                                                                                .LoadChannelEmotes(channel)
+                                                                                .ToEnumerable())
+                                                             .DisposeMany()
+                                                             .AsObservableList())
+                                       .DisposeMany()
+                                       .TransformMany(list => list)
+                                       .RefCount();
 
-        Emotes = _emotes.AsObservableList().DisposeWith(_disposable);
-        
-        GlobalEmotes = _emotes.Connect()
-                              .WhereIsType<IEmote, IGlobalEmote>()
-                              .AddKey(emote => emote.Code)
-                              .AsObservableCache()
-                              .DisposeWith(_disposable);
+        Emotes = globalEmotes.Cast(e => (IEmote)e)
+                             .Or(connectedEmotes, memberEmotes.Cast(e => (IEmote)e))
+                             .AsObservableList()
+                             .DisposeWith(_disposable);
 
-        UserEmotePairs = _emotes.Connect()
-                            .WhereIsType<IEmote, IMemberEmote>()
-                            .AddKey(emote => new EmotePair(emote.MemberChannel, emote.Code))
-                            .AsObservableCache()
-                            .DisposeWith(_disposable);
+
+        GlobalEmotes = globalEmotes
+                       .AddKey(emote => emote.Code)
+                       .AsObservableCache()
+                       .DisposeWith(_disposable);
+
+        UserEmotePairs = memberEmotes
+                         .AddKey(emote => new EmotePair(emote.MemberChannel, emote.Code))
+                         .AsObservableCache()
+                         .DisposeWith(_disposable);
     }
+
+    public void Initialize() => _providers.AddRange(_emoteProviders);
 
     public void Dispose() => _disposable.Dispose();
-
-
-    private async Task LoadChannelEmotes(ITwitchChannel channel)
-    {
-        var userRes = await _apiService.Helix.Users.GetUsersAsync(logins: new() { channel.Login }).ConfigureAwait(false);
-        var id = int.Parse(userRes.Users.Single().Id);
-
-        var (res1, res2) = await (_bttvApi.GetUserEmotes(id), _ffzApi.GetChannelEmotes(id)).ConfigureAwait(false);
-
-        var empty = Enumerable.Empty<IMemberEmote>();
-        var bttv = res1.Content?.ChannelEmotes
-                       .Select(emote =>
-                       {
-                           emote.Description = $"By: {channel.DisplayName}";
-                           return emote;
-                       })
-                       .Concat(res1.Content?.SharedEmotes ?? empty) ?? empty;
-        var ffz = res2.Content?.Sets
-                      .SelectMany(pair => pair.Value.Emoticons) ?? empty;
-                      
-        
-        _emotes.AddRange(bttv.Concat(ffz).Select(emote =>
-        {
-            emote.MemberChannel = channel;
-            return emote;
-        }));
-    }
-
-    private void UnloadChannelEmotes(ITwitchChannel channel)
-    {
-        var emotes = UserEmotePairs.Items.Where(emote => emote.MemberChannel == channel);
-
-        _emotes.RemoveMany(emotes);
-    }
-
-    [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
-    private async Task<Unit> LoadGlobalEmotes(User user, CancellationToken cancel)
-    {
-        var (res1, res2, res3) =
-            await (_apiService.Helix.Chat.GetGlobalEmotesAsync(_authService.TwitchAccessToken),
-                   _bttvApi.GetGlobalEmotes(), _ffzApi.GetGlobalEmotes())
-                .ConfigureAwait(false);
-        
-        var twitch = res1.GlobalEmotes
-                         .Select(emote => new TwitchEmote(emote));
-
-        var bttv = res2;
-
-        var ffz = res3.Content
-                      ?.DefaultSets
-                      .Select(key => res3.Content?.Sets[key])
-                      .SelectMany(set => set?.Emoticons);
-        
-        _emotes.Edit(updater =>
-        {
-            updater.Clear();
-            updater.AddRange(twitch.Concat<IGlobalEmote>(bttv).Concat(ffz));
-        });
-
-        return Unit.Default;
-    }
 }
