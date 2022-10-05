@@ -5,6 +5,7 @@ using ChatModApp.Shared.Models.Chat.Emotes;
 using ChatModApp.Shared.Services.EmoteProviders;
 using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
+using Microsoft.Extensions.Logging;
 
 namespace ChatModApp.Shared.Services;
 
@@ -29,32 +30,35 @@ public sealed class EmotesService : IDisposable
     private readonly CompositeDisposable _disposable;
     private readonly SourceList<IEmoteProvider> _providers;
 
-    public EmotesService(TwitchApiService apiService, AuthenticationService authService,
+    public EmotesService(ILogger<EmotesService> logger, TwitchApiService apiService, AuthenticationService authService,
                          TwitchChatService chatService, IEmoteProvider[] emoteProviders)
     {
-        _disposable = new();
-        _providers = new SourceList<IEmoteProvider>().DisposeWith(_disposable);
         _apiService = apiService;
         _authService = authService;
         _chatService = chatService;
         _emoteProviders = emoteProviders;
+        _disposable = new();
+        _providers = new SourceList<IEmoteProvider>().DisposeWith(_disposable);
 
         var providers = _providers
                         .Connect()
                         .ObserveOnThreadPool()
                         .RefCount();
-        var globalEmotes = providers.TransformMany(provider => provider.LoadGlobalEmotes()
-                                                                       .ToEnumerable())
-                                    .RefCount();
+        var globalEmotes = providers
+                           .Do(_ => logger.LogInformation("Loading global emotes..."))
+                           .TransformMany(provider => provider.LoadGlobalEmotes().ToEnumerable())
+                           .RefCount();
         var connectedEmotes = _apiService.UserConnected
                                          .ObserveOnThreadPool()
                                          .Select(user => new TwitchChannel(user.Id, user.DisplayName, user.Login))
+                                         .Do(channel => logger.LogInformation("Loading {User}'s emotes...", channel))
                                          .SelectMany(user => providers.TransformMany(provider => provider
                                                          .LoadConnectedEmotes(user)
                                                          .ToEnumerable()));
 
         var memberEmotes = _chatService.ChannelsJoined
                                        .ObserveOnThreadPool()
+                                       .Do(set => logger.LogInformation("Loading channel emotes in {Channel}...", set.First().Item.Current))
                                        .Transform(channel => providers
                                                              .TransformMany(provider => provider
                                                                                 .LoadChannelEmotes(channel)
