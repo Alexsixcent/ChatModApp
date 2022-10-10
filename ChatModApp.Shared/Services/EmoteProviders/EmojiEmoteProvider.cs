@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Reactive.Linq;
 using ChatModApp.Shared.Models.Chat.Emotes;
 using ChatModApp.Shared.Tools.Extensions;
+using Microsoft.Extensions.Logging;
 using ReactiveUI;
 
 namespace ChatModApp.Shared.Services.EmoteProviders;
@@ -9,10 +10,12 @@ namespace ChatModApp.Shared.Services.EmoteProviders;
 public sealed class EmojiEmoteProvider : IEmoteProvider
 {
     private const float MaxVersion = 13.0F;
+    private readonly ILogger<EmojiEmoteProvider> _logger;
     private readonly HttpClient _client;
 
-    public EmojiEmoteProvider(HttpClient client)
+    public EmojiEmoteProvider(ILogger<EmojiEmoteProvider> logger, HttpClient client)
     {
+        _logger = logger;
         _client = client;
     }
 
@@ -30,6 +33,7 @@ public sealed class EmojiEmoteProvider : IEmoteProvider
         return Observable
                .FromAsync(token => _client.GetStreamAsync("https://unicode.org/Public/emoji/14.0/emoji-test.txt",
                                                           token))
+               .Do(_ => _logger.LogDebug("Fetched emoji 14.0 list from unicode standard"))
                .ReadLinesToEnd()
                .WhereNotNullOrWhiteSpace()
                .Select(line =>
