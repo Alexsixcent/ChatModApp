@@ -54,7 +54,7 @@
         <Version>3.6.1</Version>
       </PackageReference>
       <PackageReference Include="TwitchLib.Client">
-        <Version>3.2.6</Version>
+        <Version>3.3.1</Version>
       </PackageReference>
     </ItemGroup>
 
