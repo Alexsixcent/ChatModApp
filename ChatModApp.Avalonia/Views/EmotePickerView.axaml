@@ -72,7 +72,7 @@
 									   Text="{CompiledBinding Count, StringFormat={}{0} item(s), Mode=OneWay}" />
 						</StackPanel>
 					</Expander.Header>
-					<ItemsControl Items="{Binding}">
+					<ItemsControl Items="{CompiledBinding}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
 								<tools:AlignableWrapPanel Orientation="Horizontal"
@@ -95,22 +95,62 @@
 		</DataTemplate>
 	</UserControl.DataTemplates>
 
-	<TabControl TabStripPlacement="Bottom"
-				HorizontalAlignment="Right"
-				MaxHeight="400"
-				MaxWidth="300">
-		<TabItem ToolTip.Tip="Favorites"
-				 Header="{x:Static fa:Symbol.Favorite}"
-				 Content="{CompiledBinding FavoriteEmotes}" />
-		<TabItem ToolTip.Tip="Channel Emotes"
-				 Header="{x:Static fa:Symbol.VideoFilled}"
-				 Content="{CompiledBinding ChannelEmotes}" />
-		<TabItem ToolTip.Tip="My Emotes"
-				 Header="{x:Static fa:Symbol.ClearSelection}"
-				 Content="{CompiledBinding GlobalEmotes}" />
-		<TabItem ToolTip.Tip="Emojis"
-				 Header="{x:Static fa:Symbol.Emoji2}"
-				 Content="{CompiledBinding Emojis}"/>
-	</TabControl>
+	<Grid RowDefinitions="*, Auto, Auto"
+		  MaxHeight="400"
+		  MaxWidth="300">
 
+		<ContentControl x:Name="FavoriteEmotesList"
+						Grid.Row="0"
+						Content="{CompiledBinding FavoriteEmotes}"
+						IsVisible="False" />
+		<ContentControl x:Name="ChannelEmotesList"
+						Grid.Row="0"
+						Content="{CompiledBinding ChannelEmotes}"
+						IsVisible="False" />
+		<ContentControl x:Name="GlobalEmotesList"
+						Grid.Row="0"
+						Content="{CompiledBinding GlobalEmotes}"
+						IsVisible="False" />
+		<ContentControl x:Name="EmojiList"
+						Grid.Row="0"
+						Content="{CompiledBinding Emojis}"
+						IsVisible="False" />
+
+		<TextBox Grid.Row="1"
+				 Watermark="Search"
+				 HorizontalAlignment="Stretch" />
+		<TabStrip x:Name="TabStrip"
+				  Grid.Row="2"
+				  HorizontalAlignment="Right">
+			<TabStripItem Content="{x:Static fa:Symbol.Favorite}">
+				<ToolTip.Tip>
+					<TextBlock TextWrapping="NoWrap">
+						Favorites
+					</TextBlock>
+				</ToolTip.Tip>
+			</TabStripItem>
+
+			<TabStripItem Content="{x:Static fa:Symbol.VideoFilled}">
+				<ToolTip.Tip>
+					<TextBlock TextWrapping="NoWrap">
+						Channel Emotes
+					</TextBlock>
+				</ToolTip.Tip>
+			</TabStripItem>
+			<TabStripItem Content="{x:Static fa:Symbol.ClearSelection}">
+				<ToolTip.Tip>
+					<TextBlock TextWrapping="NoWrap">
+						Global Emotes
+					</TextBlock>
+				</ToolTip.Tip>
+			</TabStripItem>
+			<TabStripItem Content="{x:Static fa:Symbol.Emoji2}">
+				<ToolTip.Tip>
+					<TextBlock TextWrapping="NoWrap">
+						Emojis
+					</TextBlock>
+				</ToolTip.Tip>
+			</TabStripItem>
+		</TabStrip>
+	</Grid>
 </UserControl>
