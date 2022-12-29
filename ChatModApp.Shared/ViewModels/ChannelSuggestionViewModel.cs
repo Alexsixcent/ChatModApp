@@ -1,4 +1,6 @@
-﻿namespace ChatModApp.Shared.ViewModels;
+﻿using ChatModApp.Shared.Models;
+
+namespace ChatModApp.Shared.ViewModels;
 
 public class ChannelSuggestionViewModel
 {
@@ -6,14 +8,13 @@ public class ChannelSuggestionViewModel
 
     public Uri ThumbnailUrl { get; }
 
-    public string DisplayName { get; }
-
-    public string Login { get; }
-
-    public ChannelSuggestionViewModel(string login, string displayName, Uri thumbnailUrl, bool isLive = false)
+    public ITwitchChannel Channel { get; }
+    public string DisplayName => Channel.DisplayName;
+    public string Login => Channel.Login;
+    
+    public ChannelSuggestionViewModel(ITwitchChannel channel, Uri thumbnailUrl, bool isLive = false)
     {
-        Login = login;
-        DisplayName = displayName;
+        Channel = channel;
         ThumbnailUrl = thumbnailUrl;
         IsLive = isLive;
     }

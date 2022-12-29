@@ -1,6 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:controls="using:ChatModApp.Controls">
+		xmlns:controls="using:ChatModApp.Controls"
+		xmlns:emo="clr-namespace:ChatModApp.Shared.Models.Chat.Emotes;assembly=ChatModApp.Shared">
 	<Design.PreviewWith>
 		<controls:ChatEmote />
 	</Design.PreviewWith>
@@ -25,8 +26,18 @@
 									   Margin="5" />
 						</Grid>
 					</ToolTip.Tip>
-					<controls:CachedImage Name="PART_EmoteImage"
-										  Stretch="None" />
+					<ContentControl Content="{TemplateBinding Emote}">
+						<ContentControl.DataTemplates>
+							<DataTemplate DataType="{x:Type emo:EmojiEmote}">
+								<TextBlock Text="{CompiledBinding EmojiValue}" />
+							</DataTemplate>
+							<DataTemplate DataType="{x:Type emo:IEmote}">
+								<controls:CachedImage Source="{CompiledBinding Small}"
+													  Stretch="None" />
+							</DataTemplate>
+						</ContentControl.DataTemplates>
+					</ContentControl>
+
 				</Border>
 			</ControlTemplate>
 		</Setter>

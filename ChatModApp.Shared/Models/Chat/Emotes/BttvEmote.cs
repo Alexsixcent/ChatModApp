@@ -1,4 +1,4 @@
-﻿using Refit;
+﻿using System.Text.Json.Serialization;
 
 namespace ChatModApp.Shared.Models.Chat.Emotes;
 
@@ -15,45 +15,46 @@ public abstract class BttvEmote : IEmote
     public abstract string Provider { get; }
 }
 
-public sealed class BttvUserEmote : BttvEmote
+public sealed class BttvUserEmote : BttvEmote, IMemberEmote
 {
     public BttvUserEmote()
     {
         Id = Code = ImageType = UserId = "";
     }
 
-    [AliasAs("id")] public override string Id { get; set; }
+    [JsonPropertyName("id")] public override string Id { get; set; }
 
-    [AliasAs("code")] public override string Code { get; set; }
+    [JsonPropertyName("code")] public override string Code { get; set; }
 
-    [AliasAs("imageType")] public override string ImageType { get; set; }
+    [JsonPropertyName("imageType")] public override string ImageType { get; set; }
 
-    [AliasAs("userId")] public string UserId { get; set; }
+    [JsonPropertyName("userId")] public string UserId { get; set; }
 
+    public ITwitchChannel MemberChannel { get; set; } = null!;
     public override string Provider => "BetterTTV Channel";
     public override string? Description { get; set; }
 }
 
-public sealed class BttvGlobalEmote : BttvEmote
+public sealed class BttvGlobalEmote : BttvEmote, IGlobalEmote
 {
     public BttvGlobalEmote()
     {
         Id = Code = ImageType = UserId = "";
     }
 
-    [AliasAs("id")] public override string Id { get; set; }
+    [JsonPropertyName("id")] public override string Id { get; set; }
 
-    [AliasAs("code")] public override string Code { get; set; }
+    [JsonPropertyName("code")] public override string Code { get; set; }
 
-    [AliasAs("imageType")] public override string ImageType { get; set; }
+    [JsonPropertyName("imageType")] public override string ImageType { get; set; }
 
-    [AliasAs("userId")] public string UserId { get; set; }
+    [JsonPropertyName("userId")] public string UserId { get; set; }
 
     public override string Provider => "BetterTTV Global";
     public override string? Description { get; set; }
 }
 
-public sealed class BttvSharedEmote : BttvEmote
+public sealed class BttvSharedEmote : BttvEmote, IMemberEmote
 {
     private BttvUser _user = null!;
 
@@ -62,13 +63,13 @@ public sealed class BttvSharedEmote : BttvEmote
         Id= Code = ImageType = "";
     }
 
-    [AliasAs("id")] public override string Id { get; set; }
+    [JsonPropertyName("id")] public override string Id { get; set; }
 
-    [AliasAs("code")] public override string Code { get; set; }
+    [JsonPropertyName("code")] public override string Code { get; set; }
 
-    [AliasAs("imageType")] public override string ImageType { get; set; }
+    [JsonPropertyName("imageType")] public override string ImageType { get; set; }
 
-    [AliasAs("user")]
+    [JsonPropertyName("user")]
     public BttvUser User
     {
         get => _user;
@@ -78,6 +79,8 @@ public sealed class BttvSharedEmote : BttvEmote
             Description = $"By: {value.DisplayName}";
         }
     }
+
+    public ITwitchChannel MemberChannel { get; set; } = null!;
 
     public override string Provider => "BetterTTV Shared";
     public override string? Description { get; set; }
@@ -90,11 +93,11 @@ public class BttvUser
         Id = Name = DisplayName = ProviderId = "";
     }
 
-    [AliasAs("id")] public string Id { get; set; }
+    [JsonPropertyName("id")] public string Id { get; set; }
 
-    [AliasAs("name")] public string Name { get; set; }
+    [JsonPropertyName("name")] public string Name { get; set; }
 
-    [AliasAs("displayName")] public string DisplayName { get; set; }
+    [JsonPropertyName("displayName")] public string DisplayName { get; set; }
 
-    [AliasAs("providerId")] public string ProviderId { get; set; }
+    [JsonPropertyName("providerId")] public string ProviderId { get; set; }
 }

@@ -2,7 +2,7 @@
 
 namespace ChatModApp.Shared.Models.Chat.Emotes;
 
-public class TwitchEmote : IEmote
+public class TwitchEmote : IGlobalEmote
 {
     public TwitchEmote(string id, string code, Uri small, Uri medium, Uri large)
     {

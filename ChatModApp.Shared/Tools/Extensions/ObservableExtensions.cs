@@ -19,19 +19,20 @@ public static class ObservableExtensions
                                   ps.Window(() => ps.Delay(sampleDuration, scheduler))
                                     .SelectMany(x => x.Take(1)));
     }
-    
+
     //From https://stackoverflow.com/a/29743225
     public static IObservable<T> QuickThrottle<T>(this IObservable<T> src, TimeSpan interval, IScheduler? scheduler)
     {
         scheduler ??= Scheduler.Default;
-        
+
         return src
                .Scan(new ValueAndDueTime<T>(), (prev, id) => AccumulateForQuickThrottle(prev, id, interval, scheduler))
                .Where(vd => !vd.Ignore)
                .SelectMany(sc => Observable.Timer(sc.DueTime, scheduler).Select(_ => sc.Value));
     }
 
-    private static ValueAndDueTime<T> AccumulateForQuickThrottle<T>(ValueAndDueTime<T> prev, T value, TimeSpan interval, IScheduler s)
+    private static ValueAndDueTime<T> AccumulateForQuickThrottle<T>(ValueAndDueTime<T> prev, T value, TimeSpan interval,
+                                                                    IScheduler s)
     {
         var now = s.Now;
 
@@ -123,4 +124,16 @@ public static class ObservableExtensions
                          .Retry(retryCount)
                          .SelectMany(t => t.Item1 ? Observable.Return(t.Item2) : Observable.Throw<T>(t.Item3));
     }
+
+    public static IObservable<string> WhereNotNullOrWhiteSpace(this IObservable<string?> source) =>
+        source.Where(s => !string.IsNullOrWhiteSpace(s))!;
+
+    public static IObservable<string?> ReadLinesToEnd(this IObservable<Stream> source)
+        => source.SelectMany(stream =>
+                                 Observable.Using(() => new StreamReader(stream),
+                                                  reader =>
+                                                  {
+                                                      return Observable.FromAsync(reader.ReadLineAsync)
+                                                                       .DoWhile(() => !reader.EndOfStream);
+                                                  }));
 }
