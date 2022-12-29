@@ -48,7 +48,7 @@
         <Version>14.6.1</Version>
       </PackageReference>
       <PackageReference Include="Splat.Serilog">
-        <Version>14.4.1</Version>
+        <Version>14.6.1</Version>
       </PackageReference>
       <PackageReference Include="TwitchLib.Api">
         <Version>3.6.1</Version>
