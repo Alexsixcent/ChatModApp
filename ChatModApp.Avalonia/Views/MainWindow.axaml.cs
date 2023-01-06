@@ -6,16 +6,15 @@ using Avalonia.Controls.Mixins;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using ChatModApp.Shared.ViewModels;
-using FluentAvalonia.Core.ApplicationModel;
 using FluentAvalonia.Styling;
-using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Media;
+using FluentAvalonia.UI.Windowing;
 using ReactiveUI;
 using Splat;
 
 namespace ChatModApp.Views;
 
-public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
+public partial class MainWindow : AppWindow, IViewFor<MainViewModel>
 {
     public static readonly StyledProperty<MainViewModel?> ViewModelProperty =
         AvaloniaProperty.Register<MainWindow, MainViewModel?>(nameof(ViewModel));
@@ -34,6 +33,7 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
     
     public MainWindow(IApplicationSplashScreen splashScreen, MainViewModel mainViewModel)
     {
+        TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
         this.WhenActivated(disposable =>
         {
             this.OneWayBind(ViewModel, vm => vm.Router, v => v.RoutedViewHost.Router)
@@ -118,9 +118,8 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
             > 500 => 500,
             _ => 400
         };
-
-        if (TitleBar is not null) 
-            TitleBar.ExtendViewIntoTitleBar = true;
+        
+        TitleBar.ExtendsContentIntoTitleBar = true;
     }
 
     private void OnRequestedThemeChanged(FluentAvaloniaTheme sender, RequestedThemeChangedEventArgs args)

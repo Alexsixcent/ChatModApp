@@ -5,6 +5,7 @@
              x:Class="ChatModApp.App">
     <Application.Styles>
         <styling:FluentAvaloniaTheme RequestedTheme="Dark"/>
+        <StyleInclude Source="avares://FluentAvalonia.UI.Windowing/Styles/FAWindowingStyles.axaml" />
 		<StyleInclude Source="/Controls/PersonIcon.axaml"/>
 		<StyleInclude Source="/Controls/CachedImage.axaml"/>
 		<StyleInclude Source="/Controls/ChatMessage.axaml"/>
