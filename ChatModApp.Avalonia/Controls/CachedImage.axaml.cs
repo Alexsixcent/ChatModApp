@@ -4,7 +4,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Controls.Primitives;
-using Avalonia.Extensions.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using ChatModApp.Shared.Tools.Extensions;
