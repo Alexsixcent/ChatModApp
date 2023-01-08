@@ -13,25 +13,18 @@
 		<!-- Set Defaults -->
 		<Setter Property="Template">
 			<ControlTemplate>
-				<WrapPanel Name="PART_Panel">
-					<StackPanel Name="PART_BadgesPanel"
-								Orientation="Horizontal" />
-					<StackPanel Orientation="Horizontal">
-						<TextBlock Name="PART_UserBlock"
-								   Text="{TemplateBinding Username}"
-								   TextWrapping="NoWrap"
-								   TextAlignment="Left"
-								   VerticalAlignment="Center"
-								   Margin="1,0,0,0"
-								   FontWeight="Bold"
-								   Foreground="{TemplateBinding UsernameColor, Converter={StaticResource ColorToBrushConverter}}" />
-						<TextBlock Text=": "
-								   TextWrapping="NoWrap"
-								   TextAlignment="Left"
-								   VerticalAlignment="Center"
-								   Margin="0,0,0,1" />
-					</StackPanel>
-				</WrapPanel>
+				<TextBlock Name="PART_MessageBlock">
+					<TextBlock.Inlines>
+						<Span Name="PART_BadgeInlines"/>
+						<Span>
+							<Run Text="{TemplateBinding Username}"
+							     FontWeight="Bold"
+							     Foreground="{TemplateBinding UsernameColor, Converter={StaticResource ColorToBrushConverter}}"/>
+							<Run Text=": "/>							
+						</Span>
+						<Span Name="PART_FragInlines"/>
+					</TextBlock.Inlines>
+				</TextBlock>
 			</ControlTemplate>
 		</Setter>
 	</Style>
