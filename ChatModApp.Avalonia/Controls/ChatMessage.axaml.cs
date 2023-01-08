@@ -78,14 +78,14 @@ public class ChatMessage : TemplatedControl
     private void OnBadgesChanged(AvaloniaPropertyChangedEventArgs args)
     {
         if (args.NewValue is not IEnumerable<IChatBadge> badges) return;
-        
+
         SetBadges(badges);
     }
 
     private void OnFragmentsChanged(AvaloniaPropertyChangedEventArgs args)
     {
         if (args.NewValue is not IEnumerable<IMessageFragment> fragments) return;
-        
+
         SetFragments(fragments);
     }
 
@@ -96,7 +96,7 @@ public class ChatMessage : TemplatedControl
         _fragInlines = e.NameScope.Find<Span>(ElementFragInlines);
 
         base.OnApplyTemplate(e);
-        
+
         SetBadges(Badges);
         SetFragments(MessageFragments);
     }
@@ -104,34 +104,47 @@ public class ChatMessage : TemplatedControl
     private void SetBadges(IEnumerable<IChatBadge> badges)
     {
         _badgeInlines?.Inlines.Clear();
-        _badgeInlines?.Inlines.AddRange(badges.Select(GetControlFromBadge));        
+        _badgeInlines?.Inlines.AddRange(badges.Select(GetInlineFromBadge));
     }
 
     private void SetFragments(IEnumerable<IMessageFragment> fragments)
     {
         _fragInlines?.Inlines.Clear();
-        _fragInlines?.Inlines.AddRange(fragments.Select(GetMsgFragControl));
+        _fragInlines?.Inlines.AddRange(fragments.Select(GetInlineFromFragment));
     }
 
-    private static Inline GetControlFromBadge(IChatBadge badge) =>
-        new InlineUIContainer(new ChatBadge {Badge = badge});
+    private static Inline GetInlineFromBadge(IChatBadge badge) =>
+        new InlineUIContainer(new ChatBadge {Badge = badge})
+        {
+            BaselineAlignment = BaselineAlignment.Center
+        };
 
-    private static Inline GetControlFromEmote(IEmote emote) =>
-        new InlineUIContainer(new ChatEmote {Emote = emote});
+    private static Inline GetInlineFromEmote(IEmote emote) =>
+        new InlineUIContainer(new ChatEmote {Emote = emote})
+        {
+            BaselineAlignment = BaselineAlignment.Center
+        };
 
-    private static Inline GetMsgFragControl(IMessageFragment frag)
+    private static Inline GetInlineFromFragment(IMessageFragment frag)
     {
         return frag switch
         {
-            EmoteFragment emoteFragment => GetControlFromEmote(emoteFragment.Emote),
-            TextFragment textFragment => new Run(textFragment.Text),
+            EmoteFragment emoteFragment => GetInlineFromEmote(emoteFragment.Emote),
+            TextFragment textFragment => new Run(textFragment.Text)
+            {
+                FontWeight = FontWeight.Normal,
+                BaselineAlignment = BaselineAlignment.Center
+            },
             UriFragment uriFragment => new InlineUIContainer(
                 new HyperlinkButton
                 {
                     Content = uriFragment.Text,
                     NavigateUri = uriFragment.Uri,
                     Padding = new(5, 5, 5, 6)
-                }),
+                })
+            {
+                BaselineAlignment = BaselineAlignment.Center
+            },
             _ => throw new ArgumentOutOfRangeException(nameof(frag))
         };
     }
