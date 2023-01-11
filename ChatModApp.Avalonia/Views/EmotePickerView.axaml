@@ -30,7 +30,7 @@
 			<Setter Property="Template">
 				<ControlTemplate>
 					<StackPanel Orientation="Vertical">
-						<ctrls:CachedImage Stretch="None"
+						<ctrls:AdvancedImage Stretch="None"
 										   Source="https://static-cdn.jtvnw.net/emoticons/v2/emotesv2_4c39207000564711868f3196cc0a8748/default/dark/3.0" />
 						<TextBlock TextWrapping="Wrap"
 								   TextAlignment="Center"

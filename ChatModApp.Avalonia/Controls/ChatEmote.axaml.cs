@@ -7,7 +7,7 @@ using ChatModApp.Shared.Models.Chat.Emotes;
 
 namespace ChatModApp.Controls;
 
-[TemplatePart(ToolTipImage, typeof(CachedImage))]
+[TemplatePart(ToolTipImage, typeof(AdvancedImage))]
 [TemplatePart(ToolTipText, typeof(TextBlock))]
 public class ChatEmote : TemplatedControl
 {
@@ -23,7 +23,7 @@ public class ChatEmote : TemplatedControl
         set => SetValue(EmoteProperty, value);
     }
 
-    private CachedImage? _toolTipImage;
+    private AdvancedImage? _toolTipImage;
     private TextBlock? _toolTipTextBlock;
 
     static ChatEmote()
@@ -33,7 +33,7 @@ public class ChatEmote : TemplatedControl
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        _toolTipImage = e.NameScope.Find<CachedImage>(ToolTipImage);
+        _toolTipImage = e.NameScope.Find<AdvancedImage>(ToolTipImage);
         _toolTipTextBlock = e.NameScope.Find<TextBlock>(ToolTipText);
         
         base.OnApplyTemplate(e);

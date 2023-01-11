@@ -6,7 +6,7 @@ using Avalonia.Threading;
 using ChatModApp.Shared.Services;
 using ChatModApp.Shared.ViewModels;
 using ChatModApp.Views;
-using FluentAvalonia.Core.ApplicationModel;
+using FluentAvalonia.UI.Windowing;
 using Splat;
 
 namespace ChatModApp.Tools;
