@@ -1,6 +1,5 @@
 ﻿using System;
 using Avalonia;
-using Avalonia.Extensions.Controls;
 using Avalonia.Logging;
 using Avalonia.ReactiveUI;
 using ChatModApp.Tools;
@@ -21,7 +20,6 @@ class Program
     {
         return AppBuilder.Configure<App>()
                          .UsePlatformDetect()
-                         .UseDoveExtensions()
 #if DEBUG
                          .LogToSerilog(LogEventLevel.Debug,
                                        LogArea.Control, LogArea.Layout, LogArea.Binding, LogArea.Property,

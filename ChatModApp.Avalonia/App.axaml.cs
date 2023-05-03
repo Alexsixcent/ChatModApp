@@ -5,12 +5,12 @@ using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
 using ChatModApp.Shared.Tools;
-using ChatModApp.Tools;
 using ChatModApp.Views;
 using DryIoc;
-using FluentAvalonia.Core.ApplicationModel;
+using FluentAvalonia.UI.Windowing;
 using ReactiveUI;
 using Splat;
+using AppSplashScreen = ChatModApp.Tools.AppSplashScreen;
 
 namespace ChatModApp;
 

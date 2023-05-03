@@ -5,8 +5,10 @@
              x:Class="ChatModApp.App">
     <Application.Styles>
         <styling:FluentAvaloniaTheme RequestedTheme="Dark"/>
-		<StyleInclude Source="/Controls/PersonIcon.axaml"/>
-		<StyleInclude Source="/Controls/CachedImage.axaml"/>
+        <StyleInclude Source="avares://FluentAvalonia.UI.Windowing/Styles/FAWindowingStyles.axaml" />
+        <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
+        <StyleInclude Source="/Controls/PersonIcon.axaml"/>
+        <StyleInclude Source="/Controls/AdvancedImage.axaml"/>
 		<StyleInclude Source="/Controls/ChatMessage.axaml"/>
 		<StyleInclude Source="/Controls/ChatEmote.axaml"/>
 		<StyleInclude Source="/Controls/ChatBadge.axaml"/>

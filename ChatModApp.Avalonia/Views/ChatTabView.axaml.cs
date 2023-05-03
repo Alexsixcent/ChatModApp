@@ -7,8 +7,8 @@ using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using Avalonia.VisualTree;
 using ChatModApp.Shared.ViewModels;
-using FluentAvalonia.Core.ApplicationModel;
 using FluentAvalonia.UI.Controls;
+using FluentAvalonia.UI.Windowing;
 using ReactiveUI;
 
 namespace ChatModApp.Views;
@@ -55,30 +55,30 @@ public partial class ChatTabView : ReactiveUserControl<ChatTabViewModel>
 
     private void OnParentWindowOpened(object? sender, EventArgs? e)
     {
-        if (e is not null && sender is Window win)
-            win.Opened -= OnParentWindowOpened;
-
-        if (sender is not CoreWindow cw)
-            return;
-        
-        var titleBar = cw.TitleBar;
-        if (titleBar is null) return;
-            
-        titleBar.LayoutMetricsChanged += OnTitleBarLayoutMetricsChanged;
-
-        cw.SetTitleBar(OverlayInsetHost);
-        OnTitleBarLayoutMetricsChanged(titleBar);
-        
-        //Finds the existing default title bar in the visual tree
-        var def = cw.GetVisualDescendants()
-                    .OfType<Panel>()
-                    .FirstOrDefault(panel => panel.Name is "DefaultTitleBar");
-        
-        OverlayInsetHost.MinHeight = def?.Height ?? titleBar.Height;
+        // if (e is not null && sender is Window win)
+        //     win.Opened -= OnParentWindowOpened;
+        //
+        // if (sender is not AppWindow cw)
+        //     return;
+        //
+        // var titleBar = cw.TitleBar;
+        // if (titleBar is null) return;
+        //     
+        // titleBar.LayoutMetricsChanged += OnTitleBarLayoutMetricsChanged;
+        //
+        // cw.SetTitleBar(OverlayInsetHost);
+        // OnTitleBarLayoutMetricsChanged(titleBar);
+        //
+        // //Finds the existing default title bar in the visual tree
+        // var def = cw.GetVisualDescendants()
+        //             .OfType<Panel>()
+        //             .FirstOrDefault(panel => panel.Name is "DefaultTitleBar");
+        //
+        // OverlayInsetHost.MinHeight = def?.Height ?? titleBar.Height;
     }
 
-    private void OnTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar bar, EventArgs? _ = null)
-    {
-        OverlayInsetHost.Margin = new(0, 0, bar.SystemOverlayRightInset, 0);
-    }
+    // private void OnTitleBarLayoutMetricsChanged(CoreApplicationViewTitleBar bar, EventArgs? _ = null)
+    // {
+    //     OverlayInsetHost.Margin = new(0, 0, bar.SystemOverlayRightInset, 0);
+    // }
 }

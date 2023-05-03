@@ -14,7 +14,7 @@
 						ToolTip.Placement="Pointer">
 					<ToolTip.Tip>
 						<Grid RowDefinitions="Auto,Auto">
-							<controls:CachedImage Name="PART_ToolTipImage"
+							<controls:AdvancedImage Name="PART_ToolTipImage"
 												  Stretch="None"
 												  HorizontalAlignment="Center"
 												  Margin="5"
@@ -32,8 +32,8 @@
 								<TextBlock Text="{CompiledBinding EmojiValue}" />
 							</DataTemplate>
 							<DataTemplate DataType="{x:Type emo:IEmote}">
-								<controls:CachedImage Source="{CompiledBinding Small}"
-													  Stretch="None" />
+								<controls:AdvancedImage Source="{Binding Small}"
+													    Stretch="None" />
 							</DataTemplate>
 						</ContentControl.DataTemplates>
 					</ContentControl>

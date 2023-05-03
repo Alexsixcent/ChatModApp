@@ -7,7 +7,6 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Utilities;
-using Avalonia.Visuals.Media.Imaging;
 using AvaloniaGif;
 
 namespace ChatModApp.Tools;
@@ -65,7 +64,7 @@ public class ImageGifBitmap : IBitmap
         GC.SuppressFinalize(this);
     }
 
-    public void Save(string fileName) => _bitmap.Save(fileName);
+    public void Save(string fileName, int? quality = null) => _bitmap.Save(fileName, quality);
 
-    public void Save(Stream stream) => _bitmap.Save(stream);
+    public void Save(Stream stream, int? quality = null) => _bitmap.Save(stream, quality);
 }

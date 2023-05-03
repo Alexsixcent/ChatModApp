@@ -1,13 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.5.1" GeneratePathProperty="true" />
+        <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.6.0" GeneratePathProperty="true" />
     </ItemGroup>
 
     <!-- Copies all content root files to output dir for app to load -->

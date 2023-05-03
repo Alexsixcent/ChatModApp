@@ -4,7 +4,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
-using Avalonia.Extensions.Controls;
 using Avalonia.Layout;
 using Avalonia.Logging;
 using Avalonia.Media;
