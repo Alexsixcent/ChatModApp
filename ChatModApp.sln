@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EFC16843-DFA0-4793-BA7B-C73C5EC40C7D}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		global.json = global.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatModApp.Shared", "ChatModApp.Shared\ChatModApp.Shared.csproj", "{E7427D1C-E2FF-417A-9EF4-72F096727C73}"

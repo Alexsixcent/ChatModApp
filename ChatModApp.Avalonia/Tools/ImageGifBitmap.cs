@@ -17,6 +17,10 @@ public class ImageGifBitmap : IBitmap
     public IRef<IBitmapImpl> PlatformImpl { get; }
 
     public PixelSize PixelSize { get; }
+
+
+    public void NotClientImplementable() => throw new NotImplementedException();
+
     public Vector Dpi { get; }
     
     private readonly GifInstance _instance;
@@ -38,8 +42,7 @@ public class ImageGifBitmap : IBitmap
         Dpi = _bitmap.Dpi;
     }
 
-    public void Draw(DrawingContext context, Rect sourceRect, Rect destRect,
-                     BitmapInterpolationMode bitmapInterpolationMode)
+    public void Draw(DrawingContext context, Rect sourceRect, Rect destRect)
     {
         if (_instance.CurrentCts?.IsCancellationRequested ?? true)
             return;
@@ -49,12 +52,12 @@ public class ImageGifBitmap : IBitmap
         var currentFrame = _instance.ProcessFrameTime(_stopwatch.Elapsed);
         if (currentFrame is { } source)
         {
-            using var ctx = _bitmap.CreateDrawingContext(null);
+            using var ctx = _bitmap.CreateDrawingContext();
             var ts = new Rect(source.Size);
-            ctx.DrawBitmap(source.PlatformImpl, 1, ts, ts);
+            ctx.DrawImage(source, ts, ts);
         }
 
-        context.DrawImage(_bitmap, sourceRect, destRect, bitmapInterpolationMode);
+        context.DrawImage(_bitmap, sourceRect, destRect);
     }
 
     public void Dispose()

@@ -28,9 +28,8 @@ public class ChatMessage : TemplatedControl
         AvaloniaProperty.Register<ChatMessage, IEnumerable<IMessageFragment>>(nameof(MessageFragments),
             defaultBindingMode: BindingMode.OneTime);
 
-    public static readonly DirectProperty<ChatMessage, string> UsernameProperty =
-        TextBlock.TextProperty.AddOwner<ChatMessage>(m => m.Username, (m, s) => m.Username = s, string.Empty,
-            BindingMode.OneTime);
+    public static readonly StyledProperty<string?> UsernameProperty =
+        TextBlock.TextProperty.AddOwner<ChatMessage>();
 
     public static readonly StyledProperty<Color> UsernameColorProperty =
         SolidColorBrush.ColorProperty.AddOwner<ChatMessage>();
@@ -47,10 +46,10 @@ public class ChatMessage : TemplatedControl
         set => SetValue(MessageFragmentsProperty, value);
     }
 
-    public string Username
+    public string? Username
     {
-        get => _username;
-        set => SetAndRaise(UsernameProperty, ref _username, value);
+        get => GetValue(UsernameProperty);
+        set => SetValue(UsernameProperty, value);
     }
 
     public Color UsernameColor

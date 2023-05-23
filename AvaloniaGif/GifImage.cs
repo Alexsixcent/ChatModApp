@@ -144,9 +144,9 @@ public class GifImage : Control
 
         if (currentFrame is { } source && _backingRtb is { })
         {
-            using var ctx = _backingRtb.CreateDrawingContext(null);
+            using var ctx = _backingRtb.CreateDrawingContext();
             var ts = new Rect(source.Size);
-            ctx.DrawBitmap(source.PlatformImpl, 1, ts, ts);
+            ctx.DrawImage(source, ts, ts);
         }
 
         if (_backingRtb is not null && Bounds.Width > 0 && Bounds.Height > 0)
@@ -163,9 +163,7 @@ public class GifImage : Control
             var sourceRect = new Rect(sourceSize)
                 .CenterRect(new Rect(destRect.Size / scale));
 
-            var interpolationMode = RenderOptions.GetBitmapInterpolationMode(this);
-
-            context.DrawImage(_backingRtb, sourceRect, destRect, interpolationMode);
+            context.DrawImage(_backingRtb, sourceRect, destRect);
         }
     }
 

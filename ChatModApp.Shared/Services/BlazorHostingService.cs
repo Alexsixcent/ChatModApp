@@ -11,7 +11,9 @@ namespace ChatModApp.Shared.Services;
 
 public sealed class BlazorHostingService : IDisposable, IAsyncDisposable
 {
-    public static bool IsBlazorAuthDisabled { get; } = OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
+    public static bool IsBlazorAuthDisabled { get; } = false;
+        //TODO: Bring back embedded WebView when CefGlue supports Avalonia 11. Hopefully it supports Linux too by then
+        //OperatingSystem.IsWindows() || OperatingSystem.IsMacOS();
     
     public string? CurrentHostingUrl { get; private set; }
     public IObservable<AuthenticatedEventArgs>? AuthFromBlazor { get; private set; }

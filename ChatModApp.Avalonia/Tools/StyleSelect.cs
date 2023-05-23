@@ -1,10 +1,12 @@
 using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Logging;
 using Avalonia.Styling;
+using ChatModApp.Shared.Tools.Extensions;
 
 namespace ChatModApp.Tools;
 
@@ -14,47 +16,62 @@ namespace ChatModApp.Tools;
 public class StyleSelect : AvaloniaObject
 {
     public static readonly AttachedProperty<Styles?> StylesProperty =
-        AvaloniaProperty.RegisterAttached<StyleSelect, IStyledElement, Styles?>(
+        AvaloniaProperty.RegisterAttached<StyleSelect, StyledElement, Styles?>(
             "Styles", default, false, BindingMode.OneTime);
 
     public static readonly AttachedProperty<object?> CurrentProperty =
-        AvaloniaProperty.RegisterAttached<StyleSelect, IStyledElement, object?>(
-            "Current", default, false, BindingMode.OneWay);
+        AvaloniaProperty.RegisterAttached<StyleSelect, StyledElement, object?>(
+            "Current");
 
     public static readonly AttachedProperty<object?> KeyProperty =
         AvaloniaProperty.RegisterAttached<StyleSelect, Style, object?>(
             "Key", default, false, BindingMode.OneTime);
 
     private const string Name = nameof(StyleSelect);
-    
+
+    private static ConditionalWeakTable<Style, Selector> OriginalStyleSelectors = new();
+
     static StyleSelect()
     {
         KeyProperty.Changed.Subscribe(x => HandleKeyChanged(x.Sender, x.NewValue.GetValueOrDefault<object?>()));
         CurrentProperty.Changed.Subscribe(x => HandleCurrentChanged(x.Sender, x.NewValue.GetValueOrDefault<object?>()));
     }
 
-    private static void HandleKeyChanged(IAvaloniaObject elem, object? value)
+    private static void HandleKeyChanged(AvaloniaObject elem, object? value)
     {
         if (value is null) return;
-        if (elem is not Style style) return; 
-        
+        if (elem is not Style style) return;
+
         var selClass = KeyToPseudoClass(value);
+
+        if (!style.Selector?.ToString().Contains(":style-select_") ?? false)
+        {
+            OriginalStyleSelectors.AddOrUpdate(style, style.Selector.Copy());
+        }
+        
         style.Selector = style.Selector.Class(selClass);
     }
 
-    private static void HandleCurrentChanged(IAvaloniaObject elem, object? value)
+    private static void HandleCurrentChanged(AvaloniaObject elem, object? value)
     {
         if (value is null) return;
-        if (elem is not IStyledElement styledElem) return;
+        if (elem is not StyledElement styledElem) return;
 
-        var styles = styledElem.Styles;
+        var curElem = styledElem;
+        Style? selected;
+        do
+        {
+            FindAppliedStyle(styledElem, curElem.Styles, value, out selected);
+            if (selected is not null)
+                break;
 
-        FindAppliedStyle(elem, styles, value, out var selected);
+            curElem = curElem.Parent;
+        } while (curElem is not null);
 
         if (selected is null)
         {
-            Logger.TryGet(LogEventLevel.Warning, LogArea.Property)?
-                .Log(elem, "Not style with corresponding key {Key} was found in {Name}.Styles",
+            Logger.TryGet(LogEventLevel.Error, LogArea.Property)?
+                .Log(elem, "No style with corresponding key {Key} was found in {Name}.Styles",
                     value, Name);
             return;
         }
@@ -69,7 +86,7 @@ public class StyleSelect : AvaloniaObject
         pseudo.Add(selClass);
     }
 
-    private static void FindAppliedStyle(IAvaloniaObject elem, Styles styles, object value, out Style? selected)
+    private static void FindAppliedStyle(StyledElement elem, Styles styles, object value, out Style? selected)
     {
         selected = null;
         for (var i = 0; i < styles.Count; i++)
@@ -82,7 +99,7 @@ public class StyleSelect : AvaloniaObject
                     var key = styleElem.GetValue(KeyProperty);
                     if (key is null)
                     {
-                        Logger.TryGet(LogEventLevel.Warning, LogArea.Property)?
+                        Logger.TryGet(LogEventLevel.Debug, LogArea.Property)?
                             .Log(elem,
                                 "Style #{Index} in {Name}.Styles was skipped because it missed a {Name}.Key attached property",
                                 i, Name, Name);
@@ -90,6 +107,14 @@ public class StyleSelect : AvaloniaObject
                     }
 
                     if (!key.Equals(value)) continue;
+
+                    if (OriginalStyleSelectors.TryGetValue(styleElem, out var originSelector))
+                    {
+                        if (!originSelector.Match(elem, null, false).IsMatch)
+                            continue;
+                    }
+                    else continue;
+
                     selected = styleElem;
                     return;
                 }

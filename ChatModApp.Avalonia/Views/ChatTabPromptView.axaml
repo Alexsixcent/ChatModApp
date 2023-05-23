@@ -15,7 +15,7 @@
 		<TextBlock Text="Enter the channel name" />
 		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 			<controls:AutoSuggestBox x:Name="ChannelCompleteBox"
-									 Items="{CompiledBinding ChannelSuggestions, Mode=OneWay}"
+									 ItemsSource="{CompiledBinding ChannelSuggestions, Mode=OneWay}"
 									 Watermark="Enter Twitch channel username"
 									 FilterMode="None"
 									 HorizontalAlignment="Stretch"

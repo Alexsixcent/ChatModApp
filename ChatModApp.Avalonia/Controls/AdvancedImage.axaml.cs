@@ -130,16 +130,16 @@ namespace ChatModApp.Controls
 
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
-            if (change.Property == SourceProperty && change.IsEffectiveValueChange)
+            if (change.Property == SourceProperty)
             {
                 UpdateImage(change.GetNewValue<Uri?>());
             }
 
-            else if (change.Property == CornerRadiusProperty && change.IsEffectiveValueChange)
+            else if (change.Property == CornerRadiusProperty)
             {
                 UpdateCornerRadius(change.GetNewValue<CornerRadius>());
             }
-            else if (change.Property == BoundsProperty && change.IsEffectiveValueChange && !CornerRadius.IsEmpty)
+            else if (change.Property == BoundsProperty && CornerRadius != default)
             {
                 UpdateCornerRadius(CornerRadius);
             }
@@ -195,7 +195,7 @@ namespace ChatModApp.Controls
 
         private void UpdateCornerRadius(CornerRadius radius)
         {
-            _isCornerRadiusUsed = !radius.IsEmpty;
+            _isCornerRadiusUsed = radius != default;
             _cornerRadiusClip = new(new(0, 0, Bounds.Width, Bounds.Height), radius);
         }
 
@@ -221,11 +221,9 @@ namespace ChatModApp.Controls
                 var sourceRect = new Rect(sourceSize)
                     .CenterRect(new(destRect.Size / scale));
 
-                var interpolationMode = RenderOptions.GetBitmapInterpolationMode(this);
-
                 DrawingContext.PushedState? pushedState =
                     _isCornerRadiusUsed ? context.PushClip(_cornerRadiusClip) : null;
-                context.DrawImage(source, sourceRect, destRect, interpolationMode);
+                context.DrawImage(source, sourceRect, destRect);
                 pushedState?.Dispose();
             }
             else

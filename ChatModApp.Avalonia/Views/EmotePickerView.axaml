@@ -46,7 +46,9 @@
 
 	<UserControl.DataTemplates>
 		<DataTemplate DataType="{x:Type emo:IEmote}">
-			<Button Background="Transparent"
+			<Button Command="{CompiledBinding }"
+					CommandParameter="{CompiledBinding}"
+					Background="Transparent"
 					BorderThickness="0"
 					Padding="3"
 					VerticalAlignment="Stretch"
@@ -72,7 +74,7 @@
 									   Text="{CompiledBinding Count, StringFormat={}{0} item(s), Mode=OneWay}" />
 						</StackPanel>
 					</Expander.Header>
-					<ItemsControl Items="{CompiledBinding}">
+					<ItemsControl ItemsSource="{CompiledBinding}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
 								<tools:AlignableWrapPanel Orientation="Horizontal"
@@ -86,7 +88,7 @@
 
 		<DataTemplate DataType="{x:Type col:IEnumerable}">
 			<ScrollViewer>
-				<ItemsControl Items="{CompiledBinding}" />
+				<ItemsControl ItemsSource="{CompiledBinding}" />
 			</ScrollViewer>
 		</DataTemplate>
 		

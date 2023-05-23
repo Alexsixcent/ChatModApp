@@ -18,7 +18,7 @@
 	<Grid RowDefinitions="8*,4,Auto">
 		<Grid>
 			<ListBox x:Name="MessageList"
-					 Items="{CompiledBinding ChatMessages, Mode=OneWay}">
+					 ItemsSource="{CompiledBinding ChatMessages, Mode=OneWay}">
 				<ListBox.ItemTemplate>
 					<DataTemplate x:DataType="viewModels:ChatMessageViewModel">
 						<controls:ChatMessage Badges="{CompiledBinding Badges, Mode=OneWay}"
@@ -92,7 +92,7 @@
 
 								<ScrollViewer HorizontalScrollBarVisibility="Disabled"
 											  Margin="5,0">
-									<ItemsRepeater Items="{CompiledBinding UsersList}">
+									<ItemsRepeater ItemsSource="{CompiledBinding UsersList}">
 										<ItemsRepeater.ItemTemplate>
 											<DataTemplate x:DataType="tk:IReadOnlyObservableGroup">
 												<StackPanel Orientation="Vertical">
@@ -107,7 +107,7 @@
 																	   Text="{CompiledBinding Count, StringFormat={}{0} item(s), Mode=OneWay}" />
 														</StackPanel>
 													</Border>
-													<ItemsRepeater Items="{Binding}">
+													<ItemsRepeater ItemsSource="{Binding}">
 														<ItemsRepeater.ItemTemplate>
 															<DataTemplate x:DataType="system:String">
 																<TextBlock Text="{CompiledBinding .}" />

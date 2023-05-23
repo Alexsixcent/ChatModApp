@@ -56,11 +56,11 @@ public class PersonIcon : TemplatedControl, IBitmapSource
     static PersonIcon()
     {
         var img = ImageSourceProperty.Changed
-                                     .Where(args => args.IsEffectiveValueChange && !args.IsSameValue())
+                                     .Where(args => !args.IsSameValue())
                                      .Select(args => ((IBitmapSource)args.Sender, args.NewValue.Value));
         SourceProperty.Changed
                       .ObserveOnThreadPool()
-                      .Where(args => args.IsEffectiveValueChange && !args.IsSameValue())
+                      .Where(args => !args.IsSameValue())
                       .SelectMany(async args =>
                                       ((IBitmapSource)args.Sender, await CachedBitmapStore.Get(args.NewValue.Value)))
                       .Merge(img)
