@@ -129,11 +129,11 @@ public class Bootstrapper : IDisposable
         container.Register<EmotesService>(Reuse.Singleton);
         container.Register<MessageProcessingService>(Reuse.Singleton);
         container.Register<ChatTabService>(Reuse.Singleton);
+        container.Register<EmotePickerViewModel>(Reuse.Singleton);
 
         container.Register<ChatViewModel>(setup: Setup.With(allowDisposableTransient: true));
         container.Register<ChatTabItemViewModel>(setup: Setup.With(allowDisposableTransient: true));
         container.Register<ChatTabPromptViewModel>(setup: Setup.With(allowDisposableTransient: true));
-        container.Register<EmotePickerViewModel>(setup: Setup.With(allowDisposableTransient:true));
     }
 
     private static LoggerConfiguration CreateLoggerConfig(string folder, LoggerConfiguration? config = null) 
