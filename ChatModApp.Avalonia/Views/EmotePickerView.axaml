@@ -124,6 +124,7 @@
 						IsVisible="False" />
 
 		<TextBox Grid.Row="1"
+				 Text="{CompiledBinding SearchText}"
 				 Watermark="Search"
 				 HorizontalAlignment="Stretch" />
 		<TabStrip x:Name="TabStrip"

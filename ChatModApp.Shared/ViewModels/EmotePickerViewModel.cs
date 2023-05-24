@@ -17,73 +17,86 @@ public sealed class EmotePickerViewModel : ReactiveObject, IActivatableViewModel
     public ViewModelActivator Activator { get; }
 
     [ObservableAsProperty] public ITwitchChannel? SrcChannel { get; }
+    
+    [Reactive] public string? SearchText { get; set; }
 
-    public ReadOnlyObservableCollection<IEmote> FavoriteEmotes => _favoriteEmotes;
-    public ReadOnlyObservableCollection<IGrouping<string, IMemberEmote>> ChannelEmotes => _channelEmotes;
-    public ReadOnlyObservableCollection<IGrouping<string, IGlobalEmote>> GlobalEmotes => _globalEmotes;
-    public ReadOnlyObservableCollection<IGrouping<string, EmojiEmote>> Emojis => _emojis;
+    public ReadOnlyObservableCollection<IEmote>? FavoriteEmotes => _favoriteEmotes;
+    public ReadOnlyObservableCollection<IGrouping<string, IMemberEmote>>? ChannelEmotes => _channelEmotes;
+    public ReadOnlyObservableCollection<IGrouping<string, IGlobalEmote>>? GlobalEmotes => _globalEmotes;
+    public ReadOnlyObservableCollection<IGrouping<string, EmojiEmote>>? Emojis => _emojis;
 
 
     private Func<IMemberEmote, bool> MemberEmoteFilter => emote => emote.MemberChannel == SrcChannel;
 
-    private readonly CompositeDisposable _disposables;
-
-    private readonly ReadOnlyObservableCollection<IEmote> _favoriteEmotes;
-    private readonly ReadOnlyObservableCollection<IGrouping<string, IMemberEmote>> _channelEmotes;
-    private readonly ReadOnlyObservableCollection<IGrouping<string, IGlobalEmote>> _globalEmotes;
-    private readonly ReadOnlyObservableCollection<IGrouping<string, EmojiEmote>> _emojis;
+    private ReadOnlyObservableCollection<IEmote>? _favoriteEmotes;
+    private ReadOnlyObservableCollection<IGrouping<string, IMemberEmote>>? _channelEmotes;
+    private ReadOnlyObservableCollection<IGrouping<string, IGlobalEmote>>? _globalEmotes;
+    private ReadOnlyObservableCollection<IGrouping<string, EmojiEmote>>? _emojis;
 
     public EmotePickerViewModel(EmotesService emotesService)
     {
-        _disposables = new();
         Activator = new();
         SrcChannel = null;
-
         var favorites = new SourceList<IEmote>();
-        favorites.Connect()
-                 .ObserveOnMainThread()
-                 .Bind(out _favoriteEmotes)
-                 .Subscribe()
-                 .DisposeWith(_disposables);
-        
-        var filterChanged = this.WhenValueChanged(vm => vm.SrcChannel)
-                                .ObserveOnThreadPool()
-                                .DistinctUntilChanged()
-                                .Select(_ => MemberEmoteFilter);
-        
-        emotesService.Emotes
-                     .Connect()
-                     .WhereIsType<IEmote, IMemberEmote>()
-                     .Filter(filterChanged)
-                     .GroupByElement(emote => emote.Provider, emote => emote)
-                     .ObserveOnMainThread()
-                     .Bind(out _channelEmotes)
-                     .Subscribe()
-                     .DisposeWith(_disposables);
 
-        emotesService.Emotes
-                     .Connect()
-                     .WhereIsType<IEmote, IGlobalEmote>()
-                     .Filter(emote => emote is not EmojiEmote)
-                     .GroupByElement(emote => emote.Provider, emote => emote)
-                     .ObserveOnMainThread()
-                     .Bind(out _globalEmotes)
-                     .Subscribe()
-                     .DisposeWith(_disposables);
+        this.WhenActivated(d =>
+        {
 
-        emotesService.Emotes
-                     .Connect()
-                     .WhereIsType<IEmote, EmojiEmote>()
-                     .GroupByElement(emote => emote.EmojiGroup, emote => emote)
+            
+            var channelFilter = this.WhenValueChanged(vm => vm.SrcChannel)
+                                    .ObserveOnThreadPool()
+                                    .DistinctUntilChanged()
+                                    .Select(_ => MemberEmoteFilter);
+
+            var emoteSearchFilter = this.WhenValueChanged(vm => vm.SearchText)
+                                        .ObserveOnThreadPool()
+                                        .DistinctUntilChanged()
+                                        .Select<string?, Func<IEmote, bool>>(s => 
+                                                                                 emote => string.IsNullOrWhiteSpace(s) || emote.Code.Contains(s, StringComparison.InvariantCultureIgnoreCase));
+            
+            favorites.Connect()
+                     .Filter(emoteSearchFilter)
                      .ObserveOnMainThread()
-                     .Bind(out _emojis)
+                     .Bind(out _favoriteEmotes)
                      .Subscribe()
-                     .DisposeWith(_disposables);
+                     .DisposeWith(d);
+            
+            emotesService.Emotes
+                         .Connect()
+                         .WhereIsType<IEmote, IMemberEmote>()
+                         .Filter(channelFilter)
+                         .Filter(emoteSearchFilter)
+                         .GroupByElement(emote => emote.Provider, emote => emote)
+                         .ObserveOnMainThread()
+                         .Bind(out _channelEmotes)
+                         .Subscribe()
+                         .DisposeWith(d);
+
+            emotesService.Emotes
+                         .Connect()
+                         .WhereIsType<IEmote, IGlobalEmote>()
+                         .Filter(emote => emote is not EmojiEmote)
+                         .Filter(emoteSearchFilter)
+                         .GroupByElement(emote => emote.Provider, emote => emote)
+                         .ObserveOnMainThread()
+                         .Bind(out _globalEmotes)
+                         .Subscribe()
+                         .DisposeWith(d);
+
+            emotesService.Emotes
+                         .Connect()
+                         .WhereIsType<IEmote, EmojiEmote>()
+                         .Filter(emoteSearchFilter)
+                         .GroupByElement(emote => emote.EmojiGroup, emote => emote)
+                         .ObserveOnMainThread()
+                         .Bind(out _emojis)
+                         .Subscribe()
+                         .DisposeWith(d);
+        });
     }
 
     public void Dispose()
     {
         Activator.Dispose();
-        _disposables.Dispose();
     }
 }
