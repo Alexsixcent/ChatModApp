@@ -9,5 +9,5 @@ public class FfzGlobalEmoteResponse
     public IEnumerable<int> DefaultSets { get; set; }
 
     [JsonPropertyName("sets")]
-    public IDictionary<int, FfzEmoteSet> Sets { get; set; }
+    public IDictionary<int, FfzEmoteSet<FfzGlobalEmote>> Sets { get; set; }
 }

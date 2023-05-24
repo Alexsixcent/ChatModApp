@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Globalization;
+using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Models.Chat;
 using ChatModApp.Shared.Models.Chat.Emotes;
 using ChatModApp.Shared.Models.Chat.Fragments;
@@ -26,34 +27,32 @@ public class MessageProcessingService
         _chatService = chatService;
     }
 
-    public ChatMessageViewModel ProcessReceivedMessage(ChatMessage message)
+    public ChatMessageViewModel ProcessReceivedMessage(ITwitchChannel channel, ChatMessage message)
     {
-        return new(
-                   message.Id,
+        return new(message.Id,
                    message.DisplayName,
-                   GetMessageBadges(message.Channel, message.Badges),
-                   GetMessageFragments(message),
+                   GetMessageBadges(channel, message.Badges),
+                   GetMessageFragments(channel, message),
                    GetColorFromTwitchHex(message.ColorHex));
     }
 
-    public ChatMessageViewModel ProcessSentMessage(SentMessage message)
+    public ChatMessageViewModel ProcessSentMessage(ITwitchChannel channel, SentMessage message)
     {
-        return new(
-                   Guid.NewGuid().ToString("N"),
+        return new(Guid.NewGuid().ToString("N"),
                    message.DisplayName,
-                   GetMessageBadges(message.Channel, message.Badges),
-                   ParseTextFragment(message.Message, message.Channel, false, false),
+                   GetMessageBadges(channel, message.Badges),
+                   ParseTextFragment(message.Message, channel, false, false),
                    GetColorFromTwitchHex(message.ColorHex));
     }
 
-    private IEnumerable<IChatBadge> GetMessageBadges(string channel,
+    private IEnumerable<IChatBadge> GetMessageBadges(ITwitchChannel channel,
                                                      IEnumerable<KeyValuePair<string, string>> badgePairs) =>
         badgePairs.Select(pair => _chatService.ChatBadges.Items
                                               .Where(chatBadge => chatBadge.SetId == pair.Key && chatBadge.Id == pair.Value)
-                                              .LastOrDefault(badge => badge.Channel is null || badge.Channel.Login == channel))
-                  .Where(b => b is not null);
+                                              .LastOrDefault(badge => badge.Channel is null || badge.Channel == channel))
+                  .Where(b => b is not null)!;
 
-    private IEnumerable<IMessageFragment> GetMessageFragments(ChatMessage chatMessage)
+    private IEnumerable<IMessageFragment> GetMessageFragments(ITwitchChannel channel, ChatMessage chatMessage)
     {
         var msg = chatMessage.Message;
         var fragments = new List<IMessageFragment>();
@@ -61,7 +60,7 @@ public class MessageProcessingService
 
         if (chatMessage.EmoteSet.Emotes.Count == 0)
         {
-            fragments.AddRange(ParseTextFragment(msg, chatMessage.Channel, false, false));
+            fragments.AddRange(ParseTextFragment(msg, channel, false, false));
         }
         else
         {
@@ -72,9 +71,8 @@ public class MessageProcessingService
             {
                 if (emote.StartIndex - lastEndIndex > 1)
                 {
-                    fragments.AddRange(
-                                       ParseTextFragment(msg.SubstringAbs(lastEndIndex, emote.StartIndex - 1),
-                                                         chatMessage.Channel, lastEndIndex == 0));
+                    fragments.AddRange(ParseTextFragment(msg.SubstringAbs(lastEndIndex, emote.StartIndex - 1),
+                                                         channel, lastEndIndex == 0));
                 }
 
                 fragments.Add(new EmoteFragment(new TwitchEmote(emote)));
@@ -83,7 +81,7 @@ public class MessageProcessingService
 
             if (lastEndIndex < msg.Length - 1)
             {
-                fragments.AddRange(ParseTextFragment(msg.Substring(lastEndIndex), chatMessage.Channel,
+                fragments.AddRange(ParseTextFragment(msg[lastEndIndex..], channel,
                                                      endSpace: false));
             }
         }
@@ -91,7 +89,7 @@ public class MessageProcessingService
         return fragments;
     }
 
-    private IEnumerable<IMessageFragment> ParseTextFragment(string? msg, string channel, bool startSpace = true,
+    private IEnumerable<IMessageFragment> ParseTextFragment(string? msg, ITwitchChannel channel, bool startSpace = true,
                                                             bool endSpace = true)
     {
         if (msg is null)
@@ -108,15 +106,11 @@ public class MessageProcessingService
                 continue;
             }
 
-            var res2 = _emotesService.UserEmotes.Lookup(channel);
+            var res2 = _emotesService.UserEmotePairs.Lookup(new(channel, frag));
             if (res2.HasValue)
             {
-                var res3 = res2.Value.Cache.Lookup(frag);
-                if (res3.HasValue)
-                {
-                    fragments.Add(new EmoteFragment(res3.Value));
-                    continue;
-                }
+                fragments.Add(new EmoteFragment(res2.Value));
+                continue;
             }
 
             if (HasValidHost(frag) &&

@@ -55,7 +55,6 @@
         </Border>
 
         <TemplatedControl Name="AuthContent"
-                          Styles="{StaticResource WebViewSelector}"
                           tools:StyleSelect.Current="{CompiledBinding UsingEmbedBrowser}"/>
     </Grid>
 </UserControl>

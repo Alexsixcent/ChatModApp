@@ -7,14 +7,12 @@ using ChatModApp.Shared.Models.Chat.Emotes;
 
 namespace ChatModApp.Controls;
 
-[TemplatePart(ToolTipImage, typeof(CachedImage))]
+[TemplatePart(ToolTipImage, typeof(AdvancedImage))]
 [TemplatePart(ToolTipText, typeof(TextBlock))]
-[TemplatePart(EmoteImage, typeof(CachedImage))]
 public class ChatEmote : TemplatedControl
 {
     private const string ToolTipImage = "PART_ToolTipImage",
-                         ToolTipText = "PART_ToolTipText",
-                         EmoteImage = "PART_EmoteImage";
+                         ToolTipText = "PART_ToolTipText";
     
     public static readonly StyledProperty<IEmote?> EmoteProperty = AvaloniaProperty.Register<ChatEmote, IEmote?>(
      nameof(Emote));
@@ -25,7 +23,7 @@ public class ChatEmote : TemplatedControl
         set => SetValue(EmoteProperty, value);
     }
 
-    private CachedImage? _toolTipImage, _emoteImage;
+    private AdvancedImage? _toolTipImage;
     private TextBlock? _toolTipTextBlock;
 
     static ChatEmote()
@@ -35,8 +33,7 @@ public class ChatEmote : TemplatedControl
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        _toolTipImage = e.NameScope.Find<CachedImage>(ToolTipImage);
-        _emoteImage = e.NameScope.Find<CachedImage>(EmoteImage);
+        _toolTipImage = e.NameScope.Find<AdvancedImage>(ToolTipImage);
         _toolTipTextBlock = e.NameScope.Find<TextBlock>(ToolTipText);
         
         base.OnApplyTemplate(e);
@@ -54,11 +51,6 @@ public class ChatEmote : TemplatedControl
         if (control._toolTipImage is not null)
         {
             control._toolTipImage.Source = emote.Large;
-        }
-
-        if (control._emoteImage is not null)
-        {
-            control._emoteImage.Source = emote.Small;
         }
 
         if (control._toolTipTextBlock is not null)

@@ -4,9 +4,10 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              x:Class="ChatModApp.App">
     <Application.Styles>
-        <styling:FluentAvaloniaTheme RequestedTheme="Dark"/>
-		<StyleInclude Source="/Controls/PersonIcon.axaml"/>
-		<StyleInclude Source="/Controls/CachedImage.axaml"/>
+        <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True"/>
+		<StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
+        <StyleInclude Source="/Controls/PersonIcon.axaml"/>
+        <StyleInclude Source="/Controls/AdvancedImage.axaml"/>
 		<StyleInclude Source="/Controls/ChatMessage.axaml"/>
 		<StyleInclude Source="/Controls/ChatEmote.axaml"/>
 		<StyleInclude Source="/Controls/ChatBadge.axaml"/>

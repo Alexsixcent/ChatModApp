@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using System.Reflection;
 using ChatModApp.Shared.Services;
 using ChatModApp.Shared.Services.ApiClients;
+using ChatModApp.Shared.Services.EmoteProviders;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Shared.ViewModels;
 using DryIoc;
@@ -113,6 +114,8 @@ public class Bootstrapper : IDisposable
         container.RegisterViewsForViewModels(Assembly.GetEntryAssembly() ?? throw new PlatformNotSupportedException("Couldn't find entry application assembly where views are defined"),
                                              "ChatModApp.Views");
 
+        //Scans assembly for all types implementing IEmoteProvider and register them as singletons
+        container.RegisterMany(new []{typeof(IEmoteProvider).Assembly}, serviceTypeCondition:type => type == typeof(IEmoteProvider), Reuse.Singleton);
 
         container.Register<AuthenticationViewModel>(Reuse.Singleton);
         container.Register<MainViewModel>(Reuse.Singleton);
@@ -126,6 +129,7 @@ public class Bootstrapper : IDisposable
         container.Register<EmotesService>(Reuse.Singleton);
         container.Register<MessageProcessingService>(Reuse.Singleton);
         container.Register<ChatTabService>(Reuse.Singleton);
+        container.Register<EmotePickerViewModel>(Reuse.Singleton);
 
         container.Register<ChatViewModel>(setup: Setup.With(allowDisposableTransient: true));
         container.Register<ChatTabItemViewModel>(setup: Setup.With(allowDisposableTransient: true));

@@ -1,12 +1,13 @@
 using System;
 using System.Reactive.Concurrency;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Media;
-using Avalonia.Threading;
+using Avalonia.ReactiveUI;
 using ChatModApp.Shared.Services;
 using ChatModApp.Shared.ViewModels;
 using ChatModApp.Views;
-using FluentAvalonia.Core.ApplicationModel;
+using FluentAvalonia.UI.Windowing;
 using Splat;
 
 namespace ChatModApp.Tools;
@@ -27,10 +28,7 @@ public class AppSplashScreen : IApplicationSplashScreen
         SplashScreenContent = new AppSplashScreenView();
     }
 
-    //This method runs on a background thread so we can safely synchronously wait for it
-    public void RunTasks() => Run().GetAwaiter().GetResult();
-    
-    private async Task Run()
+    public async Task RunTasks(CancellationToken cancellationToken)
     {
         var scheduler = AvaloniaScheduler.Instance;
         var router = _mainViewModel.Router;

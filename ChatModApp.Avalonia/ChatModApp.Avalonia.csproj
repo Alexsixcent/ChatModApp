@@ -21,15 +21,15 @@
         <TrimmableAssembly Include="Avalonia.Themes.Default" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.18" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview8" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.18" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.18" />
-        <PackageReference Include="Dove.Avalonia.Controls.Extensions" Version="1.9.2" />
-        <PackageReference Include="FluentAvaloniaUI" Version="1.4.5" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview8" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview8" />
+        <PackageReference Include="CefGlue.Avalonia" Version="106.5249.7-avalonia11" />
+        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.10.0-preview20230425001" />
+        <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview8" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
         <PackageReference Include="WebViewControl-Avalonia" Version="2.91.30" />
-        <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaGif\AvaloniaGif.csproj" />

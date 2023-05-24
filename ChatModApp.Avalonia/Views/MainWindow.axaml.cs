@@ -1,21 +1,20 @@
 using System;
-using System.Runtime.InteropServices;
+using System.Reactive.Disposables;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Mixins;
 using Avalonia.Media;
 using Avalonia.Media.Immutable;
+using Avalonia.Styling;
 using ChatModApp.Shared.ViewModels;
-using FluentAvalonia.Core.ApplicationModel;
 using FluentAvalonia.Styling;
-using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Media;
+using FluentAvalonia.UI.Windowing;
 using ReactiveUI;
 using Splat;
 
 namespace ChatModApp.Views;
 
-public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
+public partial class MainWindow : AppWindow, IViewFor<MainViewModel>
 {
     public static readonly StyledProperty<MainViewModel?> ViewModelProperty =
         AvaloniaProperty.Register<MainWindow, MainViewModel?>(nameof(ViewModel));
@@ -34,6 +33,7 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
     
     public MainWindow(IApplicationSplashScreen splashScreen, MainViewModel mainViewModel)
     {
+        TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
         this.WhenActivated(disposable =>
         {
             this.OneWayBind(ViewModel, vm => vm.Router, v => v.RoutedViewHost.Router)
@@ -54,6 +54,24 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
 
         MinWidth = 100;
         MinHeight = 200;
+        
+        Application.Current!.ActualThemeVariantChanged += OnActualThemeVariantChanged;
+    }
+
+    private void OnActualThemeVariantChanged(object? sender, EventArgs e)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            if (IsWindows11 && ActualThemeVariant != FluentAvaloniaTheme.HighContrastTheme)
+            {
+                TryEnableMicaEffect();
+            }
+            else if (ActualThemeVariant != FluentAvaloniaTheme.HighContrastTheme)
+            {
+                // Clear the local value here, and let the normal styles take over for HighContrast theme
+                SetValue(BackgroundProperty, AvaloniaProperty.UnsetValue);
+            }
+        }
     }
 
     public MainWindow() : this(Locator.Current.GetService<IApplicationSplashScreen>()!,
@@ -80,20 +98,15 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
     {
         base.OnOpened(e);
 
-        var theme = AvaloniaLocator.Current.GetService<FluentAvaloniaTheme>() ??
-                    throw new PlatformNotSupportedException();
-        theme.RequestedThemeChanged += OnRequestedThemeChanged;
+        var theme = ActualThemeVariant;
 
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && IsWindows11 &&
-            theme.RequestedTheme != FluentAvaloniaTheme.HighContrastModeString)
+        if (OperatingSystem.IsWindows() && IsWindows11 && theme != FluentAvaloniaTheme.HighContrastTheme)
         {
             TransparencyBackgroundFallback = Brushes.Transparent;
             TransparencyLevelHint = WindowTransparencyLevel.Mica;
 
-            TryEnableMicaEffect(theme);
+            TryEnableMicaEffect();
         }
-
-        theme.ForceWin32WindowToTheme(this);
 
         var screen = Screens.ScreenFromVisual(this);
         // ReSharper disable ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
@@ -118,28 +131,11 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
             > 500 => 500,
             _ => 400
         };
-
-        if (TitleBar is not null) 
-            TitleBar.ExtendViewIntoTitleBar = true;
+        
+        TitleBar.ExtendsContentIntoTitleBar = true;
     }
 
-    private void OnRequestedThemeChanged(FluentAvaloniaTheme sender, RequestedThemeChangedEventArgs args)
-    {
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            return;
-
-        if (IsWindows11 && args.NewTheme != FluentAvaloniaTheme.HighContrastModeString)
-        {
-            TryEnableMicaEffect(sender);
-        }
-        else if (args.NewTheme == FluentAvaloniaTheme.HighContrastModeString)
-        {
-            // Clear the local value here, and let the normal styles take over for HighContrast theme
-            SetValue(BackgroundProperty, AvaloniaProperty.UnsetValue);
-        }
-    }
-
-    private void TryEnableMicaEffect(FluentAvaloniaTheme thm)
+    private void TryEnableMicaEffect()
     {
         // The background colors for the Mica brush are still based around SolidBackgroundFillColorBase resource
         // BUT since we can't control the actual Mica brush color, we have to use the window background to create
@@ -148,22 +144,20 @@ public partial class MainWindow : CoreWindow, IViewFor<MainViewModel>
         // apply the opacity until we get the roughly the correct color
         // NOTE that the effect still doesn't look right, but it suffices. Ideally we need access to the Mica
         // CompositionBrush to properly change the color but I don't know if we can do that or not
-        if (thm.RequestedTheme == FluentAvaloniaTheme.DarkModeString)
+        if (ActualThemeVariant == ThemeVariant.Dark)
         {
-            var color = this.TryFindResource("SolidBackgroundFillColorBase", out var value)
-                            ? (Color2)(Color)value
-                            : new Color2(32, 32, 32);
+            var color = this.TryFindResource("SolidBackgroundFillColorBase",
+                                             ThemeVariant.Dark, out var value) ? (Color2)(Color)value : new(32, 32, 32);
 
             color = color.LightenPercent(-0.8f);
 
             Background = new ImmutableSolidColorBrush(color, 0.78);
         }
-        else if (thm.RequestedTheme == FluentAvaloniaTheme.LightModeString)
+        else if (ActualThemeVariant == ThemeVariant.Light)
         {
             // Similar effect here
-            var color = this.TryFindResource("SolidBackgroundFillColorBase", out var value)
-                            ? (Color2)(Color)value
-                            : new Color2(243, 243, 243);
+            var color = this.TryFindResource("SolidBackgroundFillColorBase",
+                                             ThemeVariant.Light, out var value) ? (Color2)(Color)value : new(243, 243, 243);
 
             color = color.LightenPercent(0.5f);
 

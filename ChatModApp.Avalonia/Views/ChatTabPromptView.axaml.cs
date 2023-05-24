@@ -28,8 +28,8 @@ public partial class ChatTabPromptView : ReactiveUserControl<ChatTabPromptViewMo
                       .Select(_ => ChannelCompleteBox.Text)
                       .Merge(committed)
                       .Where(t => !string.IsNullOrWhiteSpace(t) && ChannelCompleteBox.SelectedItem is not null)
-                      .Select(t => ChannelCompleteBox.Items
-                                                     .Cast<ChannelSuggestionViewModel>()
+                      .Select(t => ChannelCompleteBox.ItemsSource
+                                                     ?.Cast<ChannelSuggestionViewModel>()
                                                      .FirstOrDefault(model =>
                                                                          model.DisplayName
                                                                               .Equals(t,

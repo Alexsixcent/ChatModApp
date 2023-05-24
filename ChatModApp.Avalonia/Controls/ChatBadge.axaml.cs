@@ -7,9 +7,9 @@ using ChatModApp.Shared.Models.Chat;
 
 namespace ChatModApp.Controls;
 
-[TemplatePart(ToolTipImage, typeof(CachedImage))]
+[TemplatePart(ToolTipImage, typeof(AdvancedImage))]
 [TemplatePart(ToolTipText, typeof(TextBlock))]
-[TemplatePart(BadgeImage, typeof(CachedImage))]
+[TemplatePart(BadgeImage, typeof(AdvancedImage))]
 public class ChatBadge : TemplatedControl
 {
     private const string ToolTipImage = "PART_ToolTipImage",
@@ -25,7 +25,7 @@ public class ChatBadge : TemplatedControl
         set => SetValue(BadgeProperty, value);
     }
 
-    private CachedImage? _toolTipImage, _badgeImage;
+    private AdvancedImage? _toolTipImage, _badgeImage;
     private TextBlock? _toolTipTextBlock;
 
     static ChatBadge()
@@ -35,8 +35,8 @@ public class ChatBadge : TemplatedControl
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        _toolTipImage = e.NameScope.Find<CachedImage>(ToolTipImage);
-        _badgeImage = e.NameScope.Find<CachedImage>(BadgeImage);
+        _toolTipImage = e.NameScope.Find<AdvancedImage>(ToolTipImage);
+        _badgeImage = e.NameScope.Find<AdvancedImage>(BadgeImage);
         _toolTipTextBlock = e.NameScope.Find<TextBlock>(ToolTipText);
         
         base.OnApplyTemplate(e);
