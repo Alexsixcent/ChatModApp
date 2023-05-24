@@ -9,10 +9,11 @@
 			 xmlns:emo="clr-namespace:ChatModApp.Shared.Models.Chat.Emotes;assembly=ChatModApp.Shared"
 			 xmlns:vm="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
 			 xmlns:tools="clr-namespace:ChatModApp.Tools"
+			 xmlns:views="clr-namespace:ChatModApp.Views"
 			 mc:Ignorable="d"
 			 d:DesignWidth="800"
 			 d:DesignHeight="450"
-			 x:Class="ChatModApp.Views.EmotePicker"
+			 x:Class="ChatModApp.Views.EmotePickerView"
 			 x:DataType="vm:EmotePickerViewModel">
 
 	<UserControl.Styles>
@@ -46,7 +47,7 @@
 
 	<UserControl.DataTemplates>
 		<DataTemplate DataType="{x:Type emo:IEmote}">
-			<Button Command="{CompiledBinding }"
+			<Button Command="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type views:EmotePickerView}}, Path=ViewModel.EmoteSubmittedCommand, FallbackValue={x:Null}}"
 					CommandParameter="{CompiledBinding}"
 					Background="Transparent"
 					BorderThickness="0"

@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using ChatModApp.Shared.Models;
@@ -19,6 +20,9 @@ public sealed class EmotePickerViewModel : ReactiveObject, IActivatableViewModel
     [ObservableAsProperty] public ITwitchChannel? SrcChannel { get; }
     
     [Reactive] public string? SearchText { get; set; }
+    [Reactive] public string? ChatViewMessageText { get; set; }
+    
+    public ReactiveCommand<IEmote, Unit> EmoteSubmittedCommand { get; }
 
     public ReadOnlyObservableCollection<IEmote>? FavoriteEmotes => _favoriteEmotes;
     public ReadOnlyObservableCollection<IGrouping<string, IMemberEmote>>? ChannelEmotes => _channelEmotes;
@@ -37,12 +41,17 @@ public sealed class EmotePickerViewModel : ReactiveObject, IActivatableViewModel
     {
         Activator = new();
         SrcChannel = null;
+        EmoteSubmittedCommand = ReactiveCommand.Create<IEmote>(emote =>
+        {
+            if (emote is EmojiEmote emoji)
+                ChatViewMessageText += emoji.EmojiValue + ' ';
+            else
+                ChatViewMessageText += emote.Code + ' ';
+        });
         var favorites = new SourceList<IEmote>();
 
         this.WhenActivated(d =>
         {
-
-            
             var channelFilter = this.WhenValueChanged(vm => vm.SrcChannel)
                                     .ObserveOnThreadPool()
                                     .DistinctUntilChanged()

@@ -14,16 +14,18 @@ using TwitchLib.Api.Core.Models.Undocumented.Chatters;
 
 namespace ChatModApp.Shared.ViewModels;
 
-public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
+public class ChatViewModel : ReactiveObject, IActivatableViewModel, IRoutableViewModel, IDisposable
 {
     public string UrlPathSegment => Guid.NewGuid().ToString()[..5];
     public IScreen? HostScreen { get; set; }
 
+    public ViewModelActivator Activator { get; }
     public ReactiveCommand<string, Unit> SendMessageCommand { get; }
     public ReactiveCommand<Unit, Unit> ChattersLoadCommand { get; }
 
     [Reactive]
     public ITwitchChannel? Channel { get; set; }
+
     [Reactive] public string MessageText { get; set; }
     [Reactive] public string UserSearchText { get; set; }
     public EmotePickerViewModel EmotePicker { get; }
@@ -39,7 +41,7 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
     private readonly ReadOnlyObservableCollection<ChatMessageViewModel> _chatMessages;
     private readonly ReadOnlyObservableCollection<IGrouping<UserType, string>> _usersList;
 
-    
+
     public ChatViewModel(TwitchChatService chatService, MessageProcessingService msgProcService,
                          EmotePickerViewModel pickerViewModel)
     {
@@ -48,11 +50,24 @@ public class ChatViewModel : ReactiveObject, IRoutableViewModel, IDisposable
         _disposables = new();
         _chatters = new();
         _chatService = chatService;
+        Activator = new();
         EmotePicker = pickerViewModel;
-        
-        this.WhenAnyValue(vm => vm.Channel)
-            .ToPropertyEx(pickerViewModel, p => p.SrcChannel)
-            .DisposeWith(_disposables);
+
+        this.WhenActivated(d =>
+        {
+            this.WhenAnyValue(vm => vm.Channel)
+                .ToPropertyEx(pickerViewModel, p => p.SrcChannel)
+                .DisposeWith(d);
+            
+            this.WhenAnyValue(vm => vm.MessageText)
+                .BindTo(pickerViewModel, vm => vm.ChatViewMessageText)
+                .DisposeWith(d);
+            pickerViewModel.WhenAnyValue(vm => vm.ChatViewMessageText)
+                           .BindTo(this, vm => vm.MessageText)
+                           .DisposeWith(d);
+        });
+
+
 
         var messageSent = _chatService.ChatMessageSent
                                       .Where(message => message.Channel == Channel?.Login)

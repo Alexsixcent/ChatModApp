@@ -8,11 +8,11 @@ using ReactiveUI;
 
 namespace ChatModApp.Views;
 
-public partial class EmotePicker : ReactiveUserControl<EmotePickerViewModel>
+public partial class EmotePickerView : ReactiveUserControl<EmotePickerViewModel>
 {
     private int _pickerTabIndex;
 
-    public EmotePicker()
+    public EmotePickerView()
     {
         InitializeComponent();
 
