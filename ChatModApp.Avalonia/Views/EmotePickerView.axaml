@@ -77,8 +77,7 @@
 					<ItemsControl ItemsSource="{CompiledBinding}">
 						<ItemsControl.ItemsPanel>
 							<ItemsPanelTemplate>
-								<tools:AlignableWrapPanel Orientation="Horizontal"
-														  HorizontalContentAlignment="Center" />
+								<tools:VirtualizingWrapPanel Orientation="Horizontal" />
 							</ItemsPanelTemplate>
 						</ItemsControl.ItemsPanel>
 					</ItemsControl>
@@ -88,7 +87,13 @@
 
 		<DataTemplate DataType="{x:Type col:IEnumerable}">
 			<ScrollViewer>
-				<ItemsControl ItemsSource="{CompiledBinding}" />
+				<ItemsControl ItemsSource="{CompiledBinding}" >
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<VirtualizingStackPanel Orientation="Vertical"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
 			</ScrollViewer>
 		</DataTemplate>
 		
