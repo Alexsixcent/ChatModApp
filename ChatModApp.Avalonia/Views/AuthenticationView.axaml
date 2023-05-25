@@ -10,10 +10,9 @@
              x:Class="ChatModApp.Views.AuthenticationView"
              x:DataType="vms:AuthenticationViewModel">
 
-    <UserControl.Resources>
-        <Styles x:Key="WebViewSelector">
-            <Style Selector="TemplatedControl#AuthContent"
-                   tools:StyleSelect.Key="{StaticResource False}">
+    <UserControl.Styles>
+        <Style Selector="TemplatedControl#AuthContent"
+               tools:StyleSelect.Key="{StaticResource False}">
                 <Setter Property="Template">
                     <ControlTemplate>
                         <Border HorizontalAlignment="Center"
@@ -42,8 +41,7 @@
                     </ControlTemplate>
                 </Setter>
             </Style>
-        </Styles>
-    </UserControl.Resources>
+    </UserControl.Styles>
 
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Border ZIndex="2" Padding="10" Margin="10"

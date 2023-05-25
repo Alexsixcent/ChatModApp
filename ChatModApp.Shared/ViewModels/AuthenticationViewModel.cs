@@ -1,7 +1,6 @@
 ﻿using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Services;
 using ChatModApp.Shared.Tools.Extensions;
 using ReactiveUI;
@@ -34,9 +33,8 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
 
     private readonly AuthenticationService _authService;
     private readonly ChatTabViewModel _chatTabs;
-    private TwitchAuthQueryParams _queryParams;
-
-
+    private Guid _authState;
+    
     public AuthenticationViewModel(AuthenticationService authService, BlazorHostingService blazorService,
                                    ChatTabViewModel chatTabs)
     {
@@ -46,7 +44,7 @@ public class AuthenticationViewModel : ReactiveObject, IRoutableViewModel, IActi
         UsingEmbedBrowser = BlazorHostingService.IsBlazorAuthDisabled;
         AuthCompleteCommand = ReactiveCommand.CreateFromTask<WebNavigatedAction>(AuthComplete);
         var redirectUri = UsingEmbedBrowser ? null : new Uri(new(blazorService.CurrentHostingUrl!), "auth");
-        (AuthUri, _queryParams) = authService.GenerateAuthUri(redirectUri);
+        (AuthUri, _authState) = AuthenticationService.GenerateAuthUri(redirectUri);
 
         this.WhenActivated(disposable =>
         {
