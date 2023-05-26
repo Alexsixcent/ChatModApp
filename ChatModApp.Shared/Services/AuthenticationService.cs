@@ -45,7 +45,9 @@ public class AuthenticationService
 
                                              AuthScopes.User_Subscriptions,
                                              
-                                             AuthScopes.Helix_Moderator_Read_Chatters
+                                             AuthScopes.Helix_Moderator_Read_Chatters,
+                                             AuthScopes.Helix_Moderation_Read,
+                                             AuthScopes.Helix_Channel_Read_VIPs
                                          }, state);
 
         return (uri, state);

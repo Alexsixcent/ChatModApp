@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+			 xmlns:system="clr-namespace:System;assembly=System.Runtime"
+			 xmlns:collections="clr-namespace:CommunityToolkit.Mvvm.Collections;assembly=CommunityToolkit.Mvvm"
+			 xmlns:viewModels="clr-namespace:ChatModApp.Shared.ViewModels;assembly=ChatModApp.Shared"
+			 mc:Ignorable="d"
+			 d:DesignWidth="800"
+			 d:DesignHeight="450"
+			 x:Class="ChatModApp.Views.UserListView"
+			 x:DataType="viewModels:UserListViewModel">
+
+	<StackPanel Orientation="Vertical">
+		<StackPanel Orientation="Horizontal">
+			<TextBox Text="{CompiledBinding UserSearchText, Mode=OneWayToSource}"
+					 Watermark="Search user..."
+					 UseFloatingWatermark="True"
+					 Margin="0,0,0,5" />
+			<Button x:Name="UserListRefreshButton"
+					Margin="10,0,0,5"
+					VerticalAlignment="Top"
+					HorizontalAlignment="Right">
+				<controls:SymbolIcon Symbol="Refresh" />
+			</Button>
+		</StackPanel>
+
+		<ScrollViewer HorizontalScrollBarVisibility="Disabled"
+					  Margin="5,0">
+			<ItemsRepeater ItemsSource="{CompiledBinding UsersList}">
+				<ItemsRepeater.ItemTemplate>
+					<DataTemplate x:DataType="collections:IReadOnlyObservableGroup">
+						<StackPanel Orientation="Vertical">
+							<Border>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock FontStyle="Italic"
+											   FontWeight="Bold"
+											   Text="{CompiledBinding Key}" />
+									<TextBlock Margin="8,0,0,0"
+											   VerticalAlignment="Bottom"
+											   Opacity="0.8"
+											   Text="{CompiledBinding Count, StringFormat={}{0} item(s), Mode=OneWay}" />
+								</StackPanel>
+							</Border>
+							<ItemsRepeater ItemsSource="{Binding}">
+								<ItemsRepeater.ItemTemplate>
+									<DataTemplate x:DataType="system:String">
+										<TextBlock Text="{CompiledBinding .}" />
+									</DataTemplate>
+								</ItemsRepeater.ItemTemplate>
+							</ItemsRepeater>
+						</StackPanel>
+					</DataTemplate>
+				</ItemsRepeater.ItemTemplate>
+			</ItemsRepeater>
+		</ScrollViewer>
+	</StackPanel>
+</UserControl>

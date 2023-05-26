@@ -134,6 +134,7 @@ public class Bootstrapper : IDisposable
         container.Register<ChatViewModel>(setup: Setup.With(allowDisposableTransient: true));
         container.Register<ChatTabItemViewModel>(setup: Setup.With(allowDisposableTransient: true));
         container.Register<ChatTabPromptViewModel>(setup: Setup.With(allowDisposableTransient: true));
+        container.Register<UserListViewModel>(setup: Setup.With(allowDisposableTransient: true));
     }
 
     private static LoggerConfiguration CreateLoggerConfig(string folder, LoggerConfiguration? config = null) 

@@ -1,27 +1,22 @@
 ﻿using System.Reactive;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using Splat;
 using TwitchLib.Api;
 using TwitchLib.Api.Auth;
 using TwitchLib.Api.Core;
 using TwitchLib.Api.Core.Enums;
-using TwitchLib.Api.Core.Undocumented;
 using TwitchLib.Api.Helix;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 
 namespace ChatModApp.Shared.Services;
 
-public class TwitchApiService : ReactiveObject
+public class TwitchApiService
 {
-    [ObservableAsProperty]
-    public User? CurrentUser { get; }
+    public User? CurrentUser { get; private set; }
     public IObservable<User> UserConnected { get; }
 
     public Helix Helix => _api.Helix;
-    public Undocumented Undocumented => _api.Undocumented;
 
     private const string ClientId = "110gs3dzgr2bj3ask88vqi7mnczk02";
     private static readonly ApiSettings ApiSettings = new() { ClientId = ClientId };
@@ -35,8 +30,8 @@ public class TwitchApiService : ReactiveObject
         UserConnected = authService.AccessTokenChanged
                                    .Select(Connect)
                                    .SelectMany(GetCurrentUser);
-
-        UserConnected.ToProperty(this, s => s.CurrentUser, default(User));
+        
+        UserConnected.Subscribe(user => CurrentUser = user);
     }
 
 

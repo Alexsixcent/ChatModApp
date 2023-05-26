@@ -7,7 +7,7 @@ using ChatModApp.Shared.Models.Chat;
 using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
 using Microsoft.Extensions.Logging;
-using TwitchLib.Api.Core.Models.Undocumented.Chatters;
+using TwitchLib.Api.Core.Enums;
 using TwitchLib.Api.Helix.Models.Users.GetUsers;
 using TwitchLib.Client;
 using TwitchLib.Client.Events;
@@ -17,7 +17,7 @@ using TwitchLib.Communication.Models;
 
 namespace ChatModApp.Shared.Services;
 
-public class TwitchChatService : IDisposable
+public sealed class TwitchChatService : IDisposable
 {
     public IObservable<IChangeSet<ITwitchChannel>> ChannelsJoined { get; }
     public IObservableList<TwitchChatBadge> ChatBadges { get; }
@@ -86,9 +86,58 @@ public class TwitchChatService : IDisposable
 
     public void SendMessage(ITwitchChannel channel, string message) => _client.SendMessage(channel.Login, message);
 
-    public async Task<IEnumerable<ChatterFormatted>> GetChatUserList(ITwitchChannel channel)
+    public async Task<IEnumerable<TwitchChatter>> GetChatUserList(ITwitchChannel channel)
     {
-        return await _apiService.Undocumented.GetChattersAsync(channel.Login);
+        var user = _apiService.CurrentUser;
+        if (user is null) return Enumerable.Empty<TwitchChatter>();
+
+        var chatters = new Dictionary<string, TwitchChatter>();
+        string? page = null;
+        do
+        {
+            var res = await _apiService.Helix.Chat.GetChattersAsync(channel.Id, user.Id, 1000, page);
+            page = res.Pagination.Cursor;
+
+            foreach (var c in res.Data)
+            {
+                chatters.Add(c.UserId, new(UserType.Viewer, c.UserId, c.UserName));
+            }
+        } while (page is not null);
+        
+        if (chatters.Remove(channel.Id))
+        {
+            chatters.Add(channel.Id, new(UserType.Broadcaster, channel.Id, channel.DisplayName));
+        }
+        
+        if (user.Id != channel.Id) return chatters.Values;
+        
+        var moderators = new List<TwitchChatter>();
+        do
+        {
+            var res = await _apiService.Helix.Moderation.GetModeratorsAsync(user.Id, first: 100, after: page);
+            page = res.Pagination.Cursor;
+            moderators.AddRange(res.Data.Select(m => new TwitchChatter(UserType.Moderator, m.UserId, m.UserName)));
+        } while (page is not null);
+
+        var vips = new List<TwitchChatter>();
+        do
+        {
+            var res = await _apiService.Helix.Channels.GetVIPsAsync(user.Id, first: 100, after: page);
+            page = res.Pagination.Cursor;
+            vips.AddRange(res.Data.Select(v => new TwitchChatter(UserType.VIP, v.UserId, v.UserName)));
+        } while (page is not null);
+
+        foreach (var vip in vips.Where(vip => chatters.Remove(vip.Id)))
+        {
+            chatters.Add(vip.Id, vip);
+        }
+
+        foreach (var mod in moderators.Where(mod => chatters.Remove(mod.Id)))
+        {
+            chatters.Add(mod.Id, mod);
+        }
+
+        return chatters.Values;
     }
 
     public void Dispose() => _disposables.Dispose();
@@ -130,3 +179,5 @@ public class TwitchChatService : IDisposable
                                           new(version.ImageUrl4x));
     }
 }
+
+public record TwitchChatter(UserType Type, string Id, string DisplayName);
