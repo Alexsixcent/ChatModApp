@@ -7,22 +7,68 @@
 			 xmlns:controls="clr-namespace:ChatModApp.Controls"
 			 xmlns:tools="clr-namespace:ChatModApp.Tools"
 			 xmlns:reactiveUi="http://reactiveui.net"
+			 xmlns:chat="clr-namespace:ChatModApp.Shared.Models.Chat;assembly=ChatModApp.Shared"
 			 mc:Ignorable="d"
 			 x:Class="ChatModApp.Views.ChatView"
 			 x:DataType="viewModels:ChatViewModel">
 	<UserControl.Resources>
 		<tools:SystemColorToUiConverter x:Key="SysColToUiConverter" />
 	</UserControl.Resources>
+	
+	<UserControl.Styles>
+		<Style Selector="ListBoxItem">
+			<Setter Property="Padding" Value="0"/>
+		</Style>
+	</UserControl.Styles>
+	
+	<UserControl.DataTemplates>
+		<DataTemplate DataType="viewModels:ChatMessageViewModel">
+			<controls:ChatMessage Badges="{CompiledBinding Badges, Mode=OneWay}"
+								  Username="{CompiledBinding Username, Mode=OneWay}"
+								  UsernameColor="{CompiledBinding UsernameColor, Mode=OneWay, Converter={StaticResource SysColToUiConverter}}"
+								  MessageFragments="{CompiledBinding Message, Mode=OneWay}"/>
+		</DataTemplate>
+		
+		<DataTemplate DataType="viewModels:ChatSubViewModel">
+			<StackPanel Orientation="Vertical"
+						HorizontalAlignment="Stretch">
+				<TextBlock>
+					<TextBlock.Inlines>
+						<Bold>
+							<Run Text="{CompiledBinding Username}" />
+						</Bold>
+						<Run Text="{CompiledBinding Parsed}">
+							<Run.Foreground>
+								<SolidColorBrush Color="Gray"/>
+							</Run.Foreground>
+						</Run>
+					</TextBlock.Inlines>
+				</TextBlock>
+				<ContentControl Content="{CompiledBinding Message}">
+					<ContentControl.Styles>
+						<Style Selector="TemplatedControl">
+							<Setter Property="Margin" Value="0, 5, 0, 0"/>
+						</Style>
+					</ContentControl.Styles>
+				</ContentControl>
+			</StackPanel>
+		</DataTemplate>
+	</UserControl.DataTemplates>
+
 	<Grid RowDefinitions="8*,4,Auto">
 		<Grid>
 			<ListBox x:Name="MessageList"
 					 ItemsSource="{CompiledBinding ChatMessages, Mode=OneWay}">
 				<ListBox.ItemTemplate>
-					<DataTemplate x:DataType="viewModels:ChatMessageViewModel">
-						<controls:ChatMessage Badges="{CompiledBinding Badges, Mode=OneWay}"
-											  Username="{CompiledBinding Username, Mode=OneWay}"
-											  UsernameColor="{CompiledBinding UsernameColor, Mode=OneWay, Converter={StaticResource SysColToUiConverter}}"
-											  MessageFragments="{CompiledBinding Message, Mode=OneWay}" />
+					<DataTemplate x:DataType="chat:IChatMessage">
+						<controls:ChatViewStripItem Content="{CompiledBinding}"
+													IsStripped="{CompiledBinding IsStripped}"
+													StripSize="4"
+													StripSpan="10" >
+							<controls:ChatViewStripItem.StripColorBrush>
+								<SolidColorBrush Color="MediumPurple"/>
+							</controls:ChatViewStripItem.StripColorBrush>
+						</controls:ChatViewStripItem>
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>

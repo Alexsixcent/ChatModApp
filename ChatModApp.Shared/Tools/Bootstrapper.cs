@@ -131,7 +131,7 @@ public class Bootstrapper : IDisposable
         container.Register<ChatTabService>(Reuse.Singleton);
         container.Register<EmotePickerViewModel>(Reuse.Singleton);
 
-        container.Register<ChatViewModel>(setup: Setup.With(allowDisposableTransient: true));
+        container.Register<ChatViewModel>();
         container.Register<ChatTabItemViewModel>(setup: Setup.With(allowDisposableTransient: true));
         container.Register<ChatTabPromptViewModel>(setup: Setup.With(allowDisposableTransient: true));
         container.Register<UserListViewModel>(setup: Setup.With(allowDisposableTransient: true));

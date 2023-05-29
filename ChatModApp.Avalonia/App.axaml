@@ -11,6 +11,7 @@
 		<StyleInclude Source="/Controls/ChatMessage.axaml"/>
 		<StyleInclude Source="/Controls/ChatEmote.axaml"/>
 		<StyleInclude Source="/Controls/ChatBadge.axaml"/>
+		<StyleInclude Source="/Controls/ChatViewStripItem.axaml"/>
     </Application.Styles>
 	
 	<Application.Resources>

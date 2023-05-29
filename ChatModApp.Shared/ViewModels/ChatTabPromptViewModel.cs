@@ -55,7 +55,6 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
         SelectionCommand = ReactiveCommand.CreateFromTask<ChannelSuggestionViewModel>(OpenChannel);
 
         SelectionCommand.DisposeWith(_disposables);
-        _chatViewModel.DisposeWith(_disposables);
     }
 
     public void Dispose() => _disposables.Dispose();

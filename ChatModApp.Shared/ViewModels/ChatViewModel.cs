@@ -1,44 +1,35 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using ChatModApp.Shared.Models;
+using ChatModApp.Shared.Models.Chat;
 using ChatModApp.Shared.Services;
 using ChatModApp.Shared.Tools.Extensions;
 using DynamicData;
+using DynamicData.Alias;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace ChatModApp.Shared.ViewModels;
 
-public class ChatViewModel : ReactiveObject, IActivatableViewModel, IRoutableViewModel, IDisposable
+public sealed class ChatViewModel : ReactiveObject, IActivatableViewModel, IRoutableViewModel
 {
     public string UrlPathSegment => Guid.NewGuid().ToString()[..5];
     public IScreen? HostScreen { get; set; }
 
     public ViewModelActivator Activator { get; }
-    public ReactiveCommand<string, Unit> SendMessageCommand { get; }
+    public ReactiveCommand<string, Unit> SendMessageCommand { get; private set; } = null!;
 
     [Reactive] public ITwitchChannel? Channel { get; set; }
-
     [Reactive] public string MessageText { get; set; }
     public EmotePickerViewModel EmotePicker { get; }
     public UserListViewModel UserList { get; }
+    [Reactive] public ReadOnlyObservableCollection<IChatMessage>? ChatMessages { get; private set; }
 
-    public ReadOnlyObservableCollection<ChatMessageViewModel> ChatMessages => _chatMessages;
-    
-    
-    private readonly CompositeDisposable _disposables;
-    private readonly TwitchChatService _chatService;
-    
-    private readonly ReadOnlyObservableCollection<ChatMessageViewModel> _chatMessages;
-    
     public ChatViewModel(TwitchChatService chatService, MessageProcessingService msgProcService,
                          EmotePickerViewModel pickerViewModel, UserListViewModel userList)
     {
         MessageText = string.Empty;
-        _disposables = new();
-        _chatService = chatService;
         Activator = new();
         EmotePicker = pickerViewModel;
         UserList = userList;
@@ -59,36 +50,20 @@ public class ChatViewModel : ReactiveObject, IActivatableViewModel, IRoutableVie
             pickerViewModel.WhenAnyValue(vm => vm.ChatViewMessageText)
                            .BindTo(this, vm => vm.MessageText)
                            .DisposeWith(d);
+
+            msgProcService.ChannelMessages
+                          .Where(msg => msg.Channel == Channel)
+                          .ObserveOnMainThread()
+                          .Bind(out var messages)
+                          .Subscribe()
+                          .DisposeWith(d);
+            ChatMessages = messages;
+            
+            SendMessageCommand = ReactiveCommand.Create<string>(message =>
+            {
+                chatService.SendMessage(Channel ?? throw new NullReferenceException("Channel can't be null"), message);
+                MessageText = string.Empty;
+            }).DisposeWith(d);
         });
-
-
-
-        var messageSent = _chatService.ChatMessageSent
-                                      .Where(message => message.Channel == Channel?.Login)
-                                      .Select(msg => msgProcService.ProcessSentMessage(Channel!, msg));
-        
-        _chatService.ChatMessageReceived
-                    .Where(message => message.Channel == Channel?.Login)
-                    .Select(msg => msgProcService.ProcessReceivedMessage(Channel!, msg))
-                    .Merge(messageSent)
-                    .ToObservableChangeSet(model => model.Id)
-                    .ObserveOnMainThread()
-                    .Bind(out _chatMessages)
-                    .Subscribe()
-                    .DisposeWith(_disposables);
-
-
-
-
-        SendMessageCommand = ReactiveCommand.Create<string>(message =>
-        {
-            _chatService.SendMessage(Channel ?? throw new NullReferenceException("Channel can't be null"), message);
-            MessageText = string.Empty;
-        }).DisposeWith(_disposables);
-
-
     }
-
-
-    public void Dispose() => _disposables.Dispose();
 }

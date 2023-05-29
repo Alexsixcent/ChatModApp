@@ -1,22 +1,30 @@
 ﻿using System.Drawing;
 using System.Globalization;
+using System.Reactive.Linq;
 using ChatModApp.Shared.Models;
 using ChatModApp.Shared.Models.Chat;
 using ChatModApp.Shared.Models.Chat.Emotes;
 using ChatModApp.Shared.Models.Chat.Fragments;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Shared.ViewModels;
+using DynamicData;
 using TwitchLib.Client.Models;
 
 namespace ChatModApp.Shared.Services;
 
 public class MessageProcessingService
 {
+    public IObservable<IChangeSet<IChatMessage, string>> ChannelMessages { get; }
+
+
     private static readonly char[] Slash = { '/' }, Space = { ' ' };
 
     private readonly GlobalStateService _globalStateService;
     private readonly EmotesService _emotesService;
     private readonly TwitchChatService _chatService;
+    private readonly IObservableCache<ITwitchChannel,string> _roomIdToChannels;
+    private readonly IObservableCache<ITwitchChannel,string> _roomLoginToChannels;
+    private readonly SourceCache<IChatMessage, string> _chatMessageCache;
 
     public MessageProcessingService(GlobalStateService globalStateService,
                                     EmotesService emotesService,
@@ -25,53 +33,136 @@ public class MessageProcessingService
         _globalStateService = globalStateService;
         _emotesService = emotesService;
         _chatService = chatService;
+        _roomIdToChannels = chatService.ChannelsJoined.AddKey(channel => channel.Id).AsObservableCache();
+        _roomLoginToChannels = chatService.ChannelsJoined.AddKey(channel => channel.Login).AsObservableCache();
+        _chatMessageCache = new(msg => msg.Id);
+        
+        var sent = chatService.ChatMessageSent
+                              .ObserveOnThreadPool()
+                              .Select(ProcessSentMessage);
+
+        var newSub = chatService.ChatNewSub
+                             .ObserveOnThreadPool()
+                             .Select(ProcessNewSubscriberMessage);
+
+        var reSub = chatService.ChatResubbed
+                               .ObserveOnThreadPool()
+                               .Select(ProcessReSubscriberMessage);
+
+        chatService.ChatMessageReceived
+                   .ObserveOnThreadPool()
+                   .Select(ProcessReceivedMessage)
+                   .Cast<IChatMessage>()
+                   .Merge(sent)
+                   .Merge(newSub)
+                   .Merge(reSub)
+                   .Subscribe(msg => _chatMessageCache.AddOrUpdate(msg));
+
+        ChannelMessages = _chatMessageCache.Connect();
     }
 
-    public ChatMessageViewModel ProcessReceivedMessage(ITwitchChannel channel, ChatMessage message)
+    private ChatMessageViewModel ProcessReceivedMessage(ChatMessage message)
     {
-        return new(message.Id,
-                   message.DisplayName,
-                   GetMessageBadges(channel, message.Badges),
-                   GetMessageFragments(channel, message),
-                   GetColorFromTwitchHex(message.ColorHex));
+        var channel = _roomIdToChannels.Lookup(message.RoomId).Value;
+        return new()
+        {
+            Id = message.Id,
+            Channel = channel,
+            Username = message.DisplayName,
+            Badges = GetMessageBadges(channel, message.Badges),
+            Message = GetMessageFragments(channel, message.Message, message.EmoteSet),
+            UsernameColor = GetColorFromTwitchHex(message.ColorHex)
+        };
     }
 
-    public ChatMessageViewModel ProcessSentMessage(ITwitchChannel channel, SentMessage message)
+    private ChatMessageViewModel ProcessSentMessage(SentMessage message)
     {
-        return new(Guid.NewGuid().ToString("N"),
-                   message.DisplayName,
-                   GetMessageBadges(channel, message.Badges),
-                   ParseTextFragment(message.Message, channel, false, false),
-                   GetColorFromTwitchHex(message.ColorHex));
+        var channel = _roomLoginToChannels.Lookup(message.Channel).Value;
+        return new()
+        {
+            Id = Guid.NewGuid().ToString("N"),
+            Channel = channel,
+            Username = message.DisplayName,
+            Badges = GetMessageBadges(channel, message.Badges),
+            Message = ParseTextFragment(message.Message, channel, false, false),
+            UsernameColor = GetColorFromTwitchHex(message.ColorHex)
+        };
+    }
+
+    private ChatSubViewModel ProcessNewSubscriberMessage(Subscriber sub)
+    {
+        return new()
+        {
+            Id = sub.Id,
+            Channel = _roomIdToChannels.Lookup(sub.RoomId).Value,
+            Username = sub.DisplayName,
+            Plan = sub.SubscriptionPlanName,
+            Streak = sub.MsgParamStreakMonths,
+            Months = 0,
+            Parsed = sub.SystemMessageParsed.TrimStart(' ')
+                        .TrimStart(sub.DisplayName)
+                        .TrimStart(' '),
+        };
+    }
+
+    private ChatSubViewModel ProcessReSubscriberMessage(ReSubscriber reSub)
+    {
+        var channel = _roomIdToChannels.Lookup(reSub.RoomId).Value;
+        ChatMessageViewModel? message = null;
+        
+        if (!string.IsNullOrWhiteSpace(reSub.ResubMessage))
+        {
+            message = new()
+            {
+                Id = reSub.Id,
+                Channel = channel,
+                Username = reSub.DisplayName,
+                Badges = GetMessageBadges(channel, reSub.Badges),
+                Message = GetMessageFragments(channel, reSub.ResubMessage, new(reSub.EmoteSet, reSub.ResubMessage)),
+                UsernameColor = GetColorFromTwitchHex(reSub.ColorHex)
+            };
+        }
+        
+        return new()
+        {
+            Id = reSub.Id,
+            Channel = channel,
+            Username = reSub.DisplayName,
+            Plan = reSub.SubscriptionPlanName,
+            Streak = reSub.MsgParamStreakMonths,
+            Months = reSub.Months,
+            Parsed = reSub.SystemMessageParsed.TrimStart(' ').TrimStart(reSub.DisplayName).TrimStart(' '),
+            Message = message
+        };
     }
 
     private IEnumerable<IChatBadge> GetMessageBadges(ITwitchChannel channel,
                                                      IEnumerable<KeyValuePair<string, string>> badgePairs) =>
         badgePairs.Select(pair => _chatService.ChatBadges.Items
-                                              .Where(chatBadge => chatBadge.SetId == pair.Key && chatBadge.Id == pair.Value)
-                                              .LastOrDefault(badge => badge.Channel is null || badge.Channel == channel))
+                                              .Where(chatBadge =>
+                                                         chatBadge.SetId == pair.Key && chatBadge.Id == pair.Value)
+                                              .LastOrDefault(badge => badge.Channel is null ||
+                                                                      badge.Channel == channel))
                   .Where(b => b is not null)!;
 
-    private IEnumerable<IMessageFragment> GetMessageFragments(ITwitchChannel channel, ChatMessage chatMessage)
+    private IEnumerable<IMessageFragment> GetMessageFragments(ITwitchChannel channel, string message, EmoteSet emoteSet)
     {
-        var msg = chatMessage.Message;
         var fragments = new List<IMessageFragment>();
 
-
-        if (chatMessage.EmoteSet.Emotes.Count == 0)
+        if (emoteSet.Emotes.Count == 0)
         {
-            fragments.AddRange(ParseTextFragment(msg, channel, false, false));
+            fragments.AddRange(ParseTextFragment(message, channel, false, false));
         }
         else
         {
-            chatMessage.EmoteSet.Emotes.Sort((left, right) => left.StartIndex.CompareTo(right.StartIndex));
+            var emotes = emoteSet.Emotes.OrderBy(e => e.StartIndex);
 
             var lastEndIndex = 0;
-            foreach (var emote in chatMessage.EmoteSet.Emotes)
+            foreach (var emote in emotes)
             {
                 if (emote.StartIndex - lastEndIndex > 1)
                 {
-                    fragments.AddRange(ParseTextFragment(msg.SubstringAbs(lastEndIndex, emote.StartIndex - 1),
+                    fragments.AddRange(ParseTextFragment(message.SubstringAbs(lastEndIndex, emote.StartIndex - 1),
                                                          channel, lastEndIndex == 0));
                 }
 
@@ -79,16 +170,16 @@ public class MessageProcessingService
                 lastEndIndex = emote.EndIndex + 1;
             }
 
-            if (lastEndIndex < msg.Length - 1)
+            if (lastEndIndex < message.Length - 1)
             {
-                fragments.AddRange(ParseTextFragment(msg[lastEndIndex..], channel,
+                fragments.AddRange(ParseTextFragment(message[lastEndIndex..], channel,
                                                      endSpace: false));
             }
         }
 
         return fragments;
     }
-
+    
     private IEnumerable<IMessageFragment> ParseTextFragment(string? msg, ITwitchChannel channel, bool startSpace = true,
                                                             bool endSpace = true)
     {

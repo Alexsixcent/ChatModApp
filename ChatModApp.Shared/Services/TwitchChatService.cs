@@ -23,6 +23,9 @@ public sealed class TwitchChatService : IDisposable
     public IObservableList<TwitchChatBadge> ChatBadges { get; }
     public IObservable<ChatMessage> ChatMessageReceived { get; }
     public IObservable<SentMessage> ChatMessageSent { get; }
+    public IObservable<Subscriber> ChatNewSub { get; }
+    public IObservable<OnGiftedSubscriptionArgs> ChatGiftedSubs { get; }
+    public IObservable<ReSubscriber> ChatResubbed { get; }
 
 
     private readonly TwitchApiService _apiService;
@@ -67,6 +70,18 @@ public sealed class TwitchChatService : IDisposable
                           .ObserveOnThreadPool()
                           .Select(pattern => pattern.EventArgs.SentMessage);
 
+        ChatNewSub = Observable.FromEventPattern<OnNewSubscriberArgs>(_client, nameof(_client.OnNewSubscriber))
+                  .ObserveOnThreadPool()
+                  .Select(pattern => pattern.EventArgs.Subscriber);
+
+        ChatResubbed = Observable.FromEventPattern<OnReSubscriberArgs>(_client, nameof(_client.OnReSubscriber))
+                  .ObserveOnThreadPool()
+                  .Select(pattern => pattern.EventArgs.ReSubscriber);
+
+        ChatGiftedSubs = Observable.FromEventPattern<OnGiftedSubscriptionArgs>(_client, nameof(_client.OnGiftedSubscription))
+                  .ObserveOnThreadPool()
+                  .Select(pattern => pattern.EventArgs);
+        
         ChannelsJoined = tabService.Tabs
                                    .AutoRefresh(item => item.Channel)
                                    .Filter(channel => channel.Channel is not null)

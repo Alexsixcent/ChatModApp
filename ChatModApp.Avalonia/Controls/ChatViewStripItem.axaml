@@ -1,0 +1,25 @@
+<Styles xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:controls1="clr-namespace:ChatModApp.Controls">
+	<Design.PreviewWith>
+		<controls1:ChatViewStripItem />
+	</Design.PreviewWith>
+
+	<Style Selector="controls1|ChatViewStripItem">
+		<!-- Set Defaults -->
+		<Setter Property="Template">
+			<ControlTemplate>
+				<StackPanel Orientation="Horizontal"
+							Margin="{TemplateBinding Margin}">
+					<Rectangle Name="PART_StripRectangle"
+							   VerticalAlignment="Stretch"
+							   Width="{TemplateBinding StripSize}"
+							   IsVisible="{TemplateBinding IsStripped}"
+							   Fill="{TemplateBinding StripColorBrush}" />
+					<ContentControl Name="PART_ContentControl"
+									Content="{TemplateBinding Content}" />
+				</StackPanel>
+			</ControlTemplate>
+		</Setter>
+	</Style>
+</Styles>
