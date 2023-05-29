@@ -4,12 +4,12 @@ using ReactiveUI;
 
 namespace ChatModApp.Shared.ViewModels;
 
-public class ChatSubViewModel : ReactiveObject, IChatMessage
+public sealed class ChatSubViewModel : ReactiveObject, IChatMessage
 {
-    public required string Id { get; init; }
-    public required ITwitchChannel Channel { get; init; }
     public bool IsStripped => true;
-    public required string Username { get; init; }
+    public required string Id { get; init; }
+    public required ITwitchUser Channel { get; init; }
+    public required ITwitchUser User { get; init; }
     public required string Plan { get; init; }
     public required string Streak { get; init; }
     public required int Months { get; init; }

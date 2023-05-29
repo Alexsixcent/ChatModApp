@@ -19,7 +19,7 @@ public sealed class UserListViewModel : ReactiveObject, IActivatableViewModel, I
 
     public ReactiveCommand<Unit, Unit> ChattersLoadCommand { get; private set; }
 
-    [ObservableAsProperty] public ITwitchChannel? SrcChannel { get; }
+    [ObservableAsProperty] public ITwitchUser? SrcChannel { get; }
 
     [Reactive] public string? UserSearchText { get; set; }
 

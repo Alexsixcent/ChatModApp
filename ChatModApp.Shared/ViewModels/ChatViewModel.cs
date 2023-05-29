@@ -20,7 +20,7 @@ public sealed class ChatViewModel : ReactiveObject, IActivatableViewModel, IRout
     public ViewModelActivator Activator { get; }
     public ReactiveCommand<string, Unit> SendMessageCommand { get; private set; } = null!;
 
-    [Reactive] public ITwitchChannel? Channel { get; set; }
+    [Reactive] public ITwitchUser? Channel { get; set; }
     [Reactive] public string MessageText { get; set; }
     public EmotePickerViewModel EmotePicker { get; }
     public UserListViewModel UserList { get; }

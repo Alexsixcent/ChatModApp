@@ -65,7 +65,7 @@ public class ChatTabPromptViewModel : ReactiveObject, IDisposable, IRoutableView
     {
         var res = await _apiService.Helix.Search.SearchChannelsAsync(searchTerm);
 
-        return res.Channels.Select(ch => new ChannelSuggestionViewModel(new TwitchChannel(ch.Id, ch.DisplayName, ch.BroadcasterLogin),
+        return res.Channels.Select(ch => new ChannelSuggestionViewModel(new TwitchUser(ch.Id, ch.BroadcasterLogin, ch.DisplayName),
                                                                         new(ch.ThumbnailUrl), ch.IsLive));
     }
 

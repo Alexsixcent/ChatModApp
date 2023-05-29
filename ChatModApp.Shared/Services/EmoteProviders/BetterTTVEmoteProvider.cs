@@ -25,7 +25,7 @@ public sealed class BetterTTVEmoteProvider : IEmoteProvider
                                          list.Select(e => e.Code)))
             .SelectMany(list => list);
 
-    public IObservable<IMemberEmote> LoadChannelEmotes(ITwitchChannel channel)
+    public IObservable<IMemberEmote> LoadChannelEmotes(ITwitchUser channel)
     {
         var content = _api.GetUserEmotes(channel.Id)
                           .Select(res => res.Content)

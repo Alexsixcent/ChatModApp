@@ -8,13 +8,13 @@ public class ChannelSuggestionViewModel
 
     public Uri ThumbnailUrl { get; }
 
-    public ITwitchChannel Channel { get; }
+    public ITwitchUser Channel { get; }
     public string DisplayName => Channel.DisplayName;
     public string Login => Channel.Login;
     
-    public ChannelSuggestionViewModel(ITwitchChannel channel, Uri thumbnailUrl, bool isLive = false)
+    public ChannelSuggestionViewModel(ITwitchUser user, Uri thumbnailUrl, bool isLive = false)
     {
-        Channel = channel;
+        Channel = user;
         ThumbnailUrl = thumbnailUrl;
         IsLive = isLive;
     }

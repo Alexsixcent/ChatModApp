@@ -28,7 +28,7 @@ public sealed class FrankerZEmoteProvider : IEmoteProvider
             .SelectMany(sets => sets.Values)
             .SelectMany(set => set.Emoticons);
 
-    public IObservable<IMemberEmote> LoadChannelEmotes(ITwitchChannel channel) =>
+    public IObservable<IMemberEmote> LoadChannelEmotes(ITwitchUser channel) =>
         _api.GetChannelEmotes(channel.Id)
             .Select(res => res.Content?.Sets)
             .WhereNotNull()

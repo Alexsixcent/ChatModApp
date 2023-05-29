@@ -1,8 +1,8 @@
 ﻿namespace ChatModApp.Shared.Models;
 
-public interface ITwitchChannel
+public interface ITwitchUser
 {
     string Id { get; }
-    string DisplayName { get; }
     string Login { get; }
+    string DisplayName { get; }
 }

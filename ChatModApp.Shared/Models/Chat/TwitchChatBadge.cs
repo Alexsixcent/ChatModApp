@@ -2,16 +2,16 @@
 
 public class TwitchChatBadge : IChatBadge
 {
-    public ITwitchChannel? Channel { get; }
+    public ITwitchUser? Channel { get; }
     public string SetId { get; }
     public string Id { get; }
     public Uri Small { get; }
     public Uri Medium { get; }
     public Uri Large { get; }
 
-    public TwitchChatBadge(ITwitchChannel channel, string setId, string id, Uri small, Uri medium, Uri large)
+    public TwitchChatBadge(ITwitchUser user, string setId, string id, Uri small, Uri medium, Uri large)
     {
-        Channel = channel;
+        Channel = user;
         SetId = setId;
         Id = id;
         Small = small;

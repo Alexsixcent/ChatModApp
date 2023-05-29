@@ -13,7 +13,7 @@ public sealed class TwitchEmoteProvider : IEmoteProvider
         _api = api;
     }
 
-    public IObservable<IEmote> LoadConnectedEmotes(ITwitchChannel connected) =>
+    public IObservable<IEmote> LoadConnectedEmotes(ITwitchUser connected) =>
         Observable.FromAsync(() => _api.Helix.Chat.GetGlobalEmotesAsync())
                   .SelectMany(res => res.GlobalEmotes)
                   .Select(emote => new TwitchEmote(emote));

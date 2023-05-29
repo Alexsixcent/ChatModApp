@@ -9,9 +9,9 @@ public interface IEmoteProvider
     IObservable<IGlobalEmote> LoadGlobalEmotes()
         => Observable.Empty<IGlobalEmote>();
 
-    IObservable<IMemberEmote> LoadChannelEmotes(ITwitchChannel channel)
+    IObservable<IMemberEmote> LoadChannelEmotes(ITwitchUser user)
         => Observable.Empty<IMemberEmote>();
     
-    IObservable<IEmote> LoadConnectedEmotes(ITwitchChannel connected) 
+    IObservable<IEmote> LoadConnectedEmotes(ITwitchUser connected) 
         => Observable.Empty<IEmote>();
 }

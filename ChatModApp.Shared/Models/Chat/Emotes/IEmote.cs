@@ -9,7 +9,7 @@ public interface IEmote : IImageFrag
 
 public interface IMemberEmote : IEmote
 {
-    ITwitchChannel MemberChannel { get; set; }
+    ITwitchUser MemberChannel { get; set; }
 }
 
 public interface IGlobalEmote : IEmote

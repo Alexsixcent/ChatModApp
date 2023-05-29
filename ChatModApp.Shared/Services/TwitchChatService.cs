@@ -19,7 +19,7 @@ namespace ChatModApp.Shared.Services;
 
 public sealed class TwitchChatService : IDisposable
 {
-    public IObservable<IChangeSet<ITwitchChannel>> ChannelsJoined { get; }
+    public IObservable<IChangeSet<ITwitchUser>> ChannelsJoined { get; }
     public IObservableList<TwitchChatBadge> ChatBadges { get; }
     public IObservable<ChatMessage> ChatMessageReceived { get; }
     public IObservable<SentMessage> ChatMessageSent { get; }
@@ -99,9 +99,9 @@ public sealed class TwitchChatService : IDisposable
             .DisposeWith(_disposables);
     }
 
-    public void SendMessage(ITwitchChannel channel, string message) => _client.SendMessage(channel.Login, message);
+    public void SendMessage(ITwitchUser user, string message) => _client.SendMessage(user.Login, message);
 
-    public async Task<IEnumerable<TwitchChatter>> GetChatUserList(ITwitchChannel channel)
+    public async Task<IEnumerable<TwitchChatter>> GetChatUserList(ITwitchUser channel)
     {
         var user = _apiService.CurrentUser;
         if (user is null) return Enumerable.Empty<TwitchChatter>();
@@ -164,7 +164,7 @@ public sealed class TwitchChatService : IDisposable
         _client.Connect();
     }
 
-    private async Task<IEnumerable<TwitchChatBadge>> GetChannelChatBadges(ITwitchChannel channel)
+    private async Task<IEnumerable<TwitchChatBadge>> GetChannelChatBadges(ITwitchUser channel)
     {
         var res1 = await _apiService.Helix.Users.GetUsersAsync(logins: new() { channel.Login });
         var user = res1.Users.Single();

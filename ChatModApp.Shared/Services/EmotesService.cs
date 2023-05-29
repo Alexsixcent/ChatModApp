@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 
 namespace ChatModApp.Shared.Services;
 
-public sealed record EmotePair(ITwitchChannel MemberChannel, string Code)
+public sealed record EmotePair(ITwitchUser MemberChannel, string Code)
 {
-    public ITwitchChannel MemberChannel { get; } = MemberChannel;
+    public ITwitchUser MemberChannel { get; } = MemberChannel;
 
     public string Code { get; } = Code;
 }
@@ -50,7 +50,7 @@ public sealed class EmotesService : IDisposable
                            .RefCount();
         var connectedEmotes = _apiService.UserConnected
                                          .ObserveOnThreadPool()
-                                         .Select(user => new TwitchChannel(user.Id, user.DisplayName, user.Login))
+                                         .Select(user => new TwitchUser(user.Id, user.Login, user.DisplayName))
                                          .Do(channel => logger.LogInformation("Loading {User}'s emotes...", channel))
                                          .SelectMany(user => providers.TransformMany(provider => provider
                                                          .LoadConnectedEmotes(user)

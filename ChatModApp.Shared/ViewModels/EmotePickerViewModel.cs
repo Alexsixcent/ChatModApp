@@ -17,7 +17,7 @@ public sealed class EmotePickerViewModel : ReactiveObject, IActivatableViewModel
 {
     public ViewModelActivator Activator { get; }
 
-    [ObservableAsProperty] public ITwitchChannel? SrcChannel { get; }
+    [ObservableAsProperty] public ITwitchUser? SrcChannel { get; }
     
     [Reactive] public string? SearchText { get; set; }
     [Reactive] public string? ChatViewMessageText { get; set; }

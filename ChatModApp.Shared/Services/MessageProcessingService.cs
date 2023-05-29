@@ -22,8 +22,8 @@ public class MessageProcessingService
     private readonly GlobalStateService _globalStateService;
     private readonly EmotesService _emotesService;
     private readonly TwitchChatService _chatService;
-    private readonly IObservableCache<ITwitchChannel,string> _roomIdToChannels;
-    private readonly IObservableCache<ITwitchChannel,string> _roomLoginToChannels;
+    private readonly IObservableCache<ITwitchUser,string> _roomIdToChannels;
+    private readonly IObservableCache<ITwitchUser,string> _roomLoginToChannels;
     private readonly SourceCache<IChatMessage, string> _chatMessageCache;
 
     public MessageProcessingService(GlobalStateService globalStateService,
@@ -95,7 +95,7 @@ public class MessageProcessingService
         {
             Id = sub.Id,
             Channel = _roomIdToChannels.Lookup(sub.RoomId).Value,
-            Username = sub.DisplayName,
+            User = new TwitchUser(sub.UserId, sub.Login, sub.DisplayName),
             Plan = sub.SubscriptionPlanName,
             Streak = sub.MsgParamStreakMonths,
             Months = 0,
@@ -127,7 +127,7 @@ public class MessageProcessingService
         {
             Id = reSub.Id,
             Channel = channel,
-            Username = reSub.DisplayName,
+            User = new TwitchUser(reSub.UserId, reSub.Login, reSub.DisplayName),
             Plan = reSub.SubscriptionPlanName,
             Streak = reSub.MsgParamStreakMonths,
             Months = reSub.Months,
@@ -135,8 +135,7 @@ public class MessageProcessingService
             Message = message
         };
     }
-
-    private IEnumerable<IChatBadge> GetMessageBadges(ITwitchChannel channel,
+    private IEnumerable<IChatBadge> GetMessageBadges(ITwitchUser channel,
                                                      IEnumerable<KeyValuePair<string, string>> badgePairs) =>
         badgePairs.Select(pair => _chatService.ChatBadges.Items
                                               .Where(chatBadge =>
@@ -145,7 +144,7 @@ public class MessageProcessingService
                                                                       badge.Channel == channel))
                   .Where(b => b is not null)!;
 
-    private IEnumerable<IMessageFragment> GetMessageFragments(ITwitchChannel channel, string message, EmoteSet emoteSet)
+    private IEnumerable<IMessageFragment> GetMessageFragments(ITwitchUser channel, string message, EmoteSet emoteSet)
     {
         var fragments = new List<IMessageFragment>();
 
@@ -180,7 +179,7 @@ public class MessageProcessingService
         return fragments;
     }
     
-    private IEnumerable<IMessageFragment> ParseTextFragment(string? msg, ITwitchChannel channel, bool startSpace = true,
+    private IEnumerable<IMessageFragment> ParseTextFragment(string? msg, ITwitchUser channel, bool startSpace = true,
                                                             bool endSpace = true)
     {
         if (msg is null)
