@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net7.0</TargetFramework>
@@ -25,7 +25,7 @@
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview8" />
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview8" />
-        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.10.0-preview20230425001" />
+        <PackageReference Include="Deadpikle.AvaloniaProgressRing" Version="0.10.0-preview20230530001" />
         <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview8" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
         <PackageReference Include="WebViewControl-Avalonia" Version="2.106.7" />
