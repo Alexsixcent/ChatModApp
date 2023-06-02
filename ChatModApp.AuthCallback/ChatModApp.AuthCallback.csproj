@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="1.6.0" GeneratePathProperty="true" />
+        <PackageReference Include="Microsoft.Fast.Components.FluentUI" Version="2.3.5" GeneratePathProperty="true" />
     </ItemGroup>
 
     <!-- Copies all content root files to output dir for app to load -->
