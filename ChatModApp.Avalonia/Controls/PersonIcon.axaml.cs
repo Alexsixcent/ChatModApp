@@ -7,19 +7,18 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Layout;
 using Avalonia.Logging;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Tools;
 
 namespace ChatModApp.Controls;
 
-public class PersonIcon : TemplatedControl, IBitmapSource
+public class PersonIcon : TemplatedControl
 {
     public static readonly StyledProperty<Uri?> SourceProperty = AvaloniaProperty.Register<PersonIcon, Uri?>(
      nameof(Source));
 
-    public static readonly StyledProperty<IBitmap?> ImageSourceProperty =
-        AvaloniaProperty.Register<PersonIcon, IBitmap?>(nameof(ImageSource));
+    public static readonly StyledProperty<IImage?> ImageSourceProperty =
+        AvaloniaProperty.Register<PersonIcon, IImage?>(nameof(ImageSource));
 
     public static readonly StyledProperty<IBrush?> BorderStrokeProperty =
         Shape.StrokeProperty.AddOwner<PersonIcon>();
@@ -33,7 +32,7 @@ public class PersonIcon : TemplatedControl, IBitmapSource
         set => SetValue(SourceProperty, value);
     }
 
-    public IBitmap? ImageSource
+    public IImage? ImageSource
     {
         get => GetValue(ImageSourceProperty);
         set => SetValue(ImageSourceProperty, value);
@@ -57,12 +56,12 @@ public class PersonIcon : TemplatedControl, IBitmapSource
     {
         var img = ImageSourceProperty.Changed
                                      .Where(args => !args.IsSameValue())
-                                     .Select(args => ((IBitmapSource)args.Sender, args.NewValue.Value));
+                                     .Select(args => ((PersonIcon)args.Sender, args.NewValue.Value));
         SourceProperty.Changed
                       .ObserveOnThreadPool()
                       .Where(args => !args.IsSameValue())
                       .SelectMany(async args =>
-                                      ((IBitmapSource)args.Sender, await CachedBitmapStore.Get(args.NewValue.Value)))
+                                      ((PersonIcon)args.Sender, await CachedBitmapStore.Get(args.NewValue.Value)))
                       .Merge(img)
                       .ObserveOnMainThread()
                       .Subscribe(tuple => tuple.Item1.SetImageSource(tuple.Item2));
@@ -75,7 +74,7 @@ public class PersonIcon : TemplatedControl, IBitmapSource
         _ellipse = e.NameScope.Find<Ellipse>("PART_Ellipse");
     }
 
-    public void SetImageSource(IBitmap? bitmap)
+    public void SetImageSource(IImage? bitmap)
     {
         if (bitmap is null) return;
         if (_ellipse is null) return;
@@ -83,7 +82,7 @@ public class PersonIcon : TemplatedControl, IBitmapSource
         try
         {
             if (_ellipse.Fill is ImageBrush brush)
-                brush.Source = bitmap;
+                brush.Source = bitmap as IImageBrushSource;
 
             SetSize(_ellipse, bitmap.Size);
             DrawAgain();

@@ -11,7 +11,6 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Logging;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Tools;
@@ -223,9 +222,9 @@ public class AdvancedImage : TemplatedControl
         {
             State = ImageState.Loading;
             CurrentImage = null;
-        }, DispatcherPriority.Layout, token);
+        }, DispatcherPriority.Default, token);
             
-        IBitmap? bitmap = null;
+        IImage? bitmap = null;
         try
         {
             bitmap ??= await CachedBitmapStore.Get(source, _baseUri, token);
@@ -241,12 +240,12 @@ public class AdvancedImage : TemplatedControl
         {
             Logger.TryGet(LogEventLevel.Error, LogArea.Control)
                   ?.Log(this, "Could not load bitmap from URI {URI}, {Exception}", source, ex);
-            await Dispatcher.UIThread.InvokeAsync(() => State = ImageState.Failed, DispatcherPriority.Layout, token);
+            await Dispatcher.UIThread.InvokeAsync(() => State = ImageState.Failed, DispatcherPriority.Default, token);
         }
         
         if (token.IsCancellationRequested)
         {
-            await Dispatcher.UIThread.InvokeAsync(() => State = ImageState.Failed, DispatcherPriority.Layout, token);
+            await Dispatcher.UIThread.InvokeAsync(() => State = ImageState.Failed, DispatcherPriority.Default, token);
             return;
         }
 
@@ -254,7 +253,7 @@ public class AdvancedImage : TemplatedControl
         {
             CurrentImage = bitmap;
             State = ImageState.Loaded;
-        }, DispatcherPriority.Layout, token);
+        }, DispatcherPriority.Default, token);
     }
 
 

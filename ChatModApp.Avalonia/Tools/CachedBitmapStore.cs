@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Logging;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using AvaloniaGif.Decoding;
@@ -19,7 +20,7 @@ public static class CachedBitmapStore
     private static readonly MemoryCache Cache = new(new MemoryCacheOptions());
     private static readonly HttpClient Client = new();
 
-    public static async Task<IBitmap?> Get(Uri? uri, Uri? baseUri = null, CancellationToken cancellationToken = default)
+    public static async Task<IImage?> Get(Uri? uri, Uri? baseUri = null, CancellationToken cancellationToken = default)
     {
         if (uri is null)
         {
@@ -56,7 +57,7 @@ public static class CachedBitmapStore
         }
     }
 
-    private static async Task<IBitmap> BitMapFactory(ICacheEntry entry, Uri uri,
+    private static async Task<IImage> BitMapFactory(ICacheEntry entry, Uri uri,
                                                      CancellationToken cancellationToken = default)
     {
         entry.SetSlidingExpiration(TimeSpan.FromHours(1))
@@ -71,14 +72,14 @@ public static class CachedBitmapStore
         return await Download(uri, cancellationToken);
     }
 
-    private static async Task<IBitmap> Download(Uri uri, CancellationToken cancellationToken = default)
+    private static async Task<IImage> Download(Uri uri, CancellationToken cancellationToken = default)
     {
         var arr = await Observable.FromAsync(() => Client.GetByteArrayAsync(uri, cancellationToken))
                                   .RetryWithBackoffStrategy<byte[], HttpRequestException>(5, TimeSpan.FromSeconds(2));
 
         var stream = new MemoryStream(arr);
 
-        IBitmap bitmap;
+        IImage bitmap;
         try
         {
             bitmap = new ImageGifBitmap(stream);

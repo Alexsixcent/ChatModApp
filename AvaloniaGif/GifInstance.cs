@@ -77,7 +77,7 @@ public class GifInstance : IDisposable
         //     _colorTableIdList.Add(_gifDecoder.Header.GlobalColorTableCacheID);
     }
 
-    private Stream GetStreamFromString(string str)
+    private static Stream GetStreamFromString(string str)
     {
         if (!Uri.TryCreate(str, UriKind.RelativeOrAbsolute, out var res))
         {
@@ -87,7 +87,7 @@ public class GifInstance : IDisposable
         return GetStreamFromUri(res);
     }
 
-    private Stream GetStreamFromUri(Uri uri)
+    private static Stream GetStreamFromUri(Uri uri)
     {
         var uriString = uri.OriginalString.Trim();
 
@@ -95,13 +95,7 @@ public class GifInstance : IDisposable
             throw new InvalidDataException(
                                            "The URI provided is not currently supported.");
 
-        var assetLocator = AvaloniaLocator.Current.GetService<IAssetLoader>();
-
-        if (assetLocator is null)
-            throw new InvalidDataException(
-                                           "The resource URI was not found in the current assembly.");
-
-        return assetLocator.Open(uri);
+        return AssetLoader.Open(uri);
     }
 
     public PixelSize GifPixelSize { get; }

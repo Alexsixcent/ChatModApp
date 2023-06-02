@@ -316,12 +316,12 @@ namespace ChatModApp.Tools
             if (_isInLayout || index < 0 || index >= items.Count || _realizedElements is null)
                 return null;
 
-            if (GetRealizedElement(index) is Control element)
+            if (GetRealizedElement(index) is { } element)
             {
                 element.BringIntoView();
                 return element;
             }
-            else if (this.GetVisualRoot() is ILayoutRoot root)
+            else if (this.GetVisualRoot() is ILayoutRoot)
             {
                 // Create and measure the element to be brought into view. Store it in a field so that
                 // it can be re-used in the layout pass.
@@ -352,7 +352,7 @@ namespace ChatModApp.Tools
                 if (!Bounds.Contains(rect) && !_viewport.Contains(rect))
                 {
                     _isWaitingForViewportUpdate = true;
-                    root.LayoutManager.ExecuteLayoutPass();
+                    UpdateLayout();
                     _isWaitingForViewportUpdate = false;
                 }
 
@@ -365,7 +365,7 @@ namespace ChatModApp.Tools
                 // - The viewport is then updated by the layout system which invalidates our measure
                 // - Measure is then done with the new viewport.
                 _isWaitingForViewportUpdate = !_viewport.Contains(rect);
-                root.LayoutManager.ExecuteLayoutPass();
+                UpdateLayout();
 
                 // If for some reason the layout system didn't give us a new viewport during the layout, we
                 // need to do another layout pass as the one that took place was a no-op.
@@ -373,7 +373,7 @@ namespace ChatModApp.Tools
                 {
                     _isWaitingForViewportUpdate = false;
                     InvalidateMeasure();
-                    root.LayoutManager.ExecuteLayoutPass();
+                    UpdateLayout();
                 }
 
                 var result = _scrollToElement;
