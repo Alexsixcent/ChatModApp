@@ -45,7 +45,7 @@
         <Version>5.0.1-dev-00947</Version>
       </PackageReference>
       <PackageReference Include="Splat.DryIoc">
-        <Version>14.6.8</Version>
+        <Version>14.6.37</Version>
       </PackageReference>
       <PackageReference Include="Splat.Serilog">
         <Version>14.6.8</Version>
