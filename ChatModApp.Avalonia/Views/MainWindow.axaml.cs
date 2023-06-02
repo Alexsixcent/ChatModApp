@@ -30,7 +30,7 @@ public partial class MainWindow : AppWindow, IViewFor<MainViewModel>
         get => ViewModel;
         set => ViewModel = (MainViewModel?)value;
     }
-    
+
     public MainWindow(IApplicationSplashScreen splashScreen, MainViewModel mainViewModel)
     {
         TitleBar.TitleBarHitTestType = TitleBarHitTestType.Complex;
@@ -54,7 +54,7 @@ public partial class MainWindow : AppWindow, IViewFor<MainViewModel>
 
         MinWidth = 100;
         MinHeight = 200;
-        
+
         Application.Current!.ActualThemeVariantChanged += OnActualThemeVariantChanged;
     }
 
@@ -103,7 +103,8 @@ public partial class MainWindow : AppWindow, IViewFor<MainViewModel>
         if (OperatingSystem.IsWindows() && IsWindows11 && theme != FluentAvaloniaTheme.HighContrastTheme)
         {
             TransparencyBackgroundFallback = Brushes.Transparent;
-            TransparencyLevelHint = WindowTransparencyLevel.Mica;
+            TransparencyLevelHint = new[]
+                { WindowTransparencyLevel.Mica, WindowTransparencyLevel.Blur, WindowTransparencyLevel.None };
 
             TryEnableMicaEffect();
         }
@@ -131,7 +132,7 @@ public partial class MainWindow : AppWindow, IViewFor<MainViewModel>
             > 500 => 500,
             _ => 400
         };
-        
+
         TitleBar.ExtendsContentIntoTitleBar = true;
     }
 
@@ -147,7 +148,9 @@ public partial class MainWindow : AppWindow, IViewFor<MainViewModel>
         if (ActualThemeVariant == ThemeVariant.Dark)
         {
             var color = this.TryFindResource("SolidBackgroundFillColorBase",
-                                             ThemeVariant.Dark, out var value) ? (Color2)(Color)value : new(32, 32, 32);
+                                             ThemeVariant.Dark, out var value)
+                            ? (Color2)(Color)value
+                            : new(32, 32, 32);
 
             color = color.LightenPercent(-0.8f);
 
@@ -157,7 +160,9 @@ public partial class MainWindow : AppWindow, IViewFor<MainViewModel>
         {
             // Similar effect here
             var color = this.TryFindResource("SolidBackgroundFillColorBase",
-                                             ThemeVariant.Light, out var value) ? (Color2)(Color)value : new(243, 243, 243);
+                                             ThemeVariant.Light, out var value)
+                            ? (Color2)(Color)value
+                            : new(243, 243, 243);
 
             color = color.LightenPercent(0.5f);
 
