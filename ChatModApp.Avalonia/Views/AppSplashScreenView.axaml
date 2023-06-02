@@ -2,6 +2,7 @@
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:controls="clr-namespace:ChatModApp.Controls"
 			 mc:Ignorable="d"
 			 d:DesignWidth="800"
 			 d:DesignHeight="450"
@@ -17,13 +18,17 @@
 			   MinWidth="50"
 			   Margin="0,0,0,50"
 			   Source="../Assets/avalonia-logo.ico" />
-		<ProgressBar ShowProgressText="True"
-					 IsIndeterminate="True" />
-		<TextBlock FontSize="25"
-				   FontWeight="DemiBold"
-				   HorizontalAlignment="Center"
-				   VerticalAlignment="Top"
-				   Margin="0,15,0,0"
-				   Text="Loading..." />
+		<StackPanel Orientation="Horizontal">
+			<TextBlock FontSize="25"
+					   FontWeight="DemiBold"
+					   HorizontalAlignment="Center"
+					   VerticalAlignment="Top"
+					   Margin="0,15,0,0"
+					   Text="Loading..." />
+			<controls:ProgressRing MaxHeight="50"
+								   Margin="10"
+								   HorizontalAlignment="Left"
+								   VerticalAlignment="Center"/>
+		</StackPanel>
 	</StackPanel>
 </UserControl>

@@ -15,10 +15,14 @@
 					<ToolTip.Tip>
 						<Grid RowDefinitions="Auto,Auto">
 							<controls:AdvancedImage Name="PART_ToolTipImage"
-												  Stretch="None"
-												  HorizontalAlignment="Center"
-												  Margin="5"
-												  MaxWidth="200" />
+													Stretch="None"
+													HorizontalAlignment="Center"
+													Margin="5"
+													MaxHeight="200">
+								<controls:AdvancedImage.PlaceholderContent>
+									<controls:ProgressRing MaxHeight="200" />
+								</controls:AdvancedImage.PlaceholderContent>
+							</controls:AdvancedImage>
 							<TextBlock Grid.Row="1"
 									   Name="PART_ToolTipText"
 									   HorizontalAlignment="Center"
@@ -33,7 +37,11 @@
 							</DataTemplate>
 							<DataTemplate DataType="{x:Type emo:IEmote}">
 								<controls:AdvancedImage Source="{Binding Small}"
-													    Stretch="None" />
+														Stretch="None">
+									<controls:AdvancedImage.PlaceholderContent>
+										<controls:ProgressRing MaxHeight="40" />
+									</controls:AdvancedImage.PlaceholderContent>
+								</controls:AdvancedImage>
 							</DataTemplate>
 						</ContentControl.DataTemplates>
 					</ContentControl>

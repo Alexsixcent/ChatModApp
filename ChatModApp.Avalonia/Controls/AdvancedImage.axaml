@@ -1,21 +1,30 @@
-﻿<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:ChatModApp.Controls"
-        xmlns:pr="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing">
-  <Design.PreviewWith>
-    <controls:AdvancedImage />
-  </Design.PreviewWith>
+﻿<ResourceDictionary
+   xmlns="https://github.com/avaloniaui"
+   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+   xmlns:controls="clr-namespace:ChatModApp.Controls">
 
-  <Style Selector="controls|AdvancedImage">
+  <ControlTheme x:Key="{x:Type controls:AdvancedImage}"
+                TargetType="controls:AdvancedImage">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="IsTabStop" Value="False"/>
     <Setter Property="Template">
       <ControlTemplate>
-        <Grid>
-          <!-- CurrentImage will be rendered with codebehind, just as it is done in the Image -->
-          <!-- <pr:ProgressRing VerticalAlignment="Center" MinWidth="0" MaxWidth="100" -->
-          <!--                  IsActive="True" -->
-          <!--                  IsVisible="{TemplateBinding IsLoading}"/> -->
+        <Grid HorizontalAlignment="Stretch" 
+              VerticalAlignment="Stretch">
+          <Image Name="PART_Image"
+                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                 VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                 Source="{TemplateBinding CurrentImage}"
+                 Stretch="{TemplateBinding Stretch}"
+                 StretchDirection="{TemplateBinding StretchDirection}"/>
+          <ContentControl Name="PART_Placeholder"
+                          Content="{TemplateBinding PlaceholderContent}"
+                          HorizontalAlignment="{TemplateBinding Stretch}"
+                          VerticalAlignment="{TemplateBinding Stretch}"
+                          HorizontalContentAlignment="{TemplateBinding HorizontalAlignment}"
+                          VerticalContentAlignment="{TemplateBinding VerticalAlignment}"/>
         </Grid>
       </ControlTemplate>
     </Setter>
-  </Style>
-</Styles>
+  </ControlTheme>
+</ResourceDictionary>

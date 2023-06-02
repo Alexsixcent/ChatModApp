@@ -1,0 +1,17 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:controls="using:ChatModApp.Controls">
+
+	<ControlTheme x:Key="{x:Type controls:ProgressRing}"
+				  TargetType="controls:ProgressRing">
+		<!-- Set Defaults -->
+		<Setter Property="Template">
+			<ControlTemplate>
+				<Lottie Path="/Assets/Fluent_ProgressRing_Indeterminate.json"
+					Stretch="Uniform"
+					RepeatCount="-1"
+					StretchDirection="Both"/>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
+</ResourceDictionary>

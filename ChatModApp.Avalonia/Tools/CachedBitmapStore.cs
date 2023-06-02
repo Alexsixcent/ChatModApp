@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Logging;
 using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 using AvaloniaGif.Decoding;
 using ChatModApp.Shared.Tools.Extensions;
 using Microsoft.Extensions.Caching.Memory;
@@ -18,9 +19,9 @@ public static class CachedBitmapStore
     private static readonly MemoryCache Cache = new(new MemoryCacheOptions());
     private static readonly HttpClient Client = new();
 
-    public static async Task<IBitmap?> Get(Uri? uri, CancellationToken cancellationToken = default)
+    public static async Task<IBitmap?> Get(Uri? uri, Uri? baseUri = null, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(uri?.AbsoluteUri))
+        if (uri is null)
         {
             Logger.TryGet(LogEventLevel.Error, LogArea.Control)?.Log(null, "URI cannot be null or empty");
             return null;
@@ -30,9 +31,24 @@ public static class CachedBitmapStore
         {
             case "http":
             case "https":
-                return await Cache.GetOrCreateAsync(uri, entry => BitMapFactory(entry, uri, cancellationToken));
+                if (!string.IsNullOrWhiteSpace(uri.AbsoluteUri))
+                    return await Cache.GetOrCreateAsync(uri, entry => BitMapFactory(entry, uri, cancellationToken));
+                
+                Logger.TryGet(LogEventLevel.Error, LogArea.Control)?.Log(null, "Https AbsoluteUri cannot be null or empty");
+                return null;
+
             case "avares":
-                throw new NotImplementedException();
+                try
+                {
+                    if (AssetLoader.Exists(uri, baseUri))
+                        return new Bitmap(AssetLoader.Open(uri, baseUri));
+                }
+                catch (Exception ex)
+                {
+                    Logger.TryGet(LogEventLevel.Error, LogArea.Control)
+                          ?.Log(null, "Error while loading bitmap from asset loader: {Exception}", ex);
+                }
+                return null;
             default:
                 Logger.TryGet(LogEventLevel.Error, LogArea.Control)
                       ?.Log(null, "Cached bitmaps only supports HTTP/HTTPS or avares:// URI schemes");

@@ -17,7 +17,11 @@
 												  Stretch="None"
 												  HorizontalAlignment="Center"
 												  Margin="5"
-												  MaxWidth="200" />
+												  MaxWidth="200" >
+								<controls:AdvancedImage.PlaceholderContent>
+									<controls:ProgressRing MaxHeight="200"/>
+								</controls:AdvancedImage.PlaceholderContent>
+							</controls:AdvancedImage>
 							<TextBlock Grid.Row="1"
 									   Name="PART_ToolTipText"
 									   HorizontalAlignment="Center"
@@ -26,7 +30,11 @@
 						</Grid>
 					</ToolTip.Tip>
 					<controls:AdvancedImage Name="PART_BadgeImage"
-										  Stretch="None" />
+										  Stretch="None" >
+						<controls:AdvancedImage.PlaceholderContent>
+							<controls:ProgressRing MaxHeight="18"/>
+						</controls:AdvancedImage.PlaceholderContent>
+					</controls:AdvancedImage>
 				</Border>
 			</ControlTemplate>
 		</Setter>

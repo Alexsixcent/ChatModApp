@@ -5,9 +5,7 @@
              x:Class="ChatModApp.App">
     <Application.Styles>
         <styling:FluentAvaloniaTheme PreferSystemTheme="True" PreferUserAccentColor="True"/>
-		<StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml"/>
-        <StyleInclude Source="/Controls/PersonIcon.axaml"/>
-        <StyleInclude Source="/Controls/AdvancedImage.axaml"/>
+		<StyleInclude Source="/Controls/PersonIcon.axaml"/>
 		<StyleInclude Source="/Controls/ChatMessage.axaml"/>
 		<StyleInclude Source="/Controls/ChatEmote.axaml"/>
 		<StyleInclude Source="/Controls/ChatBadge.axaml"/>
@@ -15,10 +13,17 @@
     </Application.Styles>
 	
 	<Application.Resources>
-		<StaticResource x:Key="CoreSplashScreenBackground" ResourceKey="TextControlBackground" />
-		<StaticResource x:Key="CoreSplashScreenForeground" ResourceKey="TextControlForeground" />
+		<ResourceDictionary>
+			<StaticResource x:Key="CoreSplashScreenBackground" ResourceKey="TextControlBackground" />
+			<StaticResource x:Key="CoreSplashScreenForeground" ResourceKey="TextControlForeground" />
 		
-		<system:Boolean x:Key="True">True</system:Boolean>
-		<system:Boolean x:Key="False">False</system:Boolean>
+			<system:Boolean x:Key="True">True</system:Boolean>
+			<system:Boolean x:Key="False">False</system:Boolean>
+			
+			<ResourceDictionary.MergedDictionaries>
+				<MergeResourceInclude Source="/Controls/AdvancedImage.axaml"/>
+				<MergeResourceInclude Source="/Controls/ProgressRing.axaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
 	</Application.Resources>
 </Application>
