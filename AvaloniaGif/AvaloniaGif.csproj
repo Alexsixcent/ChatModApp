@@ -2,11 +2,13 @@
 	<PropertyGroup>
 		<LangVersion>default</LangVersion> 
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks> 
-		<TargetFrameworks>net7.0;netstandard2.1</TargetFrameworks>
+		<TargetFramework>net7.0</TargetFramework>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Avalonia" Version="11.0.0-preview8" />
+		<PackageReference Include="Avalonia.Skia" Version="11.0.0-preview8" />
 		<PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
 		<PackageReference Include="System.Reactive" Version="6.0.0" />
 	</ItemGroup>
 </Project>
