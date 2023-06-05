@@ -113,7 +113,6 @@ public class AdvancedImage : TemplatedControl
     private const string ElementPlaceholderControl = "PART_Placeholder";
     
     private readonly Uri? _baseUri;
-    private bool _isAnimated;
 
     private Image? _imagePart;
     private ContentControl? _placeholderPart;
