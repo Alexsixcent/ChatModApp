@@ -12,11 +12,11 @@ using Avalonia.Logging;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
+using AvaloniaGif;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Tools;
 
 namespace ChatModApp.Controls;
-
 
 [TemplatePart(ElementImageControl, typeof(Image))]
 [TemplatePart(ElementPlaceholderControl, typeof(ContentControl))]
@@ -28,20 +28,19 @@ public class AdvancedImage : TemplatedControl
     public static readonly StyledProperty<Uri?> SourceProperty =
         AvaloniaProperty.Register<AdvancedImage, Uri?>(nameof(Source));
 
-    public static readonly StyledProperty<object?> PlaceholderContentProperty = AvaloniaProperty.Register<AdvancedImage, object?>(
-     nameof(PlaceholderContent));
+    public static readonly StyledProperty<object?> PlaceholderContentProperty =
+        AvaloniaProperty.Register<AdvancedImage, object?>(nameof(PlaceholderContent));
 
-    public static readonly StyledProperty<ImageState> StateProperty = AvaloniaProperty.Register<AdvancedImage, ImageState>(
-     nameof(State));
+    public static readonly StyledProperty<ImageState> StateProperty =
+        AvaloniaProperty.Register<AdvancedImage, ImageState>(nameof(State));
 
-    public static readonly StyledProperty<IPageTransition?> ImageTransitionProperty = AvaloniaProperty.Register<AdvancedImage, IPageTransition?>(
-                                                                                                                                                 nameof(ImageTransition));
+    public static readonly StyledProperty<IPageTransition?> ImageTransitionProperty =
+        AvaloniaProperty.Register<AdvancedImage, IPageTransition?>(nameof(ImageTransition));
 
     /// <summary>
     /// Defines the <see cref="CurrentImage"/> property.
     /// </summary>
-    public static readonly StyledProperty<IImage?> CurrentImageProperty = AvaloniaProperty.Register<AdvancedImage, IImage?>(
-                                                                nameof(CurrentImage));
+    public static readonly StyledProperty<IImage?> CurrentImageProperty = Image.SourceProperty.AddOwner<AdvancedImage>();
 
     /// <summary>
     /// Defines the <see cref="Stretch"/> property.
@@ -114,7 +113,6 @@ public class AdvancedImage : TemplatedControl
     private const string ElementPlaceholderControl = "PART_Placeholder";
     
     private readonly Uri? _baseUri;
-    private bool _isAnimated;
 
     private Image? _imagePart;
     private ContentControl? _placeholderPart;
@@ -122,10 +120,6 @@ public class AdvancedImage : TemplatedControl
 
     static AdvancedImage()
     {
-        AffectsRender<AdvancedImage>(CurrentImageProperty, StretchProperty, StretchDirectionProperty,
-                                     CornerRadiusProperty);
-        AffectsMeasure<AdvancedImage>(CurrentImageProperty, StretchProperty, StretchDirectionProperty);
-
         SourceProperty.Changed
                       .ObserveOnThreadPool()
                       .SelectMany(async (args, token) =>
@@ -213,6 +207,27 @@ public class AdvancedImage : TemplatedControl
 
         _imagePart = e.NameScope.Get<Image>(ElementImageControl);
         _placeholderPart = e.NameScope.Get<ContentControl>(ElementPlaceholderControl);
+
+        if (CurrentImage is AnimatedBitmap sharpBitmap)
+        {
+            sharpBitmap.InvalidateVisual += (_, _) => _imagePart.InvalidateVisual();
+            sharpBitmap.Start();
+        }
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (change.Property == CurrentImageProperty)
+        {
+            if (change.NewValue is AnimatedBitmap newBitmap)
+            {
+                newBitmap.IterationCount = IterationCount.Infinite;
+                newBitmap.InvalidateVisual += (_, _) => _imagePart?.InvalidateVisual();
+                newBitmap.Start();
+            }
+        }
     }
 
 
@@ -223,13 +238,11 @@ public class AdvancedImage : TemplatedControl
             State = ImageState.Loading;
             CurrentImage = null;
         }, DispatcherPriority.Default, token);
-            
+
         IImage? bitmap = null;
         try
         {
             bitmap ??= await CachedBitmapStore.Get(source, _baseUri, token);
-
-            _isAnimated = bitmap is ImageGifBitmap;
         }
         catch (TaskCanceledException ex)
         {
@@ -242,7 +255,7 @@ public class AdvancedImage : TemplatedControl
                   ?.Log(this, "Could not load bitmap from URI {URI}, {Exception}", source, ex);
             await Dispatcher.UIThread.InvokeAsync(() => State = ImageState.Failed, DispatcherPriority.Default, token);
         }
-        
+
         if (token.IsCancellationRequested)
         {
             await Dispatcher.UIThread.InvokeAsync(() => State = ImageState.Failed, DispatcherPriority.Default, token);
@@ -257,25 +270,6 @@ public class AdvancedImage : TemplatedControl
     }
 
 
-    /// <summary>
-    /// Renders the control.
-    /// </summary>
-    /// <param name="context">The drawing context.</param>
-    public override void Render(DrawingContext context)
-    {
-        var source = CurrentImage;
-
-        base.Render(context);
-
-        if (source is null) return;
-        
-        if (_isAnimated) Dispatcher.UIThread.Post(_ =>
-        {
-            InvalidateVisual();
-            _imagePart?.InvalidateVisual();
-        }, DispatcherPriority.Background);
-    }
-    
     public enum ImageState
     {
         Unloaded,

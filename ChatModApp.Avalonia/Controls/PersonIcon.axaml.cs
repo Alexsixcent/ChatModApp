@@ -7,6 +7,8 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Layout;
 using Avalonia.Logging;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using AvaloniaGif;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Tools;
 
@@ -82,7 +84,18 @@ public class PersonIcon : TemplatedControl
         try
         {
             if (_ellipse.Fill is ImageBrush brush)
-                brush.Source = bitmap as IImageBrushSource;
+            {
+                switch (bitmap)
+                {
+                    case AnimatedBitmap sharpBitmap:
+                        sharpBitmap.InvalidateVisual += (_, _) => brush.Source = sharpBitmap.CurrentTarget;
+                        sharpBitmap.Start();
+                        break;
+                    case Bitmap bitmapSource:
+                        brush.Source = bitmapSource;
+                        break;
+                }
+            }
 
             SetSize(_ellipse, bitmap.Size);
             DrawAgain();

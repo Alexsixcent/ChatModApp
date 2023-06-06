@@ -8,7 +8,7 @@ using Avalonia.Logging;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using AvaloniaGif.Decoding;
+using AvaloniaGif;
 using ChatModApp.Shared.Tools.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
@@ -34,8 +34,9 @@ public static class CachedBitmapStore
             case "https":
                 if (!string.IsNullOrWhiteSpace(uri.AbsoluteUri))
                     return await Cache.GetOrCreateAsync(uri, entry => BitMapFactory(entry, uri, cancellationToken));
-                
-                Logger.TryGet(LogEventLevel.Error, LogArea.Control)?.Log(null, "Https AbsoluteUri cannot be null or empty");
+
+                Logger.TryGet(LogEventLevel.Error, LogArea.Control)
+                      ?.Log(null, "Https AbsoluteUri cannot be null or empty");
                 return null;
 
             case "avares":
@@ -49,6 +50,7 @@ public static class CachedBitmapStore
                     Logger.TryGet(LogEventLevel.Error, LogArea.Control)
                           ?.Log(null, "Error while loading bitmap from asset loader: {Exception}", ex);
                 }
+
                 return null;
             default:
                 Logger.TryGet(LogEventLevel.Error, LogArea.Control)
@@ -58,14 +60,14 @@ public static class CachedBitmapStore
     }
 
     private static async Task<IImage> BitMapFactory(ICacheEntry entry, Uri uri,
-                                                     CancellationToken cancellationToken = default)
+                                                    CancellationToken cancellationToken = default)
     {
         entry.SetSlidingExpiration(TimeSpan.FromHours(1))
              .RegisterPostEvictionCallback((key, value, reason, _) =>
              {
                  if (reason is not (EvictionReason.Capacity or EvictionReason.Expired) ||
                      value is not IDisposable d) return;
-                 
+
                  d.Dispose();
                  Log.Debug("Bitmap expired, Reason: {Reason}, Uri: {BitMapUri}", reason, key);
              });
@@ -78,19 +80,12 @@ public static class CachedBitmapStore
                                   .RetryWithBackoffStrategy<byte[], HttpRequestException>(5, TimeSpan.FromSeconds(2));
 
         var stream = new MemoryStream(arr);
+        var bitmap = new AnimatedBitmap();
 
-        IImage bitmap;
-        try
-        {
-            bitmap = new ImageGifBitmap(stream);
-        }
-        catch (InvalidGifStreamException _)
-        {
-            Log.Verbose("Image {Uri} is not a GIF switching to still image bitmap", uri);
-            stream.Position = 0; //Reset stream to prevent exception
-            bitmap = new Bitmap(stream);
-        }
+        if (bitmap.Load(stream, cancellationToken)) return bitmap;
 
-        return bitmap;
+        bitmap.Dispose();
+        stream.Position = 0;
+        return new Bitmap(stream);
     }
 }
