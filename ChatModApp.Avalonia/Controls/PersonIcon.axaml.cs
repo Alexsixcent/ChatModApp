@@ -87,7 +87,7 @@ public class PersonIcon : TemplatedControl
             {
                 switch (bitmap)
                 {
-                    case ImageSharpBitmap sharpBitmap:
+                    case AnimatedBitmap sharpBitmap:
                         sharpBitmap.InvalidateVisual += (_, _) => brush.Source = sharpBitmap.CurrentTarget;
                         sharpBitmap.Start();
                         break;

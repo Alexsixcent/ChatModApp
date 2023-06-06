@@ -208,7 +208,7 @@ public class AdvancedImage : TemplatedControl
         _imagePart = e.NameScope.Get<Image>(ElementImageControl);
         _placeholderPart = e.NameScope.Get<ContentControl>(ElementPlaceholderControl);
 
-        if (CurrentImage is ImageSharpBitmap sharpBitmap)
+        if (CurrentImage is AnimatedBitmap sharpBitmap)
         {
             sharpBitmap.InvalidateVisual += (_, _) => _imagePart.InvalidateVisual();
             sharpBitmap.Start();
@@ -221,7 +221,7 @@ public class AdvancedImage : TemplatedControl
 
         if (change.Property == CurrentImageProperty)
         {
-            if (change.NewValue is ImageSharpBitmap newBitmap)
+            if (change.NewValue is AnimatedBitmap newBitmap)
             {
                 newBitmap.IterationCount = IterationCount.Infinite;
                 newBitmap.InvalidateVisual += (_, _) => _imagePart?.InvalidateVisual();

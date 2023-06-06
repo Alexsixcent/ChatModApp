@@ -80,15 +80,12 @@ public static class CachedBitmapStore
                                   .RetryWithBackoffStrategy<byte[], HttpRequestException>(5, TimeSpan.FromSeconds(2));
 
         var stream = new MemoryStream(arr);
+        var bitmap = new AnimatedBitmap();
 
-        var bitmap = new ImageSharpBitmap();
-
-        if (!await bitmap.Load(stream, cancellationToken))
-        {
-            stream.Position = 0;
-            return new Bitmap(stream);
-        }
+        if (bitmap.Load(stream, cancellationToken)) return bitmap;
         
-        return bitmap;
+        bitmap.Dispose();
+        stream.Position = 0;
+        return new Bitmap(stream);
     }
 }
