@@ -8,7 +8,6 @@ using Avalonia.Logging;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using AvaloniaGif;
 using ChatModApp.Shared.Tools.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;

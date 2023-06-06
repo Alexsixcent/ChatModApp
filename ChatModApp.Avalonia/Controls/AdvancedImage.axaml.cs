@@ -12,7 +12,6 @@ using Avalonia.Logging;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using Avalonia.Threading;
-using AvaloniaGif;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Tools;
 
