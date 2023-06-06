@@ -8,7 +8,6 @@ using Avalonia.Layout;
 using Avalonia.Logging;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using AvaloniaGif;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Tools;
 
@@ -91,7 +90,7 @@ public class PersonIcon : TemplatedControl
                         sharpBitmap.InvalidateVisual += (_, _) => brush.Source = sharpBitmap.CurrentTarget;
                         sharpBitmap.Start();
                         break;
-                    case IBitmap bitmapSource:
+                    case Bitmap bitmapSource:
                         brush.Source = bitmapSource;
                         break;
                 }

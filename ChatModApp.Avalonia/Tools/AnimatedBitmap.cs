@@ -14,7 +14,7 @@ using Avalonia.Skia;
 using Avalonia.Threading;
 using SkiaSharp;
 
-namespace AvaloniaGif;
+namespace ChatModApp.Tools;
 
 public sealed class AnimatedBitmap : IImage, IDisposable
 {

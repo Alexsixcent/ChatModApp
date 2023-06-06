@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -29,12 +30,19 @@ public class StyleSelect : AvaloniaObject
 
     private const string Name = nameof(StyleSelect);
 
-    private static ConditionalWeakTable<Style, Selector> OriginalStyleSelectors = new();
+    private static readonly ConditionalWeakTable<Style, Selector> OriginalStyleSelectors = new();
+    private static readonly MethodInfo? SelectorMatchMethod;
+    private static readonly PropertyInfo? SelectMatchIsMatchProperty;
 
     static StyleSelect()
     {
         KeyProperty.Changed.Subscribe(x => HandleKeyChanged(x.Sender, x.NewValue.GetValueOrDefault<object?>()));
         CurrentProperty.Changed.Subscribe(x => HandleCurrentChanged(x.Sender, x.NewValue.GetValueOrDefault<object?>()));
+
+        SelectorMatchMethod = typeof(Selector).GetMethod("Match", BindingFlags.Instance | BindingFlags.NonPublic);
+        
+        SelectMatchIsMatchProperty = typeof(Selector).Assembly.GetType("Avalonia.Styling.SelectorMatch")
+                                                     ?.GetProperty("IsMatch", BindingFlags.Instance | BindingFlags.Public);
     }
 
     private static void HandleKeyChanged(AvaloniaObject elem, object? value)
@@ -110,8 +118,13 @@ public class StyleSelect : AvaloniaObject
 
                     if (OriginalStyleSelectors.TryGetValue(styleElem, out var originSelector))
                     {
-                        if (!originSelector.Match(elem, null, false).IsMatch)
-                            continue;
+                        // Method and match struct were changed to internal, have to use reflection
+                        // TODO: Find a way to match style another way
+                        var match = SelectorMatchMethod?.Invoke(originSelector, new object?[]{elem, null, false});
+                        if(match is null) continue;
+                        var isMatch = SelectMatchIsMatchProperty?.GetValue(match);
+                        if (isMatch is null) continue;
+                        if(!(bool)isMatch) continue;
                     }
                     else continue;
 

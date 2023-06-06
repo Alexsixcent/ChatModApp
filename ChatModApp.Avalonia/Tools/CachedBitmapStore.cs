@@ -8,7 +8,6 @@ using Avalonia.Logging;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using AvaloniaGif;
 using ChatModApp.Shared.Tools.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
@@ -83,7 +82,7 @@ public static class CachedBitmapStore
         var bitmap = new AnimatedBitmap();
 
         if (bitmap.Load(stream, cancellationToken)) return bitmap;
-        
+
         bitmap.Dispose();
         stream.Position = 0;
         return new Bitmap(stream);
