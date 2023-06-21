@@ -1,17 +1,69 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-		xmlns:controls="using:ChatModApp.Controls">
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:controls="using:ChatModApp.Controls">
+
+	<Design.PreviewWith>
+		<Border>
+			<controls:ProgressRing MaxWidth="200"
+								   MaxHeight="200"
+								   IsIndeterminate="True" />
+		</Border>
+	</Design.PreviewWith>
 
 	<ControlTheme x:Key="{x:Type controls:ProgressRing}"
 				  TargetType="controls:ProgressRing">
 		<!-- Set Defaults -->
 		<Setter Property="Template">
 			<ControlTemplate>
-				<Lottie Path="/Assets/Fluent_ProgressRing_Indeterminate.json"
-					Stretch="Uniform"
-					RepeatCount="-1"
-					StretchDirection="Both"/>
+				<Viewbox Stretch="UniformToFill">
+					<Grid Width="10"
+						  Height="10">
+						<Ellipse Stroke="Gray"
+								 StrokeLineCap="Round"
+								 StrokeThickness="1.5"
+								 Opacity="0.5" />
+
+						<controls:OptimizedArc 
+							 StartAngle="0"
+							 SweepAngle="180"
+							 Stroke="#2063c0"
+							 StrokeThickness="1.5"
+							 StrokeLineCap="Round"/>
+					</Grid>
+				</Viewbox>
 			</ControlTemplate>
 		</Setter>
+
+		<Style Selector="^[IsIndeterminate=True] /template/ controls|OptimizedArc">
+			<Style.Animations>
+				<Animation Duration="0:0:1.50"
+						   IterationCount="INFINITE">
+					<KeyFrame Cue="0%">
+						<Setter Property="StartAngle"
+								Value="0" />
+						<Setter Property="SweepAngle"
+								Value="180" />
+						<Setter Property="RotationAngle"
+								Value="0" />
+					</KeyFrame>
+					<KeyFrame KeyTime="0:0:0.54">
+						<Setter Property="SweepAngle"
+								Value="1" />
+						<Setter Property="RotationAngle"
+								Value="445.6" />
+					</KeyFrame>
+					<KeyFrame KeyTime="0:0:1.36">
+						<Setter Property="RotationAngle"
+								Value="954.7" />
+					</KeyFrame>
+					<KeyFrame Cue="100%">
+						<Setter Property="SweepAngle"
+								Value="180" />
+						<Setter Property="RotationAngle"
+								Value="1080" />
+					</KeyFrame>
+				</Animation>
+			</Style.Animations>
+		</Style>
 	</ControlTheme>
 </ResourceDictionary>

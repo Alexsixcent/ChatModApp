@@ -14,28 +14,29 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using ChatModApp.Shared.Tools.Extensions;
 using ChatModApp.Tools;
+using static ChatModApp.Controls.LoadingContentControl;
 
 namespace ChatModApp.Controls;
 
 [TemplatePart(ElementImageControl, typeof(Image))]
-[TemplatePart(ElementPlaceholderControl, typeof(ContentControl))]
 public class AdvancedImage : TemplatedControl
 {
+    public static readonly StyledProperty<LoadingState> StateProperty =
+        LoadingContentControl.StateProperty.AddOwner<AdvancedImage>();
+    
+    public LoadingState State
+    {
+        get => GetValue(StateProperty);
+        set => SetValue(StateProperty, value);
+    }
+    
     /// <summary>
     /// Defines the <see cref="Source"/> property.
     /// </summary>
     public static readonly StyledProperty<Uri?> SourceProperty =
         AvaloniaProperty.Register<AdvancedImage, Uri?>(nameof(Source));
 
-    public static readonly StyledProperty<object?> PlaceholderContentProperty =
-        AvaloniaProperty.Register<AdvancedImage, object?>(nameof(PlaceholderContent));
-
-    public static readonly StyledProperty<ImageState> StateProperty =
-        AvaloniaProperty.Register<AdvancedImage, ImageState>(nameof(State));
-
-    public static readonly StyledProperty<IPageTransition?> ImageTransitionProperty =
-        AvaloniaProperty.Register<AdvancedImage, IPageTransition?>(nameof(ImageTransition));
-
+    
     /// <summary>
     /// Defines the <see cref="CurrentImage"/> property.
     /// </summary>
@@ -53,23 +54,24 @@ public class AdvancedImage : TemplatedControl
     public static readonly StyledProperty<StretchDirection> StretchDirectionProperty =
         Image.StretchDirectionProperty.AddOwner<AdvancedImage>();
 
-    public ImageState State
+    public static readonly StyledProperty<double> PlaceholderWidthProperty = AvaloniaProperty.Register<AdvancedImage, double>(
+     "PlaceholderWidth");
+
+    public double PlaceholderWidth
     {
-        get => GetValue(StateProperty);
-        set => SetValue(StateProperty, value);
+        get => GetValue(PlaceholderWidthProperty);
+        set => SetValue(PlaceholderWidthProperty, value);
     }
 
-    public object? PlaceholderContent
+    public static readonly StyledProperty<double> PlaceholderHeightProperty = AvaloniaProperty.Register<AdvancedImage, double>(
+     "PlaceholderHeight");
+
+    public double PlaceholderHeight
     {
-        get => GetValue(PlaceholderContentProperty);
-        set => SetValue(PlaceholderContentProperty, value);
+        get => GetValue(PlaceholderHeightProperty);
+        set => SetValue(PlaceholderHeightProperty, value);
     }
 
-    public IPageTransition? ImageTransition
-    {
-        get => GetValue(ImageTransitionProperty);
-        set => SetValue(ImageTransitionProperty, value);
-    }
 
 
     /// <summary>
@@ -109,12 +111,10 @@ public class AdvancedImage : TemplatedControl
     }
 
     private const string ElementImageControl = "PART_Image";
-    private const string ElementPlaceholderControl = "PART_Placeholder";
-    
+
     private readonly Uri? _baseUri;
 
     private Image? _imagePart;
-    private ContentControl? _placeholderPart;
     private static Task? _updateTask;
 
     static AdvancedImage()
@@ -134,53 +134,6 @@ public class AdvancedImage : TemplatedControl
 
                           return Unit.Default;
                       }).Subscribe();
-
-        StateProperty.Changed
-                     .SelectMany(async (args, token) =>
-                     {
-                         async Task Transition(Visual? start, Visual? end, IPageTransition? transition, CancellationToken cancellationToken = default)
-                         {
-                             if (transition is null)
-                             {
-                                 if (start is not null) start.IsVisible = false;
-                                 if (end is not null) end.IsVisible = true;
-                             }
-                             else
-                                 await transition.Start(start, end, true, cancellationToken);
-                         }
-                         
-                         var img = (AdvancedImage)args.Sender;
-                         
-                         if (args.IsSameValue()) return Unit.Default;
-                         
-                         var oldState = args.GetOldValue<ImageState>();
-                         var newState = args.GetNewValue<ImageState>();
-
-                         switch (oldState)
-                         {
-                             case ImageState.Unloaded when newState is ImageState.Loading:
-                                 await Transition(null, img._placeholderPart, img.ImageTransition, token);
-                                 break;
-                             case ImageState.Loading when newState is ImageState.Loaded:
-                                 await Transition(img._placeholderPart, img._imagePart, img.ImageTransition, token);
-                                 break;
-                             case ImageState.Loaded when newState is ImageState.Loading:
-                                 await Transition(img._imagePart, img._placeholderPart, img.ImageTransition, token);
-                                 break;
-                             case ImageState.Loaded when newState is ImageState.Unloaded:
-                                 await Transition(img._imagePart, null, img.ImageTransition, token);
-                                 break;
-                             case ImageState.Failed:
-                                 Logger.TryGet(LogEventLevel.Error, LogArea.Control)?.Log(img, "[AdvancedImage] Failed loading image at {URI}", img.Source);
-                                 break;
-                             default:
-                                 Logger.TryGet(LogEventLevel.Warning, LogArea.Control)?.Log(img, "[AdvancedImage] Unknown state transition from {OldState} to {NewState}", oldState, newState);
-                                 break;
-                         }
-
-                         return Unit.Default;
-                     })
-                     .Subscribe();
     }
 
     /// <summary>
@@ -205,7 +158,6 @@ public class AdvancedImage : TemplatedControl
         base.OnApplyTemplate(e);
 
         _imagePart = e.NameScope.Get<Image>(ElementImageControl);
-        _placeholderPart = e.NameScope.Get<ContentControl>(ElementPlaceholderControl);
 
         if (CurrentImage is AnimatedBitmap sharpBitmap)
         {
@@ -234,7 +186,7 @@ public class AdvancedImage : TemplatedControl
     {
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
-            State = ImageState.Loading;
+            State = LoadingState.Loading;
             CurrentImage = null;
         }, DispatcherPriority.Default, token);
 
@@ -252,28 +204,19 @@ public class AdvancedImage : TemplatedControl
         {
             Logger.TryGet(LogEventLevel.Error, LogArea.Control)
                   ?.Log(this, "Could not load bitmap from URI {URI}, {Exception}", source, ex);
-            await Dispatcher.UIThread.InvokeAsync(() => State = ImageState.Failed, DispatcherPriority.Default, token);
+            await Dispatcher.UIThread.InvokeAsync(() => State = LoadingState.Failed, DispatcherPriority.Default, token);
         }
 
         if (token.IsCancellationRequested)
         {
-            await Dispatcher.UIThread.InvokeAsync(() => State = ImageState.Failed, DispatcherPriority.Default, token);
+            await Dispatcher.UIThread.InvokeAsync(() => State = LoadingState.Failed, DispatcherPriority.Default, token);
             return;
         }
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
             CurrentImage = bitmap;
-            State = ImageState.Loaded;
+            State = LoadingState.Loaded;
         }, DispatcherPriority.Default, token);
-    }
-
-
-    public enum ImageState
-    {
-        Unloaded,
-        Loading,
-        Loaded,
-        Failed
     }
 }

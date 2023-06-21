@@ -1,30 +1,47 @@
-﻿<ResourceDictionary
-   xmlns="https://github.com/avaloniaui"
-   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-   xmlns:controls="clr-namespace:ChatModApp.Controls">
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:controls="clr-namespace:ChatModApp.Controls"
+					xmlns:fa="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia">
 
-  <ControlTheme x:Key="{x:Type controls:AdvancedImage}"
-                TargetType="controls:AdvancedImage">
-    <Setter Property="Background" Value="Transparent"/>
-    <Setter Property="IsTabStop" Value="False"/>
-    <Setter Property="Template">
-      <ControlTemplate>
-        <Grid HorizontalAlignment="Stretch" 
-              VerticalAlignment="Stretch">
-          <Image Name="PART_Image"
-                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                 VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                 Source="{TemplateBinding CurrentImage}"
-                 Stretch="{TemplateBinding Stretch}"
-                 StretchDirection="{TemplateBinding StretchDirection}"/>
-          <ContentControl Name="PART_Placeholder"
-                          Content="{TemplateBinding PlaceholderContent}"
-                          HorizontalAlignment="{TemplateBinding Stretch}"
-                          VerticalAlignment="{TemplateBinding Stretch}"
-                          HorizontalContentAlignment="{TemplateBinding HorizontalAlignment}"
-                          VerticalContentAlignment="{TemplateBinding VerticalAlignment}"/>
-        </Grid>
-      </ControlTemplate>
-    </Setter>
-  </ControlTheme>
+	<Design.PreviewWith>
+		<Border Padding="20">
+			<controls:AdvancedImage Source="https://cdn.betterttv.net/emote/566ca38765dbbdab32ec0560/2x"/>
+		</Border>
+	</Design.PreviewWith>
+	
+	<ControlTheme x:Key="{x:Type controls:AdvancedImage}"
+				  TargetType="controls:AdvancedImage">
+		<Setter Property="IsTabStop"
+				Value="False" />
+		<Setter Property="Template">
+			<ControlTemplate>
+				<controls:LoadingContentControl State="{TemplateBinding State}">
+					<controls:LoadingContentControl.FailedContent>
+						<Button MaxWidth="{CompiledBinding $parent[controls:AdvancedImage].PlaceholderWidth}"
+								MaxHeight="{CompiledBinding $parent[controls:AdvancedImage].PlaceholderHeight}">
+							<fa:SymbolIcon Symbol="Refresh" />
+						</Button>
+					</controls:LoadingContentControl.FailedContent>
+					<controls:LoadingContentControl.UnloadedContent>
+						<Rectangle Fill="Transparent"
+								   MaxWidth="{CompiledBinding $parent[controls:AdvancedImage].PlaceholderWidth}"
+								   MaxHeight="{CompiledBinding $parent[controls:AdvancedImage].PlaceholderHeight}" />
+					</controls:LoadingContentControl.UnloadedContent>
+					<controls:LoadingContentControl.LoadingContent>
+						<controls:ProgressRing IsIndeterminate="True"
+									 MaxWidth="{CompiledBinding $parent[controls:AdvancedImage].PlaceholderWidth}"
+									 MaxHeight="{CompiledBinding $parent[controls:AdvancedImage].PlaceholderHeight}"/>
+					</controls:LoadingContentControl.LoadingContent>
+					<controls:LoadingContentControl.LoadedContent>
+						<Image Name="PART_Image"
+							   HorizontalAlignment="{CompiledBinding $parent[controls:AdvancedImage].HorizontalAlignment}"
+							   VerticalAlignment="{CompiledBinding $parent[controls:AdvancedImage].VerticalAlignment}"
+							   Source="{CompiledBinding $parent[controls:AdvancedImage].CurrentImage}"
+							   Stretch="{CompiledBinding $parent[controls:AdvancedImage].Stretch}"
+							   StretchDirection="{CompiledBinding $parent[controls:AdvancedImage].StretchDirection}" />
+					</controls:LoadingContentControl.LoadedContent>
+				</controls:LoadingContentControl>
+			</ControlTemplate>
+		</Setter>
+	</ControlTheme>
 </ResourceDictionary>

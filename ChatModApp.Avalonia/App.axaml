@@ -23,6 +23,7 @@
 			<ResourceDictionary.MergedDictionaries>
 				<MergeResourceInclude Source="/Controls/AdvancedImage.axaml"/>
 				<MergeResourceInclude Source="/Controls/ProgressRing.axaml"/>
+				<MergeResourceInclude Source="/Controls/LoadingContentControl.axaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
 	</Application.Resources>

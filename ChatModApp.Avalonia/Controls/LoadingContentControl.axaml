@@ -1,0 +1,34 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:controls="using:ChatModApp.Controls">
+	<ControlTheme x:Key="{x:Type controls:LoadingContentControl}"
+				  TargetType="controls:LoadingContentControl">
+		<!-- Set Defaults -->
+		<Setter Property="Template">
+			<ControlTemplate>
+				<TransitioningContentControl HorizontalAlignment="Stretch"
+											 VerticalAlignment="Stretch"
+											 HorizontalContentAlignment="{TemplateBinding HorizontalAlignment}"
+											 VerticalContentAlignment="{TemplateBinding VerticalAlignment}"
+											 PageTransition="{TemplateBinding PageTransition}" />
+			</ControlTemplate>
+		</Setter>
+
+		<Style Selector="^[State=Unloaded] /template/ TransitioningContentControl">
+			<Setter Property="Content"
+					Value="{Binding UnloadedContent, RelativeSource={RelativeSource TemplatedParent}}" />
+		</Style>
+		<Style Selector="^[State=Loading] /template/ TransitioningContentControl">
+			<Setter Property="Content"
+					Value="{Binding LoadingContent, RelativeSource={RelativeSource TemplatedParent}}" />
+		</Style>
+		<Style Selector="^[State=Loaded] /template/ TransitioningContentControl">
+			<Setter Property="Content"
+					Value="{Binding LoadedContent, RelativeSource={RelativeSource TemplatedParent}}" />
+		</Style>
+		<Style Selector="^[State=Failed] /template/ TransitioningContentControl">
+			<Setter Property="Content"
+					Value="{Binding FailedContent, RelativeSource={RelativeSource TemplatedParent}}" />
+		</Style>
+	</ControlTheme>
+</ResourceDictionary>
